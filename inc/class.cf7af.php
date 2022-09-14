@@ -14,7 +14,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
 
 if ( !class_exists( 'CF7AF' ) ) {
 
-	include_once( CF7AF_DIR . '/inc/lib/class.' . CF7AF_PREFIX . '.licence.php' );
+	include_once( CF7AF_DIR . '/inc/lib/class.' . CF7AF_PREFIX . '.subscription.php' );
 
 	/**
 	 * The main CF7AF class
@@ -38,7 +38,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 		}
 
 		function __construct() {
-			self::$private_data = new CF7AF_Licence();
+			self::$private_data = new CF7AF_Subscription();
 			$this->cf7af_smtp_opt = get_option( 'cf7af_smtp_option' );
 			$this->cf7af_mail_notify_opt = get_option( 'cf7af_mail_notify_option' );
 
@@ -204,7 +204,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 		/**
 		 * Action: plugin_action_links
 		 *
-		 * Add License link after active links.
+		 * Add Subscription link after active links.
 		 *
 		 * @method action__cf7af_plugin_action_links
 		 *
@@ -219,16 +219,16 @@ if ( !class_exists( 'CF7AF' ) ) {
 			}
 			if ( is_plugin_active( 'abandoned-forms-contact-form-7/abandoned-forms-contact-form-7.php' ) )
 			{
-				$licence_instance = self::$private_data;
-				new CF7AF_Update( CF7AF_VERSION, CF7AF_PLUGIN_BASENAME, get_option( $licence_instance::cf7af_licence_email, '' ), get_option( $licence_instance::cf7af_licence_key, '' ) );
+				$subscription_instance = self::$private_data;
+				new CF7AF_Update( CF7AF_VERSION, CF7AF_PLUGIN_BASENAME, get_option( $subscription_instance::cf7af_subscription_email, '' ), get_option( $subscription_instance::cf7af_subscription_key, '' ) );
 
-				$licence_link =  '<a href="'.admin_url('edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-license-activation', $scheme = 'admin' ).'">'.__( 'License', 'cf7-abandoned-form' ).'</a>';
+				$subscription_link =  '<a href="'.admin_url('edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-subscription-activation', $scheme = 'admin' ).'">'.__( 'Subscription', 'cf7-abandoned-form' ).'</a>';
 
 				$support_link = '<a href="https://zealousweb.com/support/" target="_blank">' .__( 'Support', 'cf7-abandoned-form' ). '</a>';
 
 				$document_link = '<a href="https://www.zealousweb.com/documentation/wordpress-plugins-documentation/abandoned-contact-form-7/" target="_blank">' .__( 'Document', 'cf7-abandoned-form' ). '</a>';
 
-				array_unshift( $links, $licence_link );
+				array_unshift( $links, $subscription_link );
 				array_unshift( $links, $support_link );
 				array_unshift( $links, $document_link );
 			}
@@ -292,7 +292,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 
 			session_start();
 
-			$cf7af_forms =  isset( $_POST['forms'] ) ? sanitize_text_field($_POST['forms']) : '';
+			$cf7af_forms =  isset( $_POST['forms'] ) ? $_POST['forms'] : '';
 			$cf7af_page_url =  isset( $_POST['page_url'] ) ? esc_url_raw($_POST['page_url']) : '';
 			$recover_id =  isset( $_POST['recover'] ) ? sanitize_text_field($_POST['recover']) : '';
 			$cf7af_enable_abandoned = $cf7af_abandoned_email  = '';
@@ -454,8 +454,8 @@ if ( !class_exists( 'CF7AF' ) ) {
 			# Load plugin update file
 			require_once ( CF7AF_DIR . '/inc/class.' . CF7AF_PREFIX . '.update.php' );
 
-			$licence_instance = self::$private_data;
-			new CF7AF_Update( CF7AF_VERSION, CF7AF_PLUGIN_BASENAME, get_option( $licence_instance::cf7af_licence_email, '' ), get_option( $licence_instance::cf7af_licence_key, '' ) );
+			$subscription_instance = self::$private_data;
+			new CF7AF_Update( CF7AF_VERSION, CF7AF_PLUGIN_BASENAME, get_option( $subscription_instance::cf7af_subscription_email, '' ), get_option( $subscription_instance::cf7af_subscription_key, '' ) );
 
 			add_action( 'init', array( $this, 'action__init' ) );
 			add_action( 'admin_init', array( $this, 'action__check_plugin_state' ) );
@@ -518,7 +518,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 		/**
 		 * Action: init
 		 *
-		 * - If license found then action run
+		 * - If subscription found then action run
 		 *
 		 * @method action__init
 		 *
@@ -571,18 +571,18 @@ if ( !class_exists( 'CF7AF' ) ) {
 
 			register_post_type( CF7AF_POST_TYPE , $args );
 
-			$license_status = trim( get_option( CF7AF_META_PREFIX.'addon_license_status' ) );
+			/* $subscription_status = trim( get_option( CF7AF_META_PREFIX.'addon_subscription_status' ) );
 
-			if( !$license_status &&
+			if( !$subscription_status &&
 				( isset( $_GET['post_type'] ) && $_GET['post_type']== CF7AF_POST_TYPE ) &&
-				( !isset( $_GET['page'] ) && $_GET['page']!='cf7af-license-activation' ) )
+				( !isset( $_GET['page'] ) && $_GET['page']!='cf7af-subscription-activation' ) )
 			{
-				$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-license-activation' );
+				$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-subscription-activation' );
 				$redirect = add_query_arg( array('zw_activation' => 'false', 'message' =>'' ), $base_url );
 
 				wp_redirect( $redirect );
 				exit;
-			}
+			} */
 
 			# Post Type: Here you add your post type
 		}
