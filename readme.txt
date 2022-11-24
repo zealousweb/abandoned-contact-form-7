@@ -4,13 +4,13 @@ Contributors: zealopensource
 Tags: abandoned, wordpress, contact form 7, export, email, lost contact, recover contact, missed contacts
 Requires at least: 3.5
 Donate link: http://www.zealousweb.com/payment/
-Tested up to:  6.0
-Stable tag: 1.4
+Tested up to:  6.0.1
+Stable tag: 1.5
 Requires PHP: 5.6
 CF7 requires at least: 3.0
 CF7 tested up to: 5.3.2
 License: GPLv3 or later License
-Version: 1.4
+Version: 1.5
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 Abandoned Contact Form 7 provides an ability to track the data from Contact Form 7 even if the user does not submit the form.
@@ -95,6 +95,9 @@ No, you can't Abandon the data of the file type input field.
 3. This is option of email to sent single user entry on action button.
 
 == Changelog ==
+
+= 1.5 =
+* Fixed - Solved Javascript issue
 
 = 1.4 =
 * Test - Checking with Latest wordPress and Contact form 7, Tested and works fine.

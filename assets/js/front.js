@@ -181,7 +181,9 @@
 			}
 		}
 	};
-	ZealCF7AFAbandoned.init();
+	if( $('.wpcf7-form').length ) {
+		ZealCF7AFAbandoned.init();
+	}
 })(jQuery);
 
 (function($) {
