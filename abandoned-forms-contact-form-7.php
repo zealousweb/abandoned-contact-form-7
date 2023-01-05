@@ -64,13 +64,17 @@ if( !defined( 'CF7AF_POST_TYPE' ) ) {
 if ( !function_exists( 'CF7AF' ) ) {
 
 	if ( is_admin() ) {
+
 		require_once( CF7AF_DIR . '/inc/admin/class.' . CF7AF_PREFIX . '.admin.php' );
 		require_once( CF7AF_DIR . '/inc/admin/class.' . CF7AF_PREFIX . '.admin.action.php' );
 		require_once( CF7AF_DIR . '/inc/admin/class.' . CF7AF_PREFIX . '.admin.filter.php' );
+
 	} else {
+
 		require_once( CF7AF_DIR . '/inc/front/class.' . CF7AF_PREFIX . '.front.php' );
 		require_once( CF7AF_DIR . '/inc/front/class.' . CF7AF_PREFIX . '.front.action.php' );
 		require_once( CF7AF_DIR . '/inc/front/class.' . CF7AF_PREFIX . '.front.filter.php' );
+		
 	}
 
 	//Initialize all the things.
