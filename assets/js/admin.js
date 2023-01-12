@@ -20,7 +20,14 @@
 				position: 'left center',
 			} ).pointer('open');
 		});
-
+		jQuery( '#cf7af-abandoned-specific-field-pointer' ).on( 'hover click', function() {
+			jQuery( 'body .wp-pointer-buttons .close' ).trigger( 'click' );
+			jQuery( '#cf7af-abandoned-specific-field-pointer' ).pointer({
+				pointerClass: 'wp-pointer cf7af-pointer',
+				content: translate_string_cf7af.cf7af_abandoned_specific_field,
+				position: 'left center',
+			} ).pointer('open');
+		});
 		jQuery( '#cf7af-subject-pointer' ).on( 'hover click', function() {
 			jQuery( 'body .wp-pointer-buttons .close' ).trigger( 'click' );
 			jQuery( '#cf7af-subject-pointer' ).pointer({

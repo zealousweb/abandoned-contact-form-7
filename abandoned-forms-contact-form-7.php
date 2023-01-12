@@ -3,7 +3,7 @@
  * Plugin Name: Abandoned Contact Form 7
  * Plugin URL: https://wordpress.org/plugins/abandoned-contact-form-7/
  * Description: Abandoned Contact Form 7 provides an ability to track the data from Contact Form 7 even if the user does not submit the form.
- * Version: 1.5
+ * Version: 1.6
  * Author: ZealousWeb
  * Author URI: https://www.zealousweb.com
  * Developer: The Zealousweb Team
@@ -27,7 +27,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
  */
 
 if ( !defined( 'CF7AF_VERSION' ) ) {
-	define( 'CF7AF_VERSION', '1.5' ); // Version of plugin
+	define( 'CF7AF_VERSION', '1.6' ); // Version of plugin
 }
 
 if ( !defined( 'CF7AF_FILE' ) ) {
@@ -64,17 +64,13 @@ if( !defined( 'CF7AF_POST_TYPE' ) ) {
 if ( !function_exists( 'CF7AF' ) ) {
 
 	if ( is_admin() ) {
-
 		require_once( CF7AF_DIR . '/inc/admin/class.' . CF7AF_PREFIX . '.admin.php' );
 		require_once( CF7AF_DIR . '/inc/admin/class.' . CF7AF_PREFIX . '.admin.action.php' );
 		require_once( CF7AF_DIR . '/inc/admin/class.' . CF7AF_PREFIX . '.admin.filter.php' );
-
 	} else {
-
 		require_once( CF7AF_DIR . '/inc/front/class.' . CF7AF_PREFIX . '.front.php' );
 		require_once( CF7AF_DIR . '/inc/front/class.' . CF7AF_PREFIX . '.front.action.php' );
 		require_once( CF7AF_DIR . '/inc/front/class.' . CF7AF_PREFIX . '.front.filter.php' );
-		
 	}
 
 	//Initialize all the things.

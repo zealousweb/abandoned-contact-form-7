@@ -10,7 +10,7 @@ Requires PHP: 5.6
 CF7 requires at least: 3.0
 CF7 tested up to: 5.3.2
 License: GPLv3 or later License
-Version: 1.5
+Version: 1.6
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 Abandoned Contact Form 7 provides an ability to track the data from Contact Form 7 even if the user does not submit the form.
@@ -28,6 +28,7 @@ Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data e
 * Provision to send an email to a single user that abandoned the form.
 * Facility to export the list of entire abandoned users upto 10 Entries.
 * Also, An option to customize the mail body for Abandoned email upto 10 Entries.
+* Here you can select specific field to include in tracking data.
 
 = Features of Abandoned Contact Form 7 Pro =
 
@@ -40,6 +41,7 @@ We have released the PRO version of this plugin with extra advantageous features
 * You can easily manage the number of time emails sent to the user.
 * Also, An option to customize the mail body for Abandoned email unlimited Entries.
 * For schedule mails, we have the option of SMTP settings. Here, you can set SMTP from Plugin, no need to add another plugin for SMTP configuration.
+* Here you can select specific field to include in tracking data.
 
 <strong>[Get more information of Pro version here](https://www.zealousweb.com/wordpress-plugins/abandoned-contact-form-7-pro/)</strong>
 <strong>[Demo for Abandoned Contact Form 7](http://demo.zealousweb.com/wordpress-plugins/abandoned-contact-form-7/)</strong>
@@ -95,6 +97,9 @@ No, you can't Abandon the data of the file type input field.
 3. This is option of email to sent single user entry on action button.
 
 == Changelog ==
+
+= 1.6 =
+* Add - Here you can select specific field to include in tracking data.
 
 = 1.5 =
 * Fixed - Solved Javascript issue
