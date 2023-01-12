@@ -11,6 +11,7 @@
 
 	$enable_abandoned	= get_post_meta( $post_id, CF7AF_META_PREFIX . 'enable_abandoned', true );
 	$abandoned_email	= get_post_meta( $post_id, CF7AF_META_PREFIX . 'abandoned_email', true );
+	$abandoned_specific_field	= get_post_meta( $post_id, CF7AF_META_PREFIX . 'abandoned_specific_field',false);
 
 	echo '<fieldset>'.
 		'<div class="cf7af-settings">' .
@@ -52,6 +53,36 @@
 							echo '</select>'.
 
 						'</td>' .
+					'<tr class="form-field select-abandoned-specific-field-row">' .
+						'<th scope="row">' .
+							'<label for="' . CF7AF_META_PREFIX . 'specific_field">' .
+								__( 'Select Multiple Field', 'cf7-abandoned-form' ) .
+							'</label>' .
+							'<span class="cf7af-tooltip hide-if-no-js " id="cf7af-abandoned-specific-field-pointer"></span>' .
+						'</th>' .
+						'<td>';
+							echo '<select name="' . CF7AF_META_PREFIX . 'abandoned_specific_field[]"  id="' . CF7AF_META_PREFIX . 'abandoned_specific_field" multiple="yes">';
+									if( $form_fields ) {
+										foreach ( $form_fields as $form_field ) {
+											if( $form_field->basetype != 'email' && $form_field->basetype != 'submit') {
+												$mail_tag = $form_field->name;
+
+												if(!empty($abandoned_specific_field)) {
+													$selected='';
+													if (in_array($mail_tag, $abandoned_specific_field)){
+														$selected='selected="selected"';
+												  	}
+													else{
+												  		$selected='';
+												  	}
+												}
+											  	echo '<option value="'.$mail_tag.'" '.$selected.'>['.$mail_tag.']</option>';
+											}
+										}
+									}
+							echo '</select>'.
+
+						'</td>' .
 					'</tr>';
 
 					echo '<input type="hidden" name="post" value="' . esc_attr( $post_id ) . '">' .
@@ -68,6 +99,8 @@
 					'<p>You can enable/disable Abandoned form functionality.</p>', 'cf7-abandoned-form' ),
 		'cf7af_abandoned_email' => __( '<h3>Select Email Field</h3>' .
 					'<p>Select the email field for tracking Abandoned user</p>', 'cf7-abandoned-form' ),
+		'cf7af_abandoned_specific_field' => __( '<h3>Select Multiple Field</h3>' .
+					'<p>Select the multiple field for tracking Abandoned user</p>', 'cf7-abandoned-form' ),
 	);
 
 	wp_localize_script( CF7AF_PREFIX . '_admin_js', 'translate_string_cf7af', $translation_array );

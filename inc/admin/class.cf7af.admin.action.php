@@ -68,11 +68,12 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 		 *
 		 */
 		function action__init_99() {
-			if (
-				isset( $_REQUEST['export_csv_cf7af'] )
+		
+			if (isset( $_REQUEST['export_csv_cf7af'] )
 				&& isset( $_REQUEST['form-id'] )
 				&& !empty( $_REQUEST['form-id'] )
 			) {
+
 				$form_id = sanitize_text_field($_REQUEST['form-id']);
 
 				if ( 'all' == $form_id ) {
@@ -235,6 +236,34 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 					update_post_meta( $post_id, $key, $keyval );
 				}
 			}
+
+			//Start Multiple Field Added
+
+			$old_cf7af_abandoned_specific_field = get_post_meta($post_id, CF7AF_META_PREFIX . 'abandoned_specific_field');
+			$new_cf7af_abandoned_specific_field = isset ($_REQUEST[ CF7AF_META_PREFIX .'abandoned_specific_field'] )  ? $_REQUEST[ CF7AF_META_PREFIX .'abandoned_specific_field'] : array();
+
+			if ( empty ($new_cf7af_abandoned_specific_field) ) {
+			   delete_post_meta($post_id, CF7AF_META_PREFIX . 'abandoned_specific_field');
+			} else {
+			  $already_cf7af_abandoned_specific_field = array();
+			  if ( ! empty($old_cf7af_abandoned_specific_field) ) {
+			    foreach ($old_cf7af_abandoned_specific_field as $value) {
+			      if ( ! in_array($value, $new_cf7af_abandoned_specific_field) ) {
+			        delete_post_meta($post_id, CF7AF_META_PREFIX . 'abandoned_specific_field', $value);
+			      } else {
+			        $already_cf7af_abandoned_specific_field[] = $value;
+			      }
+			    }
+			  }
+			  $to_save_cf7af_abandoned_specific_field = array_diff($new_cf7af_abandoned_specific_field, $already_cf7af_abandoned_specific_field);
+			  if ( ! empty($to_save_cf7af_abandoned_specific_field) ) {
+			    foreach ( $to_save_cf7af_abandoned_specific_field as $to_save_cf7af_abandoned_specific_field_data ) {
+			       add_post_meta( $post_id, CF7AF_META_PREFIX . 'abandoned_specific_field', $to_save_cf7af_abandoned_specific_field_data);
+			    }
+			  }
+			}
+			
+			//End Multiple Field Added
 		}
 
 		/**
@@ -371,8 +400,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 						echo '<option value="' . $post->ID . '" ' . selected( $selected, $post->ID, false ) . '>' . $post->post_title  . '</option>';
 					}
 				echo '</select>';
-
-				echo '<input type="submit" id="doaction2" name="export_csv_cf7af" class="button action" value=" '.__('Export CSV', 'cf7-abandoned-form' ).'">';
+					echo '<button type="submit" name="export_csv_cf7af" class="button action"> '.__('Export CSV', 'cf7-abandoned-form' ).'</button>';
 			echo '</div>';
 		}
 
@@ -492,6 +520,8 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 			$key = array_search ($post->ID, $total_arr);
 			$cf7af_form_id = get_post_meta( $post->ID, 'cf7af_form_id', true );
 			$cf7af_email = get_post_meta( $post->ID, 'cf7af_email', true );
+			$cf7af_specific_field = get_post_meta($post->ID, 'cf7af_abandoned_specific_field', false );
+			$cf7af_specific_field_implode_data=implode('</br>',$cf7af_specific_field);
 			$cf7af_ip_address = get_post_meta( $post->ID, 'cf7af_ip_address', true );
 			$cf7af_form_data = get_post_meta( $post->ID, 'cf7af_form_data', true );
 
@@ -518,14 +548,12 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				'</th>' .
 				'<td>'.$cf7af_ip_address.'</td>' .
 			'</tr>';
-
+			if( $cf7af_form_data && $cf7af_specific_field ) {
 			echo '<tr class="form-field">' .
 				'<th scope="row">' .
-					'<label for="hcf_author">' . __( 'Other Form Detail', 'cf7-abandoned-form' ) . '</label>' .
+					'<label for="hcf_author">' . __( 'Extra Form Field Detail', 'cf7-abandoned-form' ) . '</label>' .
 				'</th>' .
 				'<td>';
-
-				if( $cf7af_form_data ) {
 					if($key >= 10)
 					{
 						echo '<table><tbody>';
@@ -537,14 +565,17 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 					{
 						echo '<table><tbody>';
 							foreach( $cf7af_form_data AS $key => $val ) {
-								echo'<tr class="inside-field"><th scope="row"> '.$key.' :</th><td> '.$val.' </td></tr>';
+								if (in_array($val, $cf7af_specific_field)){
+									echo'<tr class="inside-field"><th scope="row"> '.$key.' :</th><td> '.$val.' </td></tr>';
+								}
 							}
 						echo '</tbody></table>';
 					}
 					
-				}
-				echo '</td>' .
-			'</tr>';
+				
+				echo '</td>';
+			}
+			echo '</tr>';
 
 			if( filter_var( $cf7af_email, FILTER_VALIDATE_EMAIL ) ) {
 				echo '<tr class="form-field">' .
