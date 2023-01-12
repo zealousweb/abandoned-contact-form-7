@@ -116,6 +116,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 			$cf7af_page_url =  isset( $_POST['page_url'] ) ? sanitize_text_field($_POST['page_url']) : '';
 			$recover_id =  isset( $_POST['recover'] ) ? sanitize_text_field($_POST['recover']) : '';
 			$cf7af_enable_abandoned = $cf7af_abandoned_email  = '';
+			$cf7af_abandoned_specific_field=array();
 
 			if( $cf7af_forms ) {
 				$cf7af_form_data = array();
@@ -137,6 +138,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 
 						$cf7af_enable_abandoned = get_post_meta( $cf7af_form_id, 'cf7af_enable_abandoned' , true);
 						$cf7af_abandoned_email = get_post_meta( $cf7af_form_id, 'cf7af_abandoned_email' , true);
+						$cf7af_abandoned_specific_field = get_post_meta( $cf7af_form_id, 'cf7af_abandoned_specific_field' , false);
 					}
 
 					if( $cf7af_form['name'] != '_wpcf7' && $cf7af_form['name'] != '_wpcf7_version' &&
@@ -242,6 +244,24 @@ if ( !class_exists( 'CF7AF' ) ) {
 						update_post_meta( $post_id, 'cf7af_mail_status', 0 );
 						update_post_meta( $post_id, 'number_fail_count', 0 );
 						update_post_meta( $post_id, 'cf7af_page_url', $cf7af_page_url );
+
+						// Start Multiple Field Added
+						if( $cf7af_forms ){
+							foreach( $cf7af_forms as $cf7af_form ) {
+								$cf7af_form_id = $cf7af_form ['value'];
+								if(!empty($cf7af_abandoned_specific_field)){
+									foreach($cf7af_abandoned_specific_field as $cf7af_abandoned_specific_field_value){
+												if($cf7af_form['name'] == $cf7af_abandoned_specific_field_value){
+													$cf7af_abandoned_specific_field_data=trim( $cf7af_form ['value'] );
+													add_post_meta($post_id,'cf7af_abandoned_specific_field',$cf7af_abandoned_specific_field_data);	
+												}
+											}
+								}
+								
+							}
+						}
+						// End Multiple Field Added
+
 
 					} else {
 						$post_id = sanitize_text_field($_SESSION['wp_cf7form_id_'.$cf7af_form_id.'']);
