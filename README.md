@@ -8,16 +8,6 @@ Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data e
 4. Go to the Plugin screen and find the newly uploaded Plugin in the list.
 5. Click ‘Activate Plugin’ to activate it.
 
-# Features of Abandoned Contact Form 7
-- Select your email ID field for Form in the form settings.
-- Select specific field to include in tracking data
-- Enable/Disable Option for multiple forms where you need in Contact Form 7.
-- View the list of entries in the Admin side for Abandoned submission.
-- In the list of Abandoned forms entry in admin side you can view IP addresses and other data which are filled-up by the user upto 10 Entries.
-- Provision to send an email to a single user that abandoned the form.
-- Facility to export the list of entire abandoned users upto 10 Entries.
-- Also, An option to customize the mail body for Abandoned email upto 10 Entries.
-
 # How To Use
 
 You have to configure it from wp-admin > Contact > Add/Edit Contact Forms (Contact Form 7 needs to be activated before) to use this plugin.
@@ -26,17 +16,48 @@ Click on ‘Contact” > “Edit Contact Form”, wherein you will find a new ta
 
 ![Screenshot](resources/img/image-1.png)
 
-This is show list of all Abandoned users.
+On clicking “Abandoned Users’, you will see the list of abandoned user records who haven’t submitted the form.
 
 ![Screenshot](resources/img/image-2.png)
 
-This is global option of Edit message body content for Abandoned users email.
+Click on any of the Abandoned Users entries to view a respective user’s form details and man‐
+age the mail notification settings.
+
+![Screenshot](resources/img/image-5.png)
+
+Click on “Action” to send a manual email to that particular user. It will contain the email body with predefined body content and subject line (which you can edit).
+
+![Screenshot](resources/img/image-4.png)
+
+In case you have enabled SMTP from “Mail Notification Settings,” you can manage the SMTP settings like username, password, and other details.
+
+![Screenshot](resources/img/image-6.png)
+
+Also, under the same settings, you can test the mail to check if the SMTP detail is correct or not.
+
+![Screenshot](resources/img/image-7.png)
+
+You can  manage the mail notification settings which are reflected in cron job schedule
 
 ![Screenshot](resources/img/image-3.png)
 
-This is option of email to sent single user entry on action button.
+- **Enable Abandoned**
+ You can enable/disable Abandoned form functionality
 
-![Screenshot](resources/img/image-4.png)
+- **Select Email Field**
+ Select the email field for tracking an Abandoned user.
+
+- **Mailer Type**
+ You can change mailer type for emails to be sent.
+
+- **Schedule Notification Time**
+ You can select the scheduled notification time to send mail
+
+- **Number of Email Notification**
+ You can select the scheduled notification time to send mail.
+
+- **Select Specific Field**
+ Select specific field to include in tracking data.
 
 # Getting Help
 
