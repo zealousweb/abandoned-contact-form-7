@@ -16,8 +16,8 @@ Click on ‘Contact” > “Edit Contact Form”, wherein you will find a new ta
 
 ![Screenshot](resources/img/image-1.png)
 
-**Enable Abandoned**
-- You can enable/disable Abandoned form functionality
+- **Enable Abandoned**
+ You can enable/disable Abandoned form functionality
 
 **Select Email Field**
 - Select the email field for tracking an Abandoned user.
