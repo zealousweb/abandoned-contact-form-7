@@ -8,6 +8,10 @@ Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data e
 4. Go to the Plugin screen and find the newly uploaded Plugin in the list.
 5. Click ‘Activate Plugin’ to activate it.
 
+# Features of Abandoned Contact Form 7
+- Select your email ID field for Form in the form settings.
+- 
+
 # How To Use
 
 You have to it from wp-admin > Contact > Add/Edit Contact Forms (Contact Form 7 needs to be activated before).
