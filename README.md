@@ -20,11 +20,9 @@ Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data e
 
 # How To Use
 
-You have to it from wp-admin > Contact > Add/Edit Contact Forms (Contact Form 7 needs to be activated before).
+You have to configure it from wp-admin > Contact > Add/Edit Contact Forms (Contact Form 7 needs to be activated before) to use this plugin.
 
-You will find a new tab “Abandoned Users”.
-
-Select specific field to include in tracking data.
+Click on ‘Contact” > “Edit Contact Form”, wherein you will find a new tab “Abandoned Form Settings” along with tabs of Form, Mail, Messages, Additional Settings. Here, you can adjust settings related to Abandoned Form and email fields.
 
 ![Screenshot](resources/img/image-1.png)
 
