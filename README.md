@@ -16,21 +16,23 @@ Click on ‘Contact” > “Edit Contact Form”, wherein you will find a new ta
 
 ![Screenshot](resources/img/image-1.png)
 
-On clicking “Abandoned Users’, you will see the list of abandoned user records who haven’t submitted the form.
+**Enable Abandoned**
+- You can enable/disable Abandoned form functionality
 
-![Screenshot](resources/img/image-2.png)
+**Select Email Field **
+- Select the email field for tracking an Abandoned user.
 
-Click on any of the Abandoned Users entries to view a respective user’s form details and man‐age the mail notification settings.
+**Mailer Type**
+- You can change mailer type for emails to be sent.
 
-![Screenshot](resources/img/image-4.png)
+**Schedule Notification Time **
+- You can select the scheduled notification time to send mail
 
-This is global option of Edit message body content for Abandoned users email.
+**Number of Email Notification**
+- You can select the scheduled notification time to send mail.
 
-![Screenshot](resources/img/image-3.png)
-
-This is option of email to sent single user entry on action button.
-
-![Screenshot](resources/img/image-4.png)
+**Select Specific Field**
+- Select specific field to include in tracking data.
 
 # Getting Help
 
