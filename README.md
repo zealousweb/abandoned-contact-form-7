@@ -19,13 +19,13 @@ Click on ‘Contact” > “Edit Contact Form”, wherein you will find a new ta
 **Enable Abandoned**
 - You can enable/disable Abandoned form functionality
 
-**Select Email Field **
+**Select Email Field**
 - Select the email field for tracking an Abandoned user.
 
 **Mailer Type**
 - You can change mailer type for emails to be sent.
 
-**Schedule Notification Time **
+**Schedule Notification Time**
 - You can select the scheduled notification time to send mail
 
 **Number of Email Notification**
