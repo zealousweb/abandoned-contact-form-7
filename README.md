@@ -16,6 +16,31 @@ Click on ‘Contact” > “Edit Contact Form”, wherein you will find a new ta
 
 ![Screenshot](resources/img/image-1.png)
 
+On clicking “Abandoned Users’, you will see the list of abandoned user records who haven’t submitted the form.
+
+![Screenshot](resources/img/image-2.png)
+
+Click on any of the Abandoned Users entries to view a respective user’s form details and man‐
+age the mail notification settings.
+
+![Screenshot](resources/img/image-5.png)
+
+Click on “Action” to send a manual email to that particular user. It will contain the email body with predefined body content and subject line (which you can edit).
+
+![Screenshot](resources/img/image-4.png)
+
+In case you have enabled SMTP from “Mail Notification Settings,” you can manage the SMTP settings like username, password, and other details.
+
+![Screenshot](resources/img/image-6.png)
+
+Also, under the same settings, you can test the mail to check if the SMTP detail is correct or not.
+
+![Screenshot](resources/img/image-7.png)
+
+You can  manage the mail notification settings which are reflected in cron job schedule
+
+![Screenshot](resources/img/image-3.png)
+
 - **Enable Abandoned**
  You can enable/disable Abandoned form functionality
 
