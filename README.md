@@ -1,5 +1,7 @@
 # Abandoned Contact Form 7
 Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data even if the user does not submit the form. And, sends mail notification to each Abandoned user.
+
+# Features of Abandoned Contact Form 7
 Select your email ID field for Form in the form settings.
 Enable/Disable Option for multiple forms where you need in Contact Form 7.
 View the list of entries in the Admin side for Abandoned submission.
