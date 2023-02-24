@@ -20,6 +20,7 @@
 				position: 'left center',
 			} ).pointer('open');
 		});
+<<<<<<< HEAD
 
 		jQuery( '#cf7af-mailer-type-pointer' ).on( 'hover click', function() {
 			jQuery( 'body .wp-pointer-buttons .close' ).trigger( 'click' );
@@ -48,6 +49,16 @@
 			} ).pointer('open');
 		});
 
+=======
+		jQuery( '#cf7af-abandoned-specific-field-pointer' ).on( 'hover click', function() {
+			jQuery( 'body .wp-pointer-buttons .close' ).trigger( 'click' );
+			jQuery( '#cf7af-abandoned-specific-field-pointer' ).pointer({
+				pointerClass: 'wp-pointer cf7af-pointer',
+				content: translate_string_cf7af.cf7af_abandoned_specific_field,
+				position: 'left center',
+			} ).pointer('open');
+		});
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 		jQuery( '#cf7af-subject-pointer' ).on( 'hover click', function() {
 			jQuery( 'body .wp-pointer-buttons .close' ).trigger( 'click' );
 			jQuery( '#cf7af-subject-pointer' ).pointer({
@@ -127,6 +138,7 @@
 				content: translate_string_cf7af.cf7af_from_name,
 				position: 'left center',
 			} ).pointer('open');
+<<<<<<< HEAD
 		})
 
 		jQuery( '#cf7af-smtp-host-pointer' ).on( 'hover click', function() {
@@ -208,6 +220,8 @@
 				content: translate_string_cf7af.cf7af_test_message,
 				position: 'left center',
 			} ).pointer('open');
+=======
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 		});
 
 	});

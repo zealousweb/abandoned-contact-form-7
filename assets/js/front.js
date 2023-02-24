@@ -181,7 +181,13 @@
 			}
 		}
 	};
+<<<<<<< HEAD
 	ZealCF7AFAbandoned.init();
+=======
+	if( $('.wpcf7-form').length ) {
+		ZealCF7AFAbandoned.init();
+	}
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 })(jQuery);
 
 (function($) {

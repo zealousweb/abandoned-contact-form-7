@@ -12,6 +12,7 @@
 		if ( ! check_admin_referer( plugin_basename( __FILE__ ), '_notify_nonce_name' ) ) {
 			$error .= ' ' . __( 'Nonce check failed.', 'cf7-abandoned-form' );
 		}
+<<<<<<< HEAD
 		wp_clear_scheduled_hook( 'cf7af_send_notify_event' );
 
 		$cf7af_mail_notify_option['cf7af_mailer_type'] = isset( $_POST['cf7af_mailer_type'] ) ? sanitize_text_field($_POST['cf7af_mailer_type']) : 'none';
@@ -20,23 +21,32 @@
 		if( $cf7af_mail_notify_option['cf7af_nums_email'] < 1 || $cf7af_mail_notify_option['cf7af_nums_email'] >= 6 ) {
 			$error .= __( 'Please enter the valid number.', 'cf7-abandoned-form' );
 		}
+=======
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 
 		$cf7af_mail_notify_option['cf7af_notification_time'] = isset( $_POST['cf7af_notification_time'] ) ? sanitize_text_field($_POST['cf7af_notification_time']) : 'cf7af_daily';
 
 		wp_schedule_event( time(), $cf7af_mail_notify_option['cf7af_notification_time'] , 'cf7af_send_notify_event' );
 
+<<<<<<< HEAD
 		$cf7af_mail_notify_option['cf7af_email_body'] = isset( $_POST['cf7af_email_body'] ) ?  sanitize_textarea_field( $_POST['cf7af_email_body'] ) : '';
+=======
+		$cf7af_mail_notify_option['cf7af_email_body'] = isset( $_POST['cf7af_email_body'] ) ?   $_POST['cf7af_email_body'] : '';
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 		$cf7af_mail_notify_option['cf7af_subject'] = isset( $_POST['cf7af_subject'] ) ?  sanitize_text_field( $_POST['cf7af_subject'] ) : '';
 
 		/* Update settings in the database */
 		if ( empty( $error ) ) {
 			update_option( 'cf7af_mail_notify_option', $cf7af_mail_notify_option );
 			$message .= __( 'Settings saved.', 'cf7-abandoned-form' );
+<<<<<<< HEAD
 
 			if( $cf7af_mail_notify_option['cf7af_mailer_type'] == 'smtp' ) {
 				$message .= __( ' To change SMTP settings <a href=" '. admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-stmp-setting' ) .' " >Click Here </a>', 'cf7-abandoned-form' );
 			}
 
+=======
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 		} else {
 			$error .= ' '. __( 'Settings are not saved.', 'cf7-abandoned-form' );
 		}
@@ -46,9 +56,15 @@
 	<div class="wrap">
 		<h2><?php _e( 'Mail Notification Settings', 'cf7-abandoned-form' ); ?></h2>
 		<p>
+<<<<<<< HEAD
 			<?php _e( 'Use {email} to insert the email into the mail body', 'cf7-abandoned-form' ); ?><br>
 			<?php _e( 'Use {contact_form} to insert the form name into the mail body', 'cf7-abandoned-form' ); ?><br>
 			<?php _e( 'Use {link} to insert the page contact link into the mail body', 'cf7-abandoned-form' ); ?>
+=======
+			<?php _e( 'Use {email} to insert the email into the mail body.', 'cf7-abandoned-form' ); ?><br>
+			<?php _e( 'Use {contact_form} to insert the form name into the mail body.', 'cf7-abandoned-form' ); ?><br>
+			<?php _e( 'Use {link} to insert the page contact link into the mail body.', 'cf7-abandoned-form' ); ?>
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 		</p>
 
 		<?php if( !empty( $message ) ) { ?>
@@ -67,6 +83,7 @@
 
 			<table class="form-table tooltip-table cf7af-notification-setting">
 				<tbody>
+<<<<<<< HEAD
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="cf7af-mailer-type">
@@ -125,6 +142,8 @@
 						/>
 					</td>
 				</tr>
+=======
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 
 				<tr valign="top">
 					<th scope="row" valign="top">
@@ -182,12 +201,15 @@
 <?php
 	// Localize the script with new data
 	$translation_array = array(
+<<<<<<< HEAD
 		'cf7af_mailer_type' => __( '<h3>Mailer Type</h3>' .
 			'<p>You can change mailer type for emails to be sent.</p>', 'cf7-abandoned-form' ),
 		'cf7af_notification_time' => __( '<h3>Schedule Notification Time</h3>' .
 			'<p>Please select the schedule notification time for send mail.</p>', 'cf7-abandoned-form' ),
 		'cf7af_nums_email' => __( '<h3>Number of Email Notification</h3>' .
 			'<p>Please set the number of email notification to the abandoned user.</p>', 'cf7-abandoned-form' ),
+=======
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 		'cf7af_subject' => __( '<h3>Subject</h3>' .
 			'<p>Please enter the subject for send mail.</p>', 'cf7-abandoned-form' ),
 		'cf7af_email_body' => __( '<h3>Email Body </h3>' .

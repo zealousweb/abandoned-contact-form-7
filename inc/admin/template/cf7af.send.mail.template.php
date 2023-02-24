@@ -6,7 +6,11 @@
 	wp_enqueue_script( 'wp-pointer' );
 	wp_enqueue_style( 'wp-pointer' );
 
+<<<<<<< HEAD
 	$abandoned_id = $_GET['abandoned_id'];
+=======
+	$abandoned_id = sanitize_text_field($_GET['abandoned_id']);
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 
 	$abandoned_email_address = !empty( get_post_meta( $abandoned_id , 'cf7af_email', true ) )
 				? get_post_meta( $abandoned_id , 'cf7af_email', true )
@@ -37,6 +41,7 @@
 			$error .= ' ' . __( 'Nonce check failed.', 'cf7-abandoned-form' );
 		} else {
 
+<<<<<<< HEAD
 			$cf7af_smtp_option =  get_option( 'cf7af_smtp_option' );
 			if( $cf7af_mail_notify_opt['cf7af_mailer_type'] == 'smtp' && empty( $cf7af_smtp_option ) ) {
 				$error .= ' ' . __( 'Please add SMTP details first.', 'cf7-abandoned-form' );
@@ -77,6 +82,44 @@
 					$error .= ' ' . __( 'Error on Send Mail.', 'cf7-abandoned-form' );
 				}
 			}
+=======
+			$to = sanitize_email( $_POST['abandoned_email_address'] );
+			$subject = sanitize_text_field( $_POST['abandoned_subject'] );
+			$body = stripslashes( nl2br( $_POST['abandoned_email_body'] ) );
+			$from_name = sanitize_text_field( $_POST['abandoned_from_name'] );
+			$from_email_address = sanitize_email( $_POST['abandoned_from_email_address'] );
+
+			$form_title = get_the_title( $cf7af_form_id );
+			$body = str_replace("{email}", $to, $body);
+			$body = str_replace("{contact_form}", $form_title, $body);
+			
+			if( $cf7af_page_url != '' ) {
+				if( strpos($cf7af_page_url, 'recover=') !== false ) {
+					$body = str_replace("{link}", $cf7af_page_url , $body);
+				} else {
+					if( strpos($cf7af_page_url, '/?') !== false ) {
+						$body = str_replace("{link}", $cf7af_page_url.'&recover='.$abandoned_id, $body);
+					} else {
+						$body = str_replace("{link}", $cf7af_page_url.'?recover='.$abandoned_id, $body);
+					}
+				}
+			}
+			else {
+				$body = str_replace("{link}", '', $body);
+			}
+
+			$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+			$headers[] = 'From: '.$from_name.' <'.$from_email_address.'>';
+			$wp_sent = wp_mail( $to, $subject, $body, $headers );
+
+			if( !$wp_sent ) {
+				$number_fail_count =  get_post_meta( $abandoned_id, 'number_fail_count', true );
+				$number_fail_count = $number_fail_count + 1;
+				update_post_meta( $abandoned_id, 'number_fail_count', $number_fail_count );
+				$error .= ' ' . __( 'Error on Send Mail.', 'cf7-abandoned-form' );
+			}
+			
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 		}
 
 		/* Update settings in the database */
@@ -96,10 +139,32 @@
 		<h2><?php _e( 'Send Mail to Abandoned User Entry', 'cf7-abandoned-form' );  ?>
 			<?php echo ' <a href="'.get_edit_post_link( $abandoned_id ).'" target="_blank" style="text-decoration:none;">#'. $abandoned_id. '</a>';  ?>
 		</h2>
+<<<<<<< HEAD
 		<p>
 			<?php _e( 'Use {email} to insert the email into the mail body', 'cf7-abandoned-form' ); ?><br>
 			<?php _e( 'Use {contact_form} to insert the form name into the mail body', 'cf7-abandoned-form' ); ?><br>
 			<?php _e( 'Use {link} to insert the page contact link into the mail body', 'cf7-abandoned-form' ); ?>
+=======
+
+		<p>
+			<?php 
+			$cf7af_total = get_option('cf7af_total');
+			$key = array_search ($abandoned_id, $cf7af_total);
+			if($key >= 10)
+			{
+
+			}
+			else
+			{
+				?>
+				<?php _e( 'Use {email} to insert the email into the mail body.', 'cf7-abandoned-form' ); ?><br>
+				<?php _e( 'Use {contact_form} to insert the form name into the mail body.', 'cf7-abandoned-form' ); ?><br>
+				<?php _e( 'Use {link} to insert the page contact link into the mail body.', 'cf7-abandoned-form' ); ?>
+				<?php
+			}
+			?>
+			
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 		</p>
 
 		<?php if( !empty( $message ) )  { ?>
@@ -203,10 +268,33 @@
 					</th>
 					<td>
 						<?php
+<<<<<<< HEAD
+=======
+						$cf7af_total = get_option('cf7af_total');
+						$key = array_search ($abandoned_id, $cf7af_total);
+						if($key >= 10)
+						{
+							echo '<table><tbody>';
+							//echo'<tr class="inside-field"><th scope="row"><img src="'.CF7AF_URL.'/assets/images/editor_disable.png"></th></tr>';
+							echo'<tr class="inside-field"><th scope="row">You are using Free Abandoned Contact Form 7 - no license needed. Enjoy! 🙂</th></tr>';
+							echo'<tr class="inside-field"><th scope="row"><a href="https://www.zealousweb.com/wordpress-plugins/product/abandoned-contact-form-7-pro/" target="_blank">To unlock more features consider upgrading to PRO.</a></th></tr>';
+						echo '</tbody></table>';
+						$content = isset( $cf7af_mail_notify_opt['cf7af_email_body'] ) ? stripslashes($cf7af_mail_notify_opt['cf7af_email_body']) : '' ;
+							echo '<input type="hidden" name="abandoned_email_body" value="'.$content.'">';
+					}
+						else
+						{
+							if($cf7af_total)
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 							$content = isset( $cf7af_mail_notify_opt['cf7af_email_body'] ) ? stripslashes($cf7af_mail_notify_opt['cf7af_email_body']) : '' ;
 
 							$settings = array('textarea_rows'=> '10', 'media_buttons' => true ) ;
 							wp_editor( $content, 'abandoned_email_body', $settings );
+<<<<<<< HEAD
+=======
+						}
+						
+>>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 						?>
 					</td>
 				</tr>
