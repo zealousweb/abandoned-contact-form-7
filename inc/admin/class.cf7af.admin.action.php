@@ -1164,7 +1164,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 					{
 						echo '<table><tbody>';
 							foreach( $cf7af_form_data AS $key => $val ) {
-								if (in_array($val, $cf7af_specific_field)){
+								if ( in_array( $key, $cf7af_abandoned_specific_field ) ){
 									echo'<tr class="inside-field"><th scope="row"> '.$key.' :</th><td> '.$val.' </td></tr>';
 								}
 							}
