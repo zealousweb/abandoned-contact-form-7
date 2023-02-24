@@ -1122,6 +1122,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 			$cf7af_specific_field_implode_data=implode('</br>',$cf7af_specific_field);
 			$cf7af_ip_address = get_post_meta( $post->ID, 'cf7af_ip_address', true );
 			$cf7af_form_data = get_post_meta( $post->ID, 'cf7af_form_data', true );
+			$cf7af_abandoned_specific_field = get_post_meta( $cf7af_form_id, 'cf7af_abandoned_specific_field' );
 
 			echo '<table class="cf7pap-box-data form-table">' .
 				'<style>.inside-field td, .inside-field th{ padding-top: 5px; padding-bottom: 5px;}</style>';
