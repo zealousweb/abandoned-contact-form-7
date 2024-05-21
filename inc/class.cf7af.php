@@ -14,11 +14,6 @@ if ( !defined( 'ABSPATH' ) ) exit;
 
 if ( !class_exists( 'CF7AF' ) ) {
 
-<<<<<<< HEAD
-	include_once( CF7AF_DIR . '/inc/lib/class.' . CF7AF_PREFIX . '.subscription.php' );
-
-=======
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 	/**
 	 * The main CF7AF class
 	 */
@@ -26,11 +21,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 
 		private static $_instance = null;
 		private static $private_data = null;
-<<<<<<< HEAD
-		public $cf7af_smtp_opt,$cf7af_mail_notify_opt;
-=======
 		public $cf7af_mail_notify_opt;
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 
 		var $admin = null,
 		    $front = null,
@@ -45,12 +36,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 		}
 
 		function __construct() {
-<<<<<<< HEAD
-			self::$private_data = new CF7AF_Subscription();
-			$this->cf7af_smtp_opt = get_option( 'cf7af_smtp_option' );
-=======
 
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 			$this->cf7af_mail_notify_opt = get_option( 'cf7af_mail_notify_option' );
 
 			# Register plugin activation hook
@@ -61,144 +47,10 @@ if ( !class_exists( 'CF7AF' ) ) {
 			add_action( 'wp_ajax_nopriv_wpcf7forms_abandoned', array( $this, 'action__wpcf7forms_abandoned' ) );
 			add_action( 'wp_ajax_remove_abandoned', array( $this, 'action__remove_abandoned' ) );
 			add_action( 'wp_ajax_nopriv_remove_abandoned', array( $this, 'action__remove_abandoned' ) );
-<<<<<<< HEAD
-			add_filter( 'cron_schedules', array( $this, 'filter__cf7af_cron_schedules' ) );
-			add_action( 'cf7af_send_notify_event',    array( $this, 'action__cf7af_send_notify_event' ), 999 );
-			add_filter( 'plugin_action_links',array( $this,'action__cf7af_plugin_action_links'), 10, 2 );
-
-			if( $this->cf7af_mail_notify_opt ) {
-				if( isset( $this->cf7af_mail_notify_opt['cf7af_mailer_type'] ) && $this->cf7af_mail_notify_opt['cf7af_mailer_type'] == 'smtp' ) {
-					add_action( 'phpmailer_init', array( $this, 'action__init_smtp_mailer' ), 9999 );
-				}
-			}
-		}
-
-		/**
-		 * Filter: cron_schedules
-		 *
-		 * - Used to add custom cron schedules.
-		 *
-		 * @method filter__cf7af_cron_schedules
-		 *
-		 * @param  array $schedules
-		 *
-		 * @return array
-		 */
-		function filter__cf7af_cron_schedules( $schedules ) {
-
-			if( !isset( $schedules["cf7af_hourly"] ) ) {
-				$schedules['cf7af_hourly'] = array(
-					'interval' =>  3600, //that's how many seconds in a hour, for the unix timestamp 3600
-					'display' => __( 'Hourly', 'cf7-abandoned-form' )
-				);
-			}
-
-			if( !isset( $schedules["cf7af_daily"] ) ) {
-				$schedules['cf7af_daily'] = array(
-					'interval' => 86400, //that's how many seconds in a week, for the unix timestamp 86400
-					'display' => __( 'Daily', 'cf7-abandoned-form' )
-				);
-			}
-
-			if( !isset( $schedules["cf7af_weekly"] ) ) {
-				$schedules['cf7af_weekly'] = array(
-					'interval' => 604800, //that's how many seconds in a week, for the unix timestamp 604800
-					'display' => __( 'Weekly', 'cf7-abandoned-form' )
-				);
-			}
-
-			if( !isset( $schedules["cf7af_monthly"] ) ) {
-				$schedules['cf7af_monthly'] = array(
-					'interval' => 259200, //that's how many seconds in a month (30 days - 24*60*60*30 ), for the unix timestamp
-					'display' => __( 'Monthly', 'cf7-abandoned-form' )
-				);
-			}
-			return $schedules;
-		}
-
-		/**
-		 * Action: cf7af_send_notify_event
-		 *
-		 * - Set cron job for mail notification.
-		 *
-		 * @method action__cf7af_send_notify_event
-		 *
-		 */
-		function action__cf7af_send_notify_event() {
-
-			/* Get Abandoned Forms Data */
-			$args = array(
-				'post_type' => CF7AF_POST_TYPE,
-				'post_status'   => 'publish',
-				'posts_per_page' => -1,
-			);
-
-			$cf7af_data = get_posts( $args );
-			if ( !empty( $cf7af_data ) ) {
-
-				foreach ( $cf7af_data as $entry ) {
-
-					$cf7af_email =  get_post_meta( $entry->ID, 'cf7af_email', true );
-					$number_sentmail =  get_post_meta( $entry->ID, 'number_sentmail', true );
-					$cf7af_mail_status =  get_post_meta( $entry->ID, 'cf7af_mail_status', true );
-					$cf7af_form_id =  get_post_meta( $entry->ID, 'cf7af_form_id', true );
-					$cf7af_page_url =  get_post_meta( $entry->ID, 'cf7af_page_url', true );
-
-					if( ( $cf7af_mail_status=='no' || $cf7af_mail_status == 0 ) &&
-						filter_var( $cf7af_email, FILTER_VALIDATE_EMAIL )
-					) {
-						// Send Mail
-						$cf7af_mail_notify_opt = $this->cf7af_mail_notify_opt;
-
-						if( !empty($cf7af_mail_notify_opt) ) {
-							$cf7af_email_body = $this->cf7af_mail_notify_opt['cf7af_email_body'];
-							$cf7af_nums_email = $this->cf7af_mail_notify_opt['cf7af_nums_email'];
-							$cf7af_subject = $this->cf7af_mail_notify_opt['cf7af_subject'];
-
-							if( $number_sentmail < $cf7af_nums_email ) {
-
-								$to = $cf7af_email;
-								$subject = $cf7af_subject;
-								$body = stripslashes( nl2br( $cf7af_email_body ) );
-
-								$form_title = get_the_title( $cf7af_form_id );
-								$body = str_replace("{email}", $to, $body);
-								$body = str_replace("{contact_form}", $form_title, $body);
-
-								if( $cf7af_page_url != '' ) {
-									if( strpos($cf7af_page_url, '/?') !== false ) {
-										$body = str_replace("{link}", $cf7af_page_url.'&recover='.$entry->ID, $body);
-									} else {
-										$body = str_replace("{link}", $cf7af_page_url.'?recover='.$entry->ID, $body);
-									}
-								}
-								else {
-									$body = str_replace("{link}", '', $body);
-								}
-
-								$headers = array( 'Content-Type: text/html; charset=UTF-8' );
-								$wp_sent = wp_mail( $to, $subject, $body, $headers );
-
-								if( $wp_sent )  {
-									$number_sentmail = $number_sentmail + 1;
-									update_post_meta( $entry->ID, 'number_sentmail', $number_sentmail );
-								} else {
-									$number_fail_count =  get_post_meta(  $entry->ID, 'number_fail_count', true );
-									$number_fail_count = $number_fail_count + 1;
-									update_post_meta(  $entry->ID, 'number_fail_count', $number_fail_count );
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-=======
 			//add_filter( 'plugin_action_links',array( $this,'action__cf7af_plugin_action_links'), 10, 2 );
 
 		}
 
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 
 		/**
 		 * Action: wp_ajax_remove_abandoned
@@ -222,11 +74,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 		/**
 		 * Action: plugin_action_links
 		 *
-<<<<<<< HEAD
-		 * Add Subscription link after active links.
-=======
 		 * Add License link after active links.
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 		 *
 		 * @method action__cf7af_plugin_action_links
 		 *
@@ -241,25 +89,11 @@ if ( !class_exists( 'CF7AF' ) ) {
 			}
 			if ( is_plugin_active( 'abandoned-forms-contact-form-7/abandoned-forms-contact-form-7.php' ) )
 			{
-<<<<<<< HEAD
-				$subscription_instance = self::$private_data;
-				new CF7AF_Update( CF7AF_VERSION, CF7AF_PLUGIN_BASENAME, get_option( $subscription_instance::cf7af_subscription_email, '' ), get_option( $subscription_instance::cf7af_subscription_key, '' ) );
-
-				$subscription_link =  '<a href="'.admin_url('edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-subscription-activation', $scheme = 'admin' ).'">'.__( 'Subscription', 'cf7-abandoned-form' ).'</a>';
-
-				$support_link = '<a href="https://zealousweb.com/support/" target="_blank">' .__( 'Support', 'cf7-abandoned-form' ). '</a>';
-
-				$document_link = '<a href="https://www.zealousweb.com/documentation/wordpress-plugins-documentation/abandoned-contact-form-7/" target="_blank">' .__( 'Document', 'cf7-abandoned-form' ). '</a>';
-
-				array_unshift( $links, $subscription_link );
-				array_unshift( $links, $support_link );
-=======
 				//$support_link = '<a href="#" target="_blank">' .__( 'Support', 'cf7-abandoned-form' ). '</a>';
 
 				$document_link = '<a href="#" target="_blank">' .__( 'Document', 'cf7-abandoned-form' ). '</a>';
 				
 				//array_unshift( $links, $support_link );
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 				array_unshift( $links, $document_link );
 			}
 			return $links;
@@ -267,53 +101,6 @@ if ( !class_exists( 'CF7AF' ) ) {
 
 
 		/**
-<<<<<<< HEAD
-		 * Action: phpmailer_init
-		 *
-		 * Set SMTP parameters if SMTP mailer.
-		 *
-		 * @method action__init_smtp_mailer
-		 *
-		 * @param  mailer object  $phpmailer
-		 *
-		 */
-		function action__init_smtp_mailer(  $phpmailer ) {
-
-			$phpmailer->IsSMTP();
-
-			$from_email = $this->cf7af_smtp_opt['cf7af_from_email'];
-			$from_name = $this->cf7af_smtp_opt['cf7af_from_name'];
-
-			$phpmailer->From     = $from_email;
-			$phpmailer->FromName = $from_name;
-			$phpmailer->SetFrom( $phpmailer->From, $phpmailer->FromName );
-
-			/* Set the SMTP Secure value */
-			if ( 'none' !== $this->cf7af_smtp_opt['cf7af_smtp_ency_type'] ) {
-				$phpmailer->SMTPSecure = $this->cf7af_smtp_opt['cf7af_smtp_ency_type'];
-			}
-
-			/* Set the other options */
-			$phpmailer->Host = $this->cf7af_smtp_opt['cf7af_smtp_host'];
-			$phpmailer->Port = $this->cf7af_smtp_opt['cf7af_smtp_port'];
-
-			/* If we're using smtp auth, set the username & password */
-			if ( 'yes' == $this->cf7af_smtp_opt['cf7af_smtp_auth'] ) {
-				$phpmailer->SMTPAuth = true;
-				$phpmailer->Username = $this->cf7af_smtp_opt['cf7af_smtp_username'];
-				$phpmailer->Password = $this->cf7af_smtp_opt['cf7af_smtp_password'];
-			}
-			//PHPMailer 5.2.10 introduced this option. However, this might cause issues if the server is advertising TLS with an invalid certificate.
-			$phpmailer->SMTPAutoTLS = false;
-
-			//set reasonable timeout
-			$phpmailer->Timeout = 10;
-			$phpmailer->CharSet  = "utf-8";
-		}
-
-		/**
-=======
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 		 * Action: wp_ajax_wpcf7forms_abandoned
 		 *
 		 * Keep abandoned entry on every change of contact form 7.
@@ -326,16 +113,10 @@ if ( !class_exists( 'CF7AF' ) ) {
 			session_start();
 
 			$cf7af_forms =  isset( $_POST['forms'] ) ? $_POST['forms'] : '';
-<<<<<<< HEAD
-			$cf7af_page_url =  isset( $_POST['page_url'] ) ? esc_url_raw($_POST['page_url']) : '';
-			$recover_id =  isset( $_POST['recover'] ) ? sanitize_text_field($_POST['recover']) : '';
-			$cf7af_enable_abandoned = $cf7af_abandoned_email  = '';
-=======
 			$cf7af_page_url =  isset( $_POST['page_url'] ) ? sanitize_text_field($_POST['page_url']) : '';
 			$recover_id =  isset( $_POST['recover'] ) ? sanitize_text_field($_POST['recover']) : '';
 			$cf7af_enable_abandoned = $cf7af_abandoned_email  = '';
 			$cf7af_abandoned_specific_field=array();
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 
 			if( $cf7af_forms ) {
 				$cf7af_form_data = array();
@@ -357,10 +138,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 
 						$cf7af_enable_abandoned = get_post_meta( $cf7af_form_id, 'cf7af_enable_abandoned' , true);
 						$cf7af_abandoned_email = get_post_meta( $cf7af_form_id, 'cf7af_abandoned_email' , true);
-<<<<<<< HEAD
-=======
 						$cf7af_abandoned_specific_field = get_post_meta( $cf7af_form_id, 'cf7af_abandoned_specific_field' , false);
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 					}
 
 					if( $cf7af_form['name'] != '_wpcf7' && $cf7af_form['name'] != '_wpcf7_version' &&
@@ -467,11 +245,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 						update_post_meta( $post_id, 'number_fail_count', 0 );
 						update_post_meta( $post_id, 'cf7af_page_url', $cf7af_page_url );
 
-<<<<<<< HEAD
-					} else {
-						$post_id = $_SESSION['wp_cf7form_id_'.$cf7af_form_id.''];
-=======
-						// Start Multiple Field Added
+						/* Start Multiple Field Added */
 						if( $cf7af_forms ){
 							foreach( $cf7af_forms as $cf7af_form ) {
 								$cf7af_form_id = $cf7af_form ['value'];
@@ -486,12 +260,10 @@ if ( !class_exists( 'CF7AF' ) ) {
 								
 							}
 						}
-						// End Multiple Field Added
-
+						/* End Multiple Field Added */
 
 					} else {
 						$post_id = sanitize_text_field($_SESSION['wp_cf7form_id_'.$cf7af_form_id.'']);
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 
 						if( filter_var( $abandoned_cf7_data_email, FILTER_VALIDATE_EMAIL) ) {
 
@@ -515,51 +287,6 @@ if ( !class_exists( 'CF7AF' ) ) {
 		*/
 
 		function action__plugins_loaded() {
-<<<<<<< HEAD
-
-			# Load Paypal SDK on int action
-
-			# Load plugin update file
-			require_once ( CF7AF_DIR . '/inc/class.' . CF7AF_PREFIX . '.update.php' );
-
-			$subscription_instance = self::$private_data;
-			new CF7AF_Update( CF7AF_VERSION, CF7AF_PLUGIN_BASENAME, get_option( $subscription_instance::cf7af_subscription_email, '' ), get_option( $subscription_instance::cf7af_subscription_key, '' ) );
-
-			add_action( 'init', array( $this, 'action__init' ) );
-			add_action( 'admin_init', array( $this, 'action__check_plugin_state' ) );
-
-			if ( !empty( self::$private_data->instance() ) ) {
-
-				# Action to load custom post type
-
-				global $wp_version;
-
-				# Set filter for plugin's languages directory
-				$CF7AF_lang_dir = dirname( CF7AF_PLUGIN_BASENAME ) . '/languages/';
-				$CF7AF_lang_dir = apply_filters( 'CF7AF_languages_directory', $CF7AF_lang_dir );
-
-				# Traditional WordPress plugin locale filter.
-				$get_locale = get_locale();
-
-				if ( $wp_version >= 4.7 ) {
-					$get_locale = get_user_locale();
-				}
-
-				# Traditional WordPress plugin locale filter
-				$locale = apply_filters( 'plugin_locale',  $get_locale, 'cf7-abandoned-form' );
-				$mofile = sprintf( '%1$s-%2$s.mo', 'cf7-abandoned-form' , $locale );
-
-				# Setup paths to current locale file
-				$mofile_global = WP_LANG_DIR . '/plugins/' . basename( CF7AF_DIR ) . '/' . $mofile;
-
-				if ( file_exists( $mofile_global ) ) {
-					# Look in global /wp-content/languages/plugin-name folder
-					load_textdomain( 'cf7-abandoned-form', $mofile_global );
-				} else {
-					# Load the default language files
-					load_plugin_textdomain( 'cf7-abandoned-form', false, $CF7AF_lang_dir );
-				}
-=======
 			
 			add_action( 'init', array( $this, 'action__init' ) );
 			add_action( 'admin_init', array( $this, 'action__check_plugin_state' ) );
@@ -593,7 +320,6 @@ if ( !class_exists( 'CF7AF' ) ) {
 			} else {
 				# Load the default language files
 				load_plugin_textdomain( 'cf7-abandoned-form', false, $CF7AF_lang_dir );
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 			}
 		}
 
@@ -621,11 +347,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 		/**
 		 * Action: init
 		 *
-<<<<<<< HEAD
-		 * - If subscription found then action run
-=======
 		 * - If Register post type
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 		 *
 		 * @method action__init
 		 *
@@ -678,22 +400,6 @@ if ( !class_exists( 'CF7AF' ) ) {
 
 			register_post_type( CF7AF_POST_TYPE , $args );
 
-<<<<<<< HEAD
-			/* $subscription_status = trim( get_option( CF7AF_META_PREFIX.'addon_subscription_status' ) );
-
-			if( !$subscription_status &&
-				( isset( $_GET['post_type'] ) && $_GET['post_type']== CF7AF_POST_TYPE ) &&
-				( !isset( $_GET['page'] ) && $_GET['page']!='cf7af-subscription-activation' ) )
-			{
-				$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-subscription-activation' );
-				$redirect = add_query_arg( array('zw_activation' => 'false', 'message' =>'' ), $base_url );
-
-				wp_redirect( $redirect );
-				exit;
-			} */
-
-=======
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 			# Post Type: Here you add your post type
 		}
 
@@ -709,13 +415,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 		function action__plugin_activation() {
 
 			if( empty( $this->cf7af_mail_notify_opt ) ) {
-<<<<<<< HEAD
-				$cf7af_mail_notify_option['cf7af_mailer_type'] = 'none';
-				$cf7af_mail_notify_option['cf7af_notification_time'] = 'cf7af_hourly';
-				$cf7af_mail_notify_option['cf7af_nums_email'] = '5';
-=======
 
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
 				$cf7af_mail_notify_option['cf7af_subject'] = __( 'You are so close!', 'cf7-abandoned-form' );
 
 				$str = __( 'Hello', 'cf7-abandoned-form' ). ' {email} <br>';

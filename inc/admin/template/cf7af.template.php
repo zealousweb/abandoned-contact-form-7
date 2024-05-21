@@ -11,11 +11,7 @@
 
 	$enable_abandoned	= get_post_meta( $post_id, CF7AF_META_PREFIX . 'enable_abandoned', true );
 	$abandoned_email	= get_post_meta( $post_id, CF7AF_META_PREFIX . 'abandoned_email', true );
-<<<<<<< HEAD
-=======
 	$abandoned_specific_field	= get_post_meta( $post_id, CF7AF_META_PREFIX . 'abandoned_specific_field',false);
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
-
 	echo '<fieldset>'.
 		'<div class="cf7af-settings">' .
 		'<div class="left-box postbox">' .
@@ -56,8 +52,6 @@
 							echo '</select>'.
 
 						'</td>' .
-<<<<<<< HEAD
-=======
 					'<tr class="form-field select-abandoned-specific-field-row">' .
 						'<th scope="row">' .
 							'<label for="' . CF7AF_META_PREFIX . 'specific_field">' .
@@ -88,7 +82,7 @@
 							echo '</select>'.
 
 						'</td>' .
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
+					'</tr>';
 					'</tr>';
 
 					echo '<input type="hidden" name="post" value="' . esc_attr( $post_id ) . '">' .
@@ -102,17 +96,12 @@
 	// Localize the script with new data
 	$translation_array = array(
 		'cf7af_enable_abandoned' => __( '<h3>Enable/Disable Abandoned</h3>' .
-<<<<<<< HEAD
-					'<p>You can enbale/disable Abandoned form functionality.</p>', 'cf7-abandoned-form' ),
-		'cf7af_abandoned_email' => __( '<h3>Select Email Field</h3>' .
-					'<p>Select the email field for tracking Abandoned user</p>', 'cf7-abandoned-form' ),
-=======
 					'<p>You can enable/disable Abandoned form functionality.</p>', 'cf7-abandoned-form' ),
 		'cf7af_abandoned_email' => __( '<h3>Select Email Field</h3>' .
 					'<p>Select the email field for tracking Abandoned user</p>', 'cf7-abandoned-form' ),
+
 		'cf7af_abandoned_specific_field' => __( '<h3>Select Multiple Field</h3>' .
-					'<p>Select the multiple field for tracking Abandoned user</p>', 'cf7-abandoned-form' ),
->>>>>>> 19b10dee14580a8ba01b012ccc6478c0dad2c1b4
+				'<p>Select the multiple field for tracking Abandoned user</p>', 'cf7-abandoned-form' ),
 	);
 
 	wp_localize_script( CF7AF_PREFIX . '_admin_js', 'translate_string_cf7af', $translation_array );
