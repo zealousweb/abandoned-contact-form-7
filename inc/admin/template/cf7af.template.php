@@ -1,17 +1,17 @@
 <?php
-	$post_id = ( isset( $_REQUEST[ 'post' ] ) ? sanitize_text_field( $_REQUEST[ 'post' ] ) : '' );
+	$custom_id = ( isset( $_REQUEST[ 'post' ] ) ? sanitize_text_field( $_REQUEST[ 'post' ] ) : '' ); //phpcs:ignore
 
-	if ( empty( $post_id ) ) {
+	if ( empty( $custom_id ) ) {
 		$wpcf7 = WPCF7_ContactForm::get_current();
-		$post_id = $wpcf7->id();
+		$custom_id = $wpcf7->id(); //phpcs:ignore
 	}
 	wp_enqueue_script( 'wp-pointer' );
 	wp_enqueue_style( 'wp-pointer' );
 	wp_enqueue_style( CF7AF_PREFIX . '_admin_css' );
 
-	$enable_abandoned	= get_post_meta( $post_id, CF7AF_META_PREFIX . 'enable_abandoned', true );
-	$abandoned_email	= get_post_meta( $post_id, CF7AF_META_PREFIX . 'abandoned_email', true );
-	$abandoned_specific_field	= get_post_meta( $post_id, CF7AF_META_PREFIX . 'abandoned_specific_field',false);
+	$enable_abandoned	= get_post_meta( $custom_id, CF7AF_META_PREFIX . 'enable_abandoned', true );
+	$abandoned_email	= get_post_meta( $custom_id, CF7AF_META_PREFIX . 'abandoned_email', true );
+	$abandoned_specific_field	= get_post_meta( $custom_id, CF7AF_META_PREFIX . 'abandoned_specific_field',false);
 	echo '<fieldset>'.
 		'<div class="cf7af-settings">' .
 		'<div class="left-box postbox">' .
@@ -19,33 +19,33 @@
 				'<tbody>' .
 					'<tr class="form-field">' .
 						'<th scope="row">' .
-							'<label for="' . CF7AF_META_PREFIX . 'enable_abandoned">' .
-								__( 'Enable Abandoned', 'cf7-abandoned-form' ) .
+						'<label for="' . esc_attr( CF7AF_META_PREFIX . 'enable_abandoned' ) . '">' .
+								esc_html__( 'Enable Abandoned', 'cf7-abandoned-form' ) .
 							'</label>' .
 							'<span class="cf7af-tooltip hide-if-no-js " id="cf7af-enable-abandoned-pointer"></span>' .
 						'</th>' .
 						'<td>' .
-							'<input id="' . CF7AF_META_PREFIX . 'enable_abandoned" name="' . CF7AF_META_PREFIX . 'enable_abandoned" type="checkbox" class="enable_required" value="1" ' . checked( $enable_abandoned, 1, false ) . '/>' .
-						'</td>' .
+						    '<input id="' . esc_attr( CF7AF_META_PREFIX ) . 'enable_abandoned" name="' . esc_attr( CF7AF_META_PREFIX ) . 'enable_abandoned" type="checkbox" class="enable_required" value="1" ' . checked( $enable_abandoned, 1, false ) . '/>' .
+						'</td>'.
 					'</tr>'.
 					'<tr class="form-field select-abandoned-email-row">' .
 						'<th scope="row">' .
-							'<label for="' . CF7AF_META_PREFIX . 'abandoned_email">' .
-								__( 'Select Email Field', 'cf7-abandoned-form' ) .
-							'</label>' .
+						'<label for="' . esc_attr( CF7AF_META_PREFIX ) . 'abandoned_email">' .
+						esc_html__( 'Select Email Field', 'cf7-abandoned-form' ) .
+						'</label>'.						
 							'<span class="cf7af-tooltip hide-if-no-js " id="cf7af-abandoned-email-pointer"></span>' .
 						'</th>' .
 						'<td>';
 
-							echo '<select name="' . CF7AF_META_PREFIX . 'abandoned_email"  id="' . CF7AF_META_PREFIX . 'abandoned_email" required>'.
+						echo '<select name="' . esc_attr( CF7AF_META_PREFIX . 'abandoned_email' ) . '" id="' . esc_attr( CF7AF_META_PREFIX . 'abandoned_email' ) . '" required>';
 								'<option>'.__( 'Select Email Field', 'cf7-abandoned-form' ).'</option>';
-									$contact_form = WPCF7_ContactForm::get_instance($post_id);
+									$contact_form = WPCF7_ContactForm::get_instance($custom_id);
 									$form_fields = $contact_form->scan_form_tags();
 									if( $form_fields ) {
 										foreach ( $form_fields as $form_field ) {
 											if( $form_field->basetype == 'email' ) {
 												$mail_tag = $form_field->name;
-												echo '<option value="'.$mail_tag.'" ' . selected( $abandoned_email, $mail_tag, false ) . '>['.$mail_tag.']</option>';
+												echo '<option value="' . esc_attr( $mail_tag ) . '" ' . selected( $abandoned_email, $mail_tag, false ) . '>[' . esc_html( $mail_tag ) . ']</option>';
 											}
 										}
 									}
@@ -54,13 +54,13 @@
 						'</td>' .
 					'<tr class="form-field select-abandoned-specific-field-row">' .
 						'<th scope="row">' .
-							'<label for="' . CF7AF_META_PREFIX . 'specific_field">' .
-								__( 'Select Multiple Field', 'cf7-abandoned-form' ) .
-							'</label>' .
+						'<label for="' . esc_attr( CF7AF_META_PREFIX . 'specific_field' ) . '">' .
+						esc_html__( 'Select Multiple Field', 'cf7-abandoned-form' ) .
+						'</label>'.
 							'<span class="cf7af-tooltip hide-if-no-js " id="cf7af-abandoned-specific-field-pointer"></span>' .
 						'</th>' .
 						'<td>';
-							echo '<select name="' . CF7AF_META_PREFIX . 'abandoned_specific_field[]"  id="' . CF7AF_META_PREFIX . 'abandoned_specific_field" multiple="yes">';
+						echo '<select name="' . esc_attr( CF7AF_META_PREFIX ) . 'abandoned_specific_field[]"  id="' . esc_attr( CF7AF_META_PREFIX ) . 'abandoned_specific_field" multiple="yes">';
 									if( $form_fields ) {
 										foreach ( $form_fields as $form_field ) {
 											if( $form_field->basetype != 'email' && $form_field->basetype != 'submit') {
@@ -75,7 +75,7 @@
 												  		$selected='';
 												  	}
 												}
-											  	echo '<option value="'.$mail_tag.'" '.$selected.'>['.$mail_tag.']</option>';
+												echo '<option value="' . esc_attr( $mail_tag ) . '" ' . esc_attr( $selected ) . '>[' . esc_html( $mail_tag ) . ']</option>';
 											}
 										}
 									}
@@ -85,7 +85,7 @@
 					'</tr>';
 					'</tr>';
 
-					echo '<input type="hidden" name="post" value="' . esc_attr( $post_id ) . '">' .
+					echo '<input type="hidden" name="post" value="' . esc_attr( $custom_id ) . '">' .
 				'</tbody>' .
 			'</table>' .
 

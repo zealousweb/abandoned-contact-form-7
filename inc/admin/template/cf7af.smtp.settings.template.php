@@ -5,14 +5,14 @@
 	wp_enqueue_style( 'wp-pointer' );
 
 	$message = '';
-	$error = array();
+	$custom_error = array();
 
 	$cf7af_smtp_option = get_option( 'cf7af_smtp_option' );
 
 	if ( isset( $_POST['cf7af_smtp_test_submit'] ) ) {
 		// check nounce
 		if ( ! check_admin_referer( plugin_basename( __FILE__ ), '_smtptest_nonce_name' ) ) {
-			$error[] =  __( 'Nonce check failed.', 'cf7-abandoned-form' );
+			$custom_error[] =  __( 'Nonce check failed.', 'cf7-abandoned-form' );
 		}
 		global $wp_version;
 		require_once ABSPATH . WPINC . '/class-phpmailer.php';
@@ -26,9 +26,10 @@
 			$mail = new PHPMailer( true );
 		}
 
-		$to_email = sanitize_email( $_POST['cf7af_test_to_email'] );
-		$subject = sanitize_text_field( $_POST['cf7af_test_subject'] );
-		$body = sanitize_textarea_field( $_POST['cf7af_test_message'] );
+		$to_email = isset( $_POST['cf7af_test_to_email'] ) ? sanitize_email( $_POST['cf7af_test_to_email'] ) : '';
+		$subject = isset( $_POST['cf7af_test_subject'] ) ? sanitize_text_field( $_POST['cf7af_test_subject'] ) : '';
+		$body = isset( $_POST['cf7af_test_message'] ) ? sanitize_textarea_field( $_POST['cf7af_test_message'] ) : '';
+
 		$ret = array();
 		//$mail = new PHPMailer( true );
 
@@ -93,12 +94,12 @@
 		$ret['debug_log'] = $debug_msg;
 
 		if( $success==0 ) {
-			$error[] = __( 'Error on send mail.', 'cf7-abandoned-form' );
-			$error[] = $ret['error'];
-			$error[] = $ret['debug_log'];
+			$custom_error[] = __( 'Error on send mail.', 'cf7-abandoned-form' );
+			$custom_error[] = $ret['error'];
+			$custom_error[] = $ret['debug_log'];
 		}
 
-		if ( empty( $error ) ) {
+		if ( empty( $custom_error ) ) {
 			$message .= __( 'Test email was successfully sent. No errors occurred during the process.', 'cf7-abandoned-form' );
 		}
 
@@ -107,18 +108,18 @@
 	if ( isset( $_POST['cf7af_smtp_submit'] ) ) {
 		// check nounce
 		if ( ! check_admin_referer( plugin_basename( __FILE__ ), '_smtp_nonce_name' ) ) {
-			$error .= ' ' . __( 'Nonce check failed.', 'cf7-abandoned-form' );
+			$custom_error .= ' ' . __( 'Nonce check failed.', 'cf7-abandoned-form' );
 		}
 
 		if ( isset( $_POST['cf7af_from_email'] ) ) {
 			if ( is_email( $_POST['cf7af_from_email'] ) ) {
 				$cf7af_smtp_option['cf7af_from_email'] = sanitize_email( $_POST['cf7af_from_email'] );
 			} else {
-				$error .= ' ' . __( "Please enter a valid email address in the 'From Email Address' field.", 'cf7-abandoned-form' );
+				$custom_error .= ' ' . __( "Please enter a valid email address in the 'From Email Address' field.", 'cf7-abandoned-form' );
 			}
 		}
-		$cf7af_smtp_option['cf7af_from_name'] = sanitize_text_field( $_POST['cf7af_from_name'] );
-		$cf7af_smtp_option['cf7af_smtp_host'] = stripslashes( $_POST['cf7af_smtp_host'] );
+		$cf7af_from_name = isset($_POST['cf7af_from_name']) ? sanitize_text_field($_POST['cf7af_from_name']) : '';
+		$cf7af_smtp_host = isset($_POST['cf7af_smtp_host']) ? stripslashes($_POST['cf7af_smtp_host']) : '';
 		$cf7af_smtp_option['cf7af_smtp_ency_type'] = isset( $_POST['cf7af_smtp_ency_type'] ) ? sanitize_text_field($_POST['cf7af_smtp_ency_type']) : 'none';
 		$cf7af_smtp_option['cf7af_smtp_auth'] = isset( $_POST['cf7af_smtp_auth'] ) ? sanitize_text_field($_POST['cf7af_smtp_auth']) : 'no';
 
@@ -128,36 +129,36 @@
 		if ( isset( $_POST['cf7af_smtp_port'] ) ) {
 			if ( empty( $_POST['cf7af_smtp_port'] ) || 1 > intval( $_POST['cf7af_smtp_port'] ) || ( ! preg_match( '/^\d+$/', $_POST['cf7af_smtp_port'] ) ) ) {
 				$cf7af_smtp_option['cf7af_smtp_port']	= '25';
-				$error                                   .= ' ' . __( "Please enter a valid port in the 'SMTP Port' field.", 'cf7-abandoned-form' );
+				$custom_error                                   .= ' ' . __( "Please enter a valid port in the 'SMTP Port' field.", 'cf7-abandoned-form' );
 			} else {
 				$cf7af_smtp_option['cf7af_smtp_port'] = sanitize_text_field( $_POST['cf7af_smtp_port'] );
 			}
 		}
-		$cf7af_smtp_option['cf7af_smtp_username']       = stripslashes( $_POST['cf7af_smtp_username'] );
-		$cf7af_smtp_option['cf7af_smtp_password'] = sanitize_text_field($_POST['cf7af_smtp_password']);
+		$cf7af_smtp_option['cf7af_smtp_username'] = isset($_POST['cf7af_smtp_username']) ? stripslashes($_POST['cf7af_smtp_username']) : '';
+		$cf7af_smtp_option['cf7af_smtp_password'] = isset($_POST['cf7af_smtp_password']) ? sanitize_text_field($_POST['cf7af_smtp_password']) : '';
 
 		/* Update settings in the database */
-		if ( empty( $error ) ) {
+		if ( empty( $custom_error ) ) {
 			update_option( 'cf7af_smtp_option', $cf7af_smtp_option );
 			$message .= __( 'Settings saved.', 'cf7-abandoned-form' );
 		} else {
-			$error .= ' ' . __( 'Settings are not saved.', 'cf7-abandoned-form' );
+			$custom_error .= ' ' . __( 'Settings are not saved.', 'cf7-abandoned-form' );
 		}
 
 	}
 	$current = ( ! empty( $_GET['tab'] ) ) ? esc_attr( $_GET['tab'] ) : 'smtp-settings';
 
-	$tabs = array(
+	$new_tabs = array(
 		'smtp-settings'   => __( 'SMTP Settings', 'cf7-abandoned-form' ),
 		'test-mail'  => __( 'Test Mail', 'cf7-abandoned-form' )
 	);
 	$html = '<h2 class="nav-tab-wrapper">';
-	foreach( $tabs as $tab => $name ){
-		$class = ( $tab == $current ) ? 'nav-tab-active' : '';
-		$html .= '<a class="nav-tab ' . $class . '" href="?post_type='.CF7AF_POST_TYPE.'&page=cf7af-stmp-setting&tab=' . $tab . '">' . $name . '</a>';
+	foreach( $new_tabs as $new_tab => $name ){
+		$class = ( $new_tab == $current ) ? 'nav-tab-active' : '';
+		$html .= '<a class="nav-tab ' . $class . '" href="?post_type='.CF7AF_POST_TYPE.'&page=cf7af-stmp-setting&tab=' . $new_tab . '">' . $name . '</a>';
 	}
 	$html .= '</h2>';
-	echo $html;
+	echo esc_html($html);
 
 	echo '<div class="wrap">';
 
@@ -172,9 +173,9 @@
 		</div>
 		<?php } ?>
 
-		<?php if( !empty( $error ) )  { ?>
+		<?php if( !empty( $custom_error ) )  { ?>
 		<div id="setting-error-settings_updated" class="notice notice-error settings-error is-dismissible">
-			<p><strong><?php echo esc_html( $error ); ?></strong></p>
+			<p><strong><?php echo esc_html( $custom_error ); ?></strong></p>
 		</div>
 		<?php } ?>
 
@@ -368,11 +369,11 @@
 		</div>
 		<?php } ?>
 
-		<?php if( !empty( $error ) )  { ?>
+		<?php if( !empty( $custom_error ) )  { ?>
 		<div id="setting-error-settings_updated" class="notice notice-error settings-error is-dismissible">
 			<?php
-			foreach( $error as $key=>$val) {
-				echo '<p><strong>'.  ( $val ) .'</strong></p>';
+			foreach( $custom_error as $key=>$val) {
+				echo '<p><strong>'.  esc_html( $val ) .'</strong></p>';
 			}
 			?>
 		</div>

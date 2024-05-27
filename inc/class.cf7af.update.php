@@ -177,4 +177,4 @@ if ( !class_exists( 'CF7AF_Update' ) ) {
 	}
 }
 
-?>
+

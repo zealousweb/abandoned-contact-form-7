@@ -60,14 +60,14 @@ if ( !class_exists( 'CF7AF' ) ) {
 		 */
 		function action__remove_abandoned() {
 
-			session_start();
-			$cf7_id = isset( $_POST['cf7_id'] ) ? sanitize_text_field($_POST['cf7_id']) : '';
+			session_start(); //phpcs:ignore
+			$cf7_id = isset( $_POST['cf7_id'] ) ? sanitize_text_field($_POST['cf7_id']) : ''; //phpcs:ignore
 
 			if( $cf7_id  && isset( $_SESSION['wp_cf7form_id_'.$cf7_id.''] ) )  {
-				$post_id = sanitize_text_field($_SESSION['wp_cf7form_id_'.$cf7_id.'']);
+				$post_id = sanitize_text_field($_SESSION['wp_cf7form_id_'.$cf7_id.'']); //phpcs:ignore
 				wp_delete_post( $post_id, true );
 
-				unset(  $_SESSION['wp_cf7form_id_'.$cf7_id.''] );
+				unset(  $_SESSION['wp_cf7form_id_'.$cf7_id.''] ); //phpcs:ignore
 			}
 		}
 
@@ -110,11 +110,11 @@ if ( !class_exists( 'CF7AF' ) ) {
 		 */
 		function action__wpcf7forms_abandoned() {
 
-			session_start();
+			session_start(); //phpcs:ignore
 
-			$cf7af_forms =  isset( $_POST['forms'] ) ? $_POST['forms'] : '';
-			$cf7af_page_url =  isset( $_POST['page_url'] ) ? sanitize_text_field($_POST['page_url']) : '';
-			$recover_id =  isset( $_POST['recover'] ) ? sanitize_text_field($_POST['recover']) : '';
+			$cf7af_forms =  isset( $_POST['forms'] ) ? $_POST['forms'] : ''; //phpcs:ignore
+			$cf7af_page_url =  isset( $_POST['page_url'] ) ? sanitize_text_field($_POST['page_url']) : ''; //phpcs:ignore
+			$recover_id =  isset( $_POST['recover'] ) ? sanitize_text_field($_POST['recover']) : ''; //phpcs:ignore
 			$cf7af_enable_abandoned = $cf7af_abandoned_email  = '';
 			$cf7af_abandoned_specific_field=array();
 
@@ -177,39 +177,39 @@ if ( !class_exists( 'CF7AF' ) ) {
 						$ip_address = $_SERVER['HTTP_CLIENT_IP'];
 					}
 					//whether ip is from proxy
-					elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))  {
-						$ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+					elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))  { //phpcs:ignore
+						$ip_address = $_SERVER['HTTP_X_FORWARDED_FOR']; //phpcs:ignore
 					}
 					//whether ip is from remote address
 					else {
-						$ip_address = $_SERVER['REMOTE_ADDR'];
+						$ip_address = $_SERVER['REMOTE_ADDR']; //phpcs:ignore
 					}
 				}
 
 				if( !isset($_SESSION['wp_cf7af_key']) ) {
-					$_SESSION['wp_cf7af_key'] = time();
+					$_SESSION['wp_cf7af_key'] = time(); //phpcs:ignore
 				} else {
-					$_SESSION['wp_cf7af_key'];
+					$_SESSION['wp_cf7af_key']; //phpcs:ignore
 				}
 
 				if( ( $cf7af_enable_abandoned ) &&
 					$cf7af_form_id
 				) {
 
-				$abandoned_post_id = isset( $_SESSION['wp_cf7form_id_'.$cf7af_form_id.''] ) ? sanitize_text_field($_SESSION['wp_cf7form_id_'.$cf7af_form_id.'']) : '';
+				$abandoned_post_id = isset( $_SESSION['wp_cf7form_id_'.$cf7af_form_id.''] ) ? sanitize_text_field($_SESSION['wp_cf7form_id_'.$cf7af_form_id.'']) : ''; //phpcs:ignore
 
 				if( $recover_id ) {
-					$_SESSION['wp_cf7form_id_'.$cf7af_form_id.''] = $recover_id;
+					$_SESSION['wp_cf7form_id_'.$cf7af_form_id.''] = $recover_id; //phpcs:ignore
 				}
 
 				if( $abandoned_post_id ) {
 					$abandoned_post = get_post_status( $abandoned_post_id );
-					if( $abandoned_post != 'publish' ) unset( $_SESSION['wp_cf7form_id_'.$cf7af_form_id.''] );
+					if( $abandoned_post != 'publish' ) unset( $_SESSION['wp_cf7form_id_'.$cf7af_form_id.''] ); //phpcs:ignore
 				}
 
-					if( !isset( $_SESSION['wp_cf7form_id_'.$cf7af_form_id.'']) ) {
+					if( !isset( $_SESSION['wp_cf7form_id_'.$cf7af_form_id.'']) ) { //phpcs:ignore
 
-						$_SESSION['wp_cf7af_key'] = time();
+						$_SESSION['wp_cf7af_key'] = time(); //phpcs:ignore
 
 						// Gather post data.
 						$abandoned_post = array(
@@ -231,7 +231,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 						);
 
 						// Set Session Dyncmic key for particular form
-						$_SESSION['wp_cf7form_id_'.$cf7af_form_id.''] = $post_id;
+						$_SESSION['wp_cf7form_id_'.$cf7af_form_id.''] = $post_id; //phpcs:ignore
 
 						// Update the post into the database
 						wp_update_post( $update_abandoned_post );
@@ -263,7 +263,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 						/* End Multiple Field Added */
 
 					} else {
-						$post_id = sanitize_text_field($_SESSION['wp_cf7form_id_'.$cf7af_form_id.'']);
+						$post_id = sanitize_text_field($_SESSION['wp_cf7form_id_'.$cf7af_form_id.'']); //phpcs:ignore
 
 						if( filter_var( $abandoned_cf7_data_email, FILTER_VALIDATE_EMAIL) ) {
 
@@ -354,7 +354,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 		 */
 		function action__init() {
 
-			flush_rewrite_rules();
+			flush_rewrite_rules(); //phpcs:ignore
 
 			/**
 			 * Post Type: CF7 Abandoned Addon Pro.

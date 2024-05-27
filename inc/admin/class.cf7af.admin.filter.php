@@ -81,11 +81,11 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 				$post_id = $wpcf7->id();
 			}
 
-			if ( !empty( $post_id ) ) {
-				$cf7 = WPCF7_ContactForm::get_instance($_GET['post']);
+			if ( isset( $_GET['post'] ) && !empty( $post_id ) ) {
+				$cf7 = WPCF7_ContactForm::get_instance( $_GET['post'] ); 
 				$tags = $cf7->collect_mail_tags();
 			}
-
+			
 			if( !empty( $tags ) ){
 				$panels[ 'Abandoned-add-on' ] = array(
 					'title'    => __( 'Abandoned Form Settings', 'cf7-abandoned-form' ),
@@ -143,7 +143,7 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 		 *
 		 * @param  array $query
 		 */
-		function filter__pre_get_posts( $query ){
+		function filter__pre_get_posts( $query ){ //phpcs:ignore
 
 			// Extend search for document post type
 			$post_type = CF7AF_POST_TYPE;

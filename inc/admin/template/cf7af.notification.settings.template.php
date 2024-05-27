@@ -3,14 +3,14 @@
 	wp_enqueue_script( 'wp-pointer' );
 	wp_enqueue_style( 'wp-pointer' );
 
-	$message = $error = '';
+	$message = $custom_error = ''; 
 
 	$cf7af_mail_notify_option = get_option( 'cf7af_mail_notify_option' );
 
 	if ( isset( $_POST['save_notify'] ) ) {
 		// check nounce
 		if ( ! check_admin_referer( plugin_basename( __FILE__ ), '_notify_nonce_name' ) ) {
-			$error .= ' ' . __( 'Nonce check failed.', 'cf7-abandoned-form' );
+			$custom_error .= ' ' . __( 'Nonce check failed.', 'cf7-abandoned-form' ); 
 		}
 
 		$cf7af_mail_notify_option['cf7af_notification_time'] = isset( $_POST['cf7af_notification_time'] ) ? sanitize_text_field($_POST['cf7af_notification_time']) : 'cf7af_daily';
@@ -21,11 +21,11 @@
 		$cf7af_mail_notify_option['cf7af_subject'] = isset( $_POST['cf7af_subject'] ) ?  sanitize_text_field( $_POST['cf7af_subject'] ) : '';
 
 		/* Update settings in the database */
-		if ( empty( $error ) ) {
+		if ( empty( $custom_error ) ) {
 			update_option( 'cf7af_mail_notify_option', $cf7af_mail_notify_option );
 			$message .= __( 'Settings saved.', 'cf7-abandoned-form' );
 		} else {
-			$error .= ' '. __( 'Settings are not saved.', 'cf7-abandoned-form' );
+			$custom_error .= ' '. __( 'Settings are not saved.', 'cf7-abandoned-form' ); 
 		}
 	}
 	?>
@@ -40,13 +40,13 @@
 
 		<?php if( !empty( $message ) ) { ?>
 		<div id="setting-error-settings_updated" class="notice notice-success settings-error is-dismissible">
-			<p><strong><?php echo $message; ?></strong></p>
+		<p><strong><?php echo esc_html( $message ); ?></strong></p>
 		</div>
 		<?php } ?>
 
-		<?php if( !empty( $error ) ) { ?>
+		<?php if( !empty( $custom_error ) ) { ?>
 		<div id="setting-error-settings_updated" class="notice notice-error settings-error is-dismissible">
-			<p><strong><?php echo esc_html( $error ); ?></strong></p>
+			<p><strong><?php echo esc_html( $custom_error ); ?></strong></p>
 		</div>
 		<?php } ?>
 

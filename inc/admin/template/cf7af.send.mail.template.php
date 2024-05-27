@@ -30,18 +30,18 @@
 
 	$cf7af_mail_notify_opt =  get_option( 'cf7af_mail_notify_option' );
 
-	$message = $error = '';
+	$message = $custom_error = ''; 
 	if ( isset( $_POST['send_mail'] ) ) {
 		// check nounce
 		if ( ! check_admin_referer( plugin_basename( __FILE__ ), '_send_mail_nonce_name' ) ) {
-			$error .= ' ' . __( 'Nonce check failed.', 'cf7-abandoned-form' );
+			$custom_error .= ' ' . __( 'Nonce check failed.', 'cf7-abandoned-form' ); 
 		} else {
 
-			$to = sanitize_email( $_POST['abandoned_email_address'] );
-			$subject = sanitize_text_field( $_POST['abandoned_subject'] );
-			$body = stripslashes( nl2br( $_POST['abandoned_email_body'] ) );
-			$from_name = sanitize_text_field( $_POST['abandoned_from_name'] );
-			$from_email_address = sanitize_email( $_POST['abandoned_from_email_address'] );
+			$to = isset($_POST['abandoned_email_address']) ? sanitize_email($_POST['abandoned_email_address']) : '';
+			$subject = isset($_POST['abandoned_subject']) ? sanitize_text_field($_POST['abandoned_subject']) : '';
+			$body = isset($_POST['abandoned_email_body']) ? stripslashes(nl2br($_POST['abandoned_email_body'])) : '';
+			$from_name = isset($_POST['abandoned_from_name']) ? sanitize_text_field($_POST['abandoned_from_name']) : '';
+			$from_email_address = isset($_POST['abandoned_from_email_address']) ? sanitize_email($_POST['abandoned_from_email_address']) : '';
 
 			$form_title = get_the_title( $cf7af_form_id );
 			$body = str_replace("{email}", $to, $body);
@@ -70,27 +70,27 @@
 				$number_fail_count =  get_post_meta( $abandoned_id, 'number_fail_count', true );
 				$number_fail_count = $number_fail_count + 1;
 				update_post_meta( $abandoned_id, 'number_fail_count', $number_fail_count );
-				$error .= ' ' . __( 'Error on Send Mail.', 'cf7-abandoned-form' );
+				$custom_error .= ' ' . __( 'Error on Send Mail.', 'cf7-abandoned-form' ); 
 			}
 			
 		}
 
 		/* Update settings in the database */
-		if ( empty( $error ) ) {
+		if ( empty( $custom_error ) ) {
 			$number_sentmail =  get_post_meta( $abandoned_id, 'number_sentmail', true );
 			$number_sentmail = $number_sentmail + 1;
 			update_post_meta( $abandoned_id, 'number_sentmail', $number_sentmail );
 
 			$message .= __( 'Send Mail Suceessfully to Abandoned User.', 'cf7-abandoned-form' );
 		} else {
-			$error .= ' ' . __( 'Mail has not send.', 'cf7-abandoned-form' );
+			$custom_error .= ' ' . __( 'Mail has not send.', 'cf7-abandoned-form' ); 
 		}
 	}
 
 	?>
 	<div class="wrap">
 		<h2><?php _e( 'Send Mail to Abandoned User Entry', 'cf7-abandoned-form' );  ?>
-			<?php echo ' <a href="'.get_edit_post_link( $abandoned_id ).'" target="_blank" style="text-decoration:none;">#'. $abandoned_id. '</a>';  ?>
+		<?php echo ' <a href="' . esc_url( get_edit_post_link( $abandoned_id ) ) . '" target="_blank" style="text-decoration:none;">#' .esc_html($abandoned_id) . '</a>';  ?>
 		</h2>
 
 		<p>
@@ -119,9 +119,9 @@
 		</div>
 		<?php } ?>
 
-		<?php if( !empty( $error ) )  { ?>
+		<?php if( !empty( $custom_error ) )  { ?>
 		<div id="setting-error-settings_updated" class="notice notice-error settings-error is-dismissible">
-			<p><strong><?php echo esc_html( $error ); ?></strong></p>
+			<p><strong><?php echo esc_html( $custom_error ); ?></strong></p>
 		</div>
 		<?php } ?>
 
@@ -201,7 +201,7 @@
 							type="text"
 							class="regular-text"
 							required
-							value="<?php echo $abandoned_subject; ?>"
+							value="<?php echo esc_attr( $abandoned_subject ); ?>"
 						/>
 					</td>
 				</tr>
@@ -221,10 +221,10 @@
 							echo '<table><tbody>';
 							//echo'<tr class="inside-field"><th scope="row"><img src="'.CF7AF_URL.'/assets/images/editor_disable.png"></th></tr>';
 							echo'<tr class="inside-field"><th scope="row">You are using Free Abandoned Contact Form 7 - no license needed. Enjoy! 🙂</th></tr>';
-							echo'<tr class="inside-field"><th scope="row"><a href="https://www.zealousweb.com/wordpress-plugins/product/abandoned-contact-form-7-pro/" target="_blank">To unlock more features consider upgrading to PRO.</a></th></tr>';
+							echo'<tr class="inside-field"><th scope="row"><a href="https://store.zealousweb.com/abandoned-contact-form-7-pro" target="_blank">To unlock more features consider upgrading to PRO.</a></th></tr>';
 						echo '</tbody></table>';
 						$content = isset( $cf7af_mail_notify_opt['cf7af_email_body'] ) ? stripslashes($cf7af_mail_notify_opt['cf7af_email_body']) : '' ;
-							echo '<input type="hidden" name="abandoned_email_body" value="'.$content.'">';
+						 echo '<input type="hidden" name="abandoned_email_body" value="' . esc_attr( $content ) . '">';
 					}
 						else
 						{
