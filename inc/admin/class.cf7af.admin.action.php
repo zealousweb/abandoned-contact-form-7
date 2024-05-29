@@ -228,10 +228,11 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				CF7AF_META_PREFIX . 'abandoned_email',
 			);
 
-			if ( !empty( $form_fields ) ) {
-				foreach ( $form_fields as $key ) {
-					$keyval = ( sanitize_text_field($_REQUEST[ $key ]) );
-					update_post_meta( $post_id, $key, $keyval );
+			if (!empty($form_fields)) {
+				foreach ($form_fields as $key) {
+						$keyval = sanitize_text_field($_REQUEST[$key]);
+						update_post_meta($post_id, $key, $keyval);
+					
 				}
 			}
 
@@ -278,19 +279,15 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 			switch ( $column ) {
 
 				case 'cf7af_email' :
-					echo (
-						!empty( get_post_meta( $post_id , 'cf7af_email', true ) )
-						? get_post_meta( $post_id , 'cf7af_email', true )
-						: ''
-					);
+					echo ! empty( get_post_meta( $post_id , 'cf7af_email', true ) )
+						? esc_html( get_post_meta( $post_id , 'cf7af_email', true ) )
+						: '';
 					break;
 
 				case 'cf7af_ip_address' :
-					echo (
-						!empty( get_post_meta( $post_id , 'cf7af_ip_address', true ) )
-						? get_post_meta( $post_id , 'cf7af_ip_address', true )
-						: ''
-					);
+					echo !empty( get_post_meta( $post_id , 'cf7af_ip_address', true ) )
+						? esc_html(get_post_meta( $post_id , 'cf7af_ip_address', true ))
+						: '';					
 					break;
 
 				case 'cf7af_send_mail' :
@@ -304,16 +301,17 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 							filter_var( $cf7af_email, FILTER_VALIDATE_EMAIL) &&
 							$abandoned_post_status != 'trash'
 						) {
-							echo '<a href="' . esc_url( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-send-mail&abandoned_id='.$post_id.'"' ) ) . '" class="button button-primary"> '. __( 'Action', 'cf7-abandoned-form' ).' </a>';
+							echo '<a href="' . esc_url( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-send-mail&abandoned_id='.$post_id.'"' ) ) . '" class="button button-primary"> '. esc_html__( 'Action', 'cf7-abandoned-form' ).' </a>';
+
 						} else {
-							echo '<a href="javascript::void(0);" class="disabled button-primary"> '. __( 'Invalid Email', 'cf7-abandoned-form' ).' </a>';
+							echo '<a href="javascript::void(0);" class="disabled button-primary"> '. esc_html__( 'Invalid Email', 'cf7-abandoned-form' ).' </a>';
 						}
 					break;
 
 				case 'number_sentmail' :
 					echo (
 						!empty( get_post_meta( $post_id, 'number_sentmail', true ) )
-						? get_post_meta( $post_id, 'number_sentmail', true )
+						? esc_html(get_post_meta( $post_id, 'number_sentmail', true ))
 						: 0
 					);
 					break;
@@ -321,7 +319,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				case 'number_fail_count' :
 					echo (
 						!empty( get_post_meta( $post_id, 'number_fail_count', true ) )
-						? get_post_meta( $post_id, 'number_fail_count', true )
+						? esc_html(get_post_meta( $post_id, 'number_fail_count', true ))
 						: 0
 					);
 					break;
@@ -393,13 +391,14 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 
 			echo '<div class="alignleft actions">';
 				echo '<select name="form-id" id="form-id">';
-					echo '<option value="all">' . __( 'Select Forms', 'cf7-abandoned-form' ) . '</option>';
+					echo '<option value="all">' . esc_html__( 'Select Forms', 'cf7-abandoned-form' ) . '</option>';
 					foreach ( $posts as $post ) {
-						echo '<option value="' . $post->ID . '" ' . selected( $selected, $post->ID, false ) . '>' . $post->post_title  . '</option>';
+						echo '<option value="' . esc_attr( $post->ID ) . '" ' . selected( $selected, $post->ID, false ) . '>' . esc_html( $post->post_title )  . '</option>';
+
 					}
 				echo '</select>';
 
-				echo '<button type="submit" name="export_csv_cf7af" class="button action"> '.__('Export CSV', 'cf7-abandoned-form' ).'</button>';
+				echo '<button type="submit" name="export_csv_cf7af" class="button action"> '.esc_html__('Export CSV', 'cf7-abandoned-form' ).'</button>';
 			echo '</div>';
 		}
 
@@ -463,7 +462,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 		function action__cf7af_admin_notices_export() {
 			echo '<div id="setting-error-settings_updated" class="notice notice-error settings-error is-dismissible"> ' .
 				'<p>' .
-					__( 'Please select form to export.', 'cf7-abandoned-form' ) .
+					esc_html__( 'Please select form to export.', 'cf7-abandoned-form' ) .
 				'</p>' .
 			'</div>';
 		}
@@ -478,7 +477,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 		function action__cf7af_admin_notices_blank() {
 			echo '<div id="setting-error-settings_updated" class="notice notice-error settings-error is-dismissible"> ' .
 				'<p>' .
-					__( 'No Abandoned data Found', 'cf7-abandoned-form' ) .
+					esc_html__( 'No Abandoned data Found', 'cf7-abandoned-form' ) .
 				'</p>' .
 			'</div>';
 		}
@@ -529,28 +528,27 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 
 			echo '<tr class="form-field">' .
 				'<th scope="row">' .
-					'<label for="hcf_author">' . __( 'CF7 Form Name', 'cf7-abandoned-form' ) . '</label>' .
+					'<label for="hcf_author">' . esc_html__( 'CF7 Form Name', 'cf7-abandoned-form' ) . '</label>' .
 				'</th>' .
-				'<td>'.get_the_title( $cf7af_form_id ).'</td>' .
+			    '<td>' . esc_html( get_the_title( $cf7af_form_id ) ) . '</td>';
 			'</tr>';
 
 			echo '<tr class="form-field">' .
 				'<th scope="row">' .
-					'<label for="hcf_author">' . __( 'User Email', 'cf7-abandoned-form' ) . '</label>' .
+					'<label for="hcf_author">' . esc_html__( 'User Email', 'cf7-abandoned-form' ) . '</label>' .
 				'</th>' .
-				'<td>'.$cf7af_email.'</td>' .
+				'<td>' . esc_html( $cf7af_email ) . '</td>';
 			'</tr>';
 
 			echo '<tr class="form-field">' .
 				'<th scope="row">' .
-					'<label for="hcf_author">' . __( 'User IP', 'cf7-abandoned-form' ) . '</label>' .
+					'<label for="hcf_author">' . esc_html__( 'User IP', 'cf7-abandoned-form' ) . '</label>' .
 				'</th>' .
-				'<td>'.$cf7af_ip_address.'</td>' .
+				'<td>'.esc_html($cf7af_ip_address).'</td>' .
 			'</tr>';
-
 			echo '<tr class="form-field">' .
 				'<th scope="row">' .
-					'<label for="hcf_author">' . __( 'Extra Form Field Detail', 'cf7-abandoned-form' ) . '</label>' .
+					'<label for="hcf_author">' . esc_html__( 'Extra Form Field Detail', 'cf7-abandoned-form' ) . '</label>' .
 				'</th>' .
 				'<td>';
 
@@ -559,7 +557,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 					{
 						echo '<table><tbody>';
 							echo'<tr class="inside-field"><th scope="row">You are using Free Abandoned Contact Form 7 - no license needed. Enjoy! 🙂</th></tr>';
-							echo'<tr class="inside-field"><th scope="row"><a href="https://www.zealousweb.com/wordpress-plugins/product/abandoned-contact-form-7-pro/" target="_blank">To unlock more features consider upgrading to PRO.</a></th></tr>';
+							echo'<tr class="inside-field"><th scope="row"><a href="https://store.zealousweb.com/abandoned-contact-form-7-pro" target="_blank">To unlock more features consider upgrading to PRO.</a></th></tr>';
 						echo '</tbody></table>';
 					}
 					else
@@ -567,7 +565,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 						echo '<table><tbody>';
 							foreach( $cf7af_form_data AS $key => $val ) {
 								if (in_array($val, $cf7af_specific_field)){
-									echo'<tr class="inside-field"><th scope="row"> '.$key.' :</th><td> '.$val.' </td></tr>';
+									echo '<tr class="inside-field"><th scope="row"> ' . esc_html( $key ) . ' :</th><td> ' . esc_html( $val ) . ' </td></tr>';
 								}
 							}
 						echo '</tbody></table>';
@@ -583,7 +581,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 						'<label for="cf7af_mail_status">'. esc_html__('Send Mail', 'cf7-abandoned-form' ) .'</label>' .
 					'</th>' .
 					'<td>' .
-						'<a href="' . esc_url( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-send-mail&abandoned_id='.$post->ID.'"' ) ) . '" class="button button-primary"> '. __( 'Action', 'cf7-abandoned-form' ).' </a> '.
+						'<a href="' . esc_url( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-send-mail&abandoned_id='.$post->ID.'"' ) ) . '" class="button button-primary"> '. esc_html__( 'Action', 'cf7-abandoned-form' ).' </a> '.
 					'</td>' .
 				'</tr>';
 			}

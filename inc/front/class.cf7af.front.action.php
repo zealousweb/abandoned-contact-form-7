@@ -94,12 +94,12 @@ if ( !class_exists( 'CF7AF_Front_Action' ) ){
 
 					if( $form_field->basetype == 'textarea' ) {
 						echo '<script type="text/javascript"> ';
-						echo 'var textarea = document.querySelector("textarea[name='.$form_field->name.']");';
-						echo ' textarea.value = "'.$cf7af_form_data[$form_field->name].'"';
+						echo 'var textarea = document.querySelector("textarea[name=\''. esc_attr($form_field->name) .'\']");';
+						echo ' textarea.value = "' . esc_attr( $cf7af_form_data[$form_field->name] ) . '"';
 						echo '</script>';
 					} elseif( $form_field->basetype == 'radio' ) {
-						echo '<script type="text/javascript">';
-						echo 'jQuery("input[name='.$form_field->name.'][value='.$cf7af_form_data[$form_field->name].']").attr("checked","checked");';
+						echo '<script type="text/javascript">';					
+						echo 'jQuery("input[name=\'' . esc_js( $form_field->name ) . '\'][value=\'' . esc_js( $cf7af_form_data[ $form_field->name ] ) . '\']").prop("checked", true);';
 						echo '</script>';
 					} elseif( $form_field->basetype == 'select' && in_array( 'multiple', $form_field->options ) ) {
 						echo '<script type="text/javascript">';
@@ -107,13 +107,13 @@ if ( !class_exists( 'CF7AF_Front_Action' ) ){
 						if( $form_field_value!= '' ) {
 							$form_field_value = explode( ",", $form_field_value);
 							foreach(  $form_field_value AS $field_value ) {
-								echo 'jQuery("select[name=\''.$form_field->name.'[]\'] option[value='.trim($field_value).']").attr("selected","selected");';
+								echo 'jQuery("select[name=\''. esc_js( $form_field->name ) .'[]\'] option[value=\''. esc_attr( trim( $field_value ) ) .'\']").attr("selected","selected");';
 							}
 						}
 						echo '</script>';
 					} elseif( $form_field->basetype == 'select' ) {
 						echo '<script type="text/javascript">';
-						echo 'jQuery("select[name='.$form_field->name.'] option[value='.$cf7af_form_data[$form_field->name].']").attr("selected","selected");';
+						echo 'jQuery("select[name=' . esc_js( $form_field->name ) . '] option[value=' . esc_js( $cf7af_form_data[$form_field->name] ) . ']").attr("selected","selected");';
 						echo '</script>';
 					} elseif( $form_field->basetype == 'checkbox' ) {
 						$form_field_value = $cf7af_form_data[$form_field->name];
@@ -124,8 +124,8 @@ if ( !class_exists( 'CF7AF_Front_Action' ) ){
 								$form_field_value[$loop] = trim( $field_value );
 								$loop++;
 							}
-							echo '<script type="text/javascript">';
-							echo 'var chk_arr = document.getElementsByName("'.$form_field->name.'[]");';
+							echo '<script type="text/javascript">';						
+							echo 'var chk_arr = document.getElementsByName("' . esc_html( $form_field->name ) . '[]");';
 							echo 'var chklength = chk_arr.length;';
 							echo 'var form_field_value = '.json_encode( $form_field_value ).';';
 							echo 'for(k=0;k<chklength;k++)
@@ -139,7 +139,7 @@ if ( !class_exists( 'CF7AF_Front_Action' ) ){
 					} else {
 						if( $form_field->name && $cf7af_form_data[$form_field->name]!='') {
 							echo '<script type="text/javascript">';
-							echo 'jQuery("input[name='.$form_field->name.']").val("'.$cf7af_form_data[$form_field->name].'");';
+							echo 'jQuery("input[name='. esc_js( $form_field->name ) .']").val("' . esc_js( $cf7af_form_data[ $form_field->name ] ) .'");';
 							echo '</script>';
 						}
 					}
