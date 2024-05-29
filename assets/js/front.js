@@ -190,10 +190,12 @@
 	"use strict";
 
 	document.addEventListener( 'wpcf7mailsent', function( event ) {
-
+		var urlParams = new URLSearchParams(window.location.search);
+		var recoverId = urlParams.get('recover');
 		var data = {
 			'action': 'remove_abandoned',
 			'cf7_id':  event.detail.contactFormId  ,
+			'recover_id': recoverId,
 		}
 
 		$.ajax({

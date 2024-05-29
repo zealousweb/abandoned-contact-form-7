@@ -62,6 +62,11 @@ if ( !class_exists( 'CF7AF' ) ) {
 
 			session_start(); //phpcs:ignore
 			$cf7_id = isset( $_POST['cf7_id'] ) ? sanitize_text_field($_POST['cf7_id']) : ''; //phpcs:ignore
+			$recover_id = isset( $_POST['recover_id'] ) ? sanitize_text_field($_POST['recover_id']) : ''; //phpcs:ignore
+
+			if(!empty($recover_id)){
+				wp_delete_post( $recover_id, true );
+			}
 
 			if( $cf7_id  && isset( $_SESSION['wp_cf7form_id_'.$cf7_id.''] ) )  {
 				$post_id = sanitize_text_field($_SESSION['wp_cf7form_id_'.$cf7_id.'']); //phpcs:ignore
