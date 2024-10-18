@@ -11,6 +11,8 @@ Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data e
 - Also, An option to customize the mail body for Abandoned email upto 10 Entries.
 - Select specific field to include in tracking data
 - Compatibility of WordPress VIP.
+[Learn more about the Pro version](https://store.zealousweb.com/abandoned-contact-form-7).
+
 
 # Installation
 1. Download the plugin zip file from WordPress.org plugin site to your desktop / PC
