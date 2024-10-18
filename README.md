@@ -12,7 +12,7 @@ Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data e
 - Select specific field to include in tracking data
 - Compatibility of WordPress VIP.
   
-[Learn more about the Pro version](https://store.zealousweb.com/abandoned-contact-form-7).
+[Learn more about the Pro version](https://store.zealousweb.com/abandoned-contact-form-7-pro).
 
 **Features of Abandoned Contact Form 7 Pro**
 
