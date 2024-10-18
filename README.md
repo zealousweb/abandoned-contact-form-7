@@ -14,6 +14,17 @@ Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data e
   
 [Learn more about the Pro version](https://store.zealousweb.com/abandoned-contact-form-7).
 
+**Features of Abandoned Contact Form 7 Pro**
+
+ We have released the PRO version of this plugin with extra advantageous features added. PRO Version 1.0 Released.
+ 
+- In the list of Abandoned forms entry in admin side you can view IP addresses and other data which are filled-up by the user unlimited Entries.
+- Facility to export the list of entire abandoned users unlimited Entries.
+- You can schedule a time for sending emails to each abandoned user.
+- You can set the “Status” of the user to send an email so we can manage not to send the same email again to the same user.
+- You can easily manage the number of time emails sent to the user.
+- Also, An option to customize the mail body for Abandoned email unlimited Entries.
+- For schedule mails, we have the option of SMTP settings. Here, you can set SMTP from Plugin, no need to add another plugin for SMTP configuration.
 
 # Installation
 1. Download the plugin zip file from WordPress.org plugin site to your desktop / PC
