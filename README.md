@@ -25,6 +25,7 @@ Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data e
 - You can easily manage the number of time emails sent to the user.
 - Also, An option to customize the mail body for Abandoned email unlimited Entries.
 - For schedule mails, we have the option of SMTP settings. Here, you can set SMTP from Plugin, no need to add another plugin for SMTP configuration.
+
 * <strong>[Demo for Abandoned Contact Form 7 Pro](https://demo.zealousweb.com/wordpress-plugins/abandoned-contact-form-7/)</strong>
 
 **OUR OTHER PLUGINS**
