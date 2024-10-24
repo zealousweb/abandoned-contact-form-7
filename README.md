@@ -26,7 +26,7 @@ Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data e
 - Also, An option to customize the mail body for Abandoned email unlimited Entries.
 - For schedule mails, we have the option of SMTP settings. Here, you can set SMTP from Plugin, no need to add another plugin for SMTP configuration.
 
-# OUR OTHER PLUGINS
+**OUR OTHER PLUGINS**
 
 * <strong>[Accept PayPal Payments Using Contact Form 7 Pro](https://store.zealousweb.com/accept-paypal-payments-using-contact-form-7-pro)</strong>
 * <strong>[Accept Stripe Payments Using Contact Form 7 Pro](https://store.zealousweb.com/accept-stripe-payments-using-contact-form-7-pro)</strong>
