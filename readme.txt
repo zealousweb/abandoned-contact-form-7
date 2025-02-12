@@ -5,7 +5,7 @@ Tags: abandoned, contact form 7, export, email, wpvip
 Requires at least: 3.5
 Donate link: http://www.zealousweb.com/payment/
 Tested up to:  6.6
-Stable tag: 1.7
+Stable tag: 1.8
 Requires PHP: 5.6
 CF7 requires at least: 3.0
 CF7 tested up to: 5.8
