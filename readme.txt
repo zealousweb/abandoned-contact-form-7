@@ -10,7 +10,7 @@ Requires PHP: 5.6
 CF7 requires at least: 3.0
 CF7 tested up to: 5.8
 License: GPLv3 or later License
-Version: 1.7
+Version: 1.8
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 Abandoned Contact Form 7 provides an ability to track the data from Contact Form 7 even if the user does not submit the form.
@@ -96,6 +96,9 @@ No, you can't Abandon the data of the file type input field.
 4. Select specific field to include in tracking data 
 
 == Changelog ==
+
+= 1.8 =
+* Improved compatibility with WordPress VIP platform by refactoring code to adhere to VIP coding standards.
 
 = 1.7 =
 * Improved compatibility with WordPress VIP platform by refactoring code to adhere to VIP coding standards.
