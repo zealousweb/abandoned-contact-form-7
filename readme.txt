@@ -98,7 +98,7 @@ No, you can't Abandon the data of the file type input field.
 == Changelog ==
 
 = 1.8 =
-* Improved compatibility with WordPress VIP platform by refactoring code to adhere to VIP coding standards.
+* Minor changes - Hidden
 
 = 1.7 =
 * Improved compatibility with WordPress VIP platform by refactoring code to adhere to VIP coding standards.
