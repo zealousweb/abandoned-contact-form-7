@@ -1,10 +1,10 @@
 === Abandoned Contact Form 7 ===
 
 Contributors: zealopensource
-Tags: abandoned, contact form 7, export, email
+Tags: abandoned, contact form 7, export, email, wpvip
 Requires at least: 3.5
 Donate link: http://www.zealousweb.com/payment/
-Tested up to:  6.5
+Tested up to:  6.6
 Stable tag: 1.7
 Requires PHP: 5.6
 CF7 requires at least: 3.0
@@ -29,7 +29,7 @@ Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data e
 * Facility to export the list of entire abandoned users upto 10 Entries.
 * Also, An option to customize the mail body for Abandoned email upto 10 Entries.
 * Select specific field to include in tracking data
-* Compatibility of WordPress VIP 
+* Compatibility of WordPress VIP. 
 
 = Features of Abandoned Contact Form 7 Pro =
 
