@@ -5,12 +5,12 @@ Tags: abandoned, contact form 7, export, email, wpvip
 Requires at least: 3.5
 Donate link: http://www.zealousweb.com/payment/
 Tested up to:  6.8
-Stable tag: 2.0
+Stable tag: 2.1
 Requires PHP: 5.6
 CF7 requires at least: 3.0
 CF7 tested up to: 5.8
 License: GPLv3 or later License
-Version: 2.0
+Version: 2.1
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 Abandoned Contact Form 7 provides an ability to track the data from Contact Form 7 even if the user does not submit the form.
@@ -101,6 +101,9 @@ No, you can't Abandon the data of the file type input field.
 4. Select specific field to include in tracking data 
 
 == Changelog ==
+
+= 2.1 =
+* Minor changes - Doc update
 
 = 2.0 =
 * Minor changes - Doc update
