@@ -25,7 +25,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 		function __construct()  {
 
 			$this->cf7af_mail_notify_opt = get_option( 'cf7af_mail_notify_option' );
-
+			add_action( 'admin_enqueue_scripts', array( $this, 'admin_cf7af_scripts' ),999 );
 			add_action( 'admin_init', 		array( $this, 'action__admin_init' ) );
 			add_action( 'init',         	array( $this, 'action__init_99' ), 99 );
 			add_action( 'add_meta_boxes', 	array( $this, 'action__add_meta_boxes' ) );
@@ -59,6 +59,14 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 			wp_register_style( CF7AF_PREFIX . '_admin_css', CF7AF_URL . 'assets/css/admin.min.css', array(), CF7AF_VERSION );
 
 			wp_register_script( CF7AF_PREFIX . '_admin_js', CF7AF_URL . 'assets/js/admin.min.js', array( 'jquery-core' ), CF7AF_VERSION );
+		}
+
+		/**
+		 * enqueue script and style for plugin
+		 */
+
+		function admin_cf7af_scripts() {
+			wp_enqueue_style( CF7AF_PREFIX . '-style-admin', CF7AF_URL .'assets/css/admin.css' );
 		}
 
 		/**
@@ -399,6 +407,10 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				echo '</select>';
 
 				echo '<button type="submit" name="export_csv_cf7af" class="button action"> '.esc_html__('Export CSV', 'cf7-abandoned-form' ).'</button>';
+
+				echo '<a class="cf7af-primary-btn" href="https://support.zealousweb.com/portal/en/home" target="_blank" rel="noopener noreferrer">'
+				. esc_html__( 'Open Support Ticket', 'cf7-abandoned-form' ) .
+				'</a>';
 			echo '</div>';
 		}
 
