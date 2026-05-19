@@ -12,7 +12,7 @@
 	if ( isset( $_POST['cf7af_smtp_test_submit'] ) ) {
 		// check nounce
 		if ( ! check_admin_referer( plugin_basename( __FILE__ ), '_smtptest_nonce_name' ) ) {
-			$custom_error[] =  __( 'Nonce check failed.', 'cf7-abandoned-form' );
+			$custom_error[] =  __( 'Nonce check failed.', 'abandoned-contact-form-7' );
 		}
 		global $wp_version;
 		require_once ABSPATH . WPINC . '/class-phpmailer.php';
@@ -94,13 +94,13 @@
 		$ret['debug_log'] = $debug_msg;
 
 		if( $success==0 ) {
-			$custom_error[] = __( 'Error on send mail.', 'cf7-abandoned-form' );
+			$custom_error[] = __( 'Error on send mail.', 'abandoned-contact-form-7' );
 			$custom_error[] = $ret['error'];
 			$custom_error[] = $ret['debug_log'];
 		}
 
 		if ( empty( $custom_error ) ) {
-			$message .= __( 'Test email was successfully sent. No errors occurred during the process.', 'cf7-abandoned-form' );
+			$message .= __( 'Test email was successfully sent. No errors occurred during the process.', 'abandoned-contact-form-7' );
 		}
 
 	}
@@ -108,14 +108,14 @@
 	if ( isset( $_POST['cf7af_smtp_submit'] ) ) {
 		// check nounce
 		if ( ! check_admin_referer( plugin_basename( __FILE__ ), '_smtp_nonce_name' ) ) {
-			$custom_error .= ' ' . __( 'Nonce check failed.', 'cf7-abandoned-form' );
+			$custom_error .= ' ' . __( 'Nonce check failed.', 'abandoned-contact-form-7' );
 		}
 
 		if ( isset( $_POST['cf7af_from_email'] ) ) {
 			if ( is_email( $_POST['cf7af_from_email'] ) ) {
 				$cf7af_smtp_option['cf7af_from_email'] = sanitize_email( $_POST['cf7af_from_email'] );
 			} else {
-				$custom_error .= ' ' . __( "Please enter a valid email address in the 'From Email Address' field.", 'cf7-abandoned-form' );
+				$custom_error .= ' ' . __( "Please enter a valid email address in the 'From Email Address' field.", 'abandoned-contact-form-7' );
 			}
 		}
 		$cf7af_from_name = isset($_POST['cf7af_from_name']) ? sanitize_text_field($_POST['cf7af_from_name']) : '';
@@ -129,7 +129,7 @@
 		if ( isset( $_POST['cf7af_smtp_port'] ) ) {
 			if ( empty( $_POST['cf7af_smtp_port'] ) || 1 > intval( $_POST['cf7af_smtp_port'] ) || ( ! preg_match( '/^\d+$/', $_POST['cf7af_smtp_port'] ) ) ) {
 				$cf7af_smtp_option['cf7af_smtp_port']	= '25';
-				$custom_error                                   .= ' ' . __( "Please enter a valid port in the 'SMTP Port' field.", 'cf7-abandoned-form' );
+				$custom_error                                   .= ' ' . __( "Please enter a valid port in the 'SMTP Port' field.", 'abandoned-contact-form-7' );
 			} else {
 				$cf7af_smtp_option['cf7af_smtp_port'] = sanitize_text_field( $_POST['cf7af_smtp_port'] );
 			}
@@ -140,17 +140,17 @@
 		/* Update settings in the database */
 		if ( empty( $custom_error ) ) {
 			update_option( 'cf7af_smtp_option', $cf7af_smtp_option );
-			$message .= __( 'Settings saved.', 'cf7-abandoned-form' );
+			$message .= __( 'Settings saved.', 'abandoned-contact-form-7' );
 		} else {
-			$custom_error .= ' ' . __( 'Settings are not saved.', 'cf7-abandoned-form' );
+			$custom_error .= ' ' . __( 'Settings are not saved.', 'abandoned-contact-form-7' );
 		}
 
 	}
 	$current = ( ! empty( $_GET['tab'] ) ) ? esc_attr( $_GET['tab'] ) : 'smtp-settings';
 
 	$new_tabs = array(
-		'smtp-settings'   => __( 'SMTP Settings', 'cf7-abandoned-form' ),
-		'test-mail'  => __( 'Test Mail', 'cf7-abandoned-form' )
+		'smtp-settings'   => __( 'SMTP Settings', 'abandoned-contact-form-7' ),
+		'test-mail'  => __( 'Test Mail', 'abandoned-contact-form-7' )
 	);
 	$html = '<h2 class="nav-tab-wrapper">';
 	foreach( $new_tabs as $new_tab => $name ){
@@ -165,7 +165,7 @@
 	if ( $current != 'test-mail' ) {
 	?>
 
-		<h2><?php _e( 'SMTP Settings', 'cf7-abandoned-form' ); ?></h2>
+		<h2><?php _e( 'SMTP Settings', 'abandoned-contact-form-7' ); ?></h2>
 
 		<?php if( !empty( $message ) )  { ?>
 		<div id="setting-error-settings_updated" class="notice notice-success settings-error is-dismissible">
@@ -187,7 +187,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="cf7af-from-email">
-							<?php _e( 'From Email Address', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'From Email Address', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="cf7af-from-email-pointer"></span>
 					</th>
@@ -206,7 +206,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="cf7af-from-name">
-							<?php _e( 'From Name', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'From Name', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="cf7af-from-name-pointer"></span>
 					</th>
@@ -224,7 +224,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="cf7af-smtp-host">
-							<?php _e( 'SMTP Host', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'SMTP Host', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="cf7af-smtp-host-pointer"></span>
 					</th>
@@ -243,7 +243,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="cf7af-smtp-ency-type">
-							<?php _e( 'Type of Encryption', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'Type of Encryption', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="cf7af-smtp-ency-type-pointer"></span>
 					</th>
@@ -252,15 +252,15 @@
 					$cf7af_smtp_option['cf7af_smtp_ency_type'] = isset( $cf7af_smtp_option['cf7af_smtp_ency_type'] ) ? $cf7af_smtp_option['cf7af_smtp_ency_type'] : 'none';
 					?>
 						<label for="cf7af_smtp_ency_type_1">
-							<input id="cf7af_smtp_ency_type_1" name="cf7af_smtp_ency_type" type="radio" value="none"  <?php checked( $cf7af_smtp_option['cf7af_smtp_ency_type'], 'none' ); ?> ><?php _e( 'None', 'cf7-abandoned-form' ); ?>
+							<input id="cf7af_smtp_ency_type_1" name="cf7af_smtp_ency_type" type="radio" value="none"  <?php checked( $cf7af_smtp_option['cf7af_smtp_ency_type'], 'none' ); ?> ><?php _e( 'None', 'abandoned-contact-form-7' ); ?>
 						</label>
 
 						<label for="cf7af_smtp_ency_type_2">
-							<input id="cf7af_smtp_ency_type_2" name="cf7af_smtp_ency_type" type="radio" value="ssl"  <?php checked( $cf7af_smtp_option['cf7af_smtp_ency_type'], 'ssl' ); ?> ><?php _e( 'SSL/TLS', 'cf7-abandoned-form' ); ?>
+							<input id="cf7af_smtp_ency_type_2" name="cf7af_smtp_ency_type" type="radio" value="ssl"  <?php checked( $cf7af_smtp_option['cf7af_smtp_ency_type'], 'ssl' ); ?> ><?php _e( 'SSL/TLS', 'abandoned-contact-form-7' ); ?>
 						</label>
 
 						<label for="cf7af_smtp_ency_type_3">
-							<input id="cf7af_smtp_ency_type_3" name="cf7af_smtp_ency_type" type="radio" value="tls"  <?php checked( $cf7af_smtp_option['cf7af_smtp_ency_type'], 'tls' ); ?> ><?php _e( 'STARTTLS', 'cf7-abandoned-form' ); ?>
+							<input id="cf7af_smtp_ency_type_3" name="cf7af_smtp_ency_type" type="radio" value="tls"  <?php checked( $cf7af_smtp_option['cf7af_smtp_ency_type'], 'tls' ); ?> ><?php _e( 'STARTTLS', 'abandoned-contact-form-7' ); ?>
 						</label>
 					</td>
 				</tr>
@@ -268,7 +268,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="cf7af-smtp-port">
-							<?php _e( 'Port', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'Port', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="cf7af-smtp-port-pointer"></span>
 					</th>
@@ -287,7 +287,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="cf7af-smtp-auth">
-							<?php _e( 'SMTP Authentication', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'SMTP Authentication', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="cf7af-smtp-auth-pointer"></span>
 					</th>
@@ -296,11 +296,11 @@
 					$cf7af_smtp_option['cf7af_smtp_auth'] = isset( $cf7af_smtp_option['cf7af_smtp_auth'] ) ? $cf7af_smtp_option['cf7af_smtp_auth'] : 'yes';
 					?>
 						<label for="cf7af_smtp_auth_1">
-							<input id="cf7af_smtp_auth_1" name="cf7af_smtp_auth" type="radio" value="no" <?php checked( $cf7af_smtp_option['cf7af_smtp_auth'], 'no' ); ?> ><?php _e( 'No', 'cf7-abandoned-form' ); ?>
+							<input id="cf7af_smtp_auth_1" name="cf7af_smtp_auth" type="radio" value="no" <?php checked( $cf7af_smtp_option['cf7af_smtp_auth'], 'no' ); ?> ><?php _e( 'No', 'abandoned-contact-form-7' ); ?>
 						</label>
 
 						<label for="cf7af_smtp_auth_2">
-							<input id="cf7af_smtp_auth_2" name="cf7af_smtp_auth" type="radio" value="yes" <?php checked( $cf7af_smtp_option['cf7af_smtp_auth'], 'yes' ); ?> ><?php _e( 'Yes', 'cf7-abandoned-form' ); ?>
+							<input id="cf7af_smtp_auth_2" name="cf7af_smtp_auth" type="radio" value="yes" <?php checked( $cf7af_smtp_option['cf7af_smtp_auth'], 'yes' ); ?> ><?php _e( 'Yes', 'abandoned-contact-form-7' ); ?>
 						</label>
 					</td>
 				</tr>
@@ -308,7 +308,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="cf7af-smtp-username">
-							<?php _e( 'SMTP Username', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'SMTP Username', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="cf7af-smtp-username-pointer"></span>
 					</th>
@@ -327,7 +327,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="cf7af-smtp-password">
-							<?php _e( 'SMTP Password', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'SMTP Password', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="cf7af-smtp-password-pointer"></span>
 					</th>
@@ -351,7 +351,7 @@
 							name="cf7af_smtp_submit"
 							type="submit"
 							class="button-primary"
-							value="<?php _e( 'Save', 'cf7-abandoned-form' ); ?>"
+							value="<?php _e( 'Save', 'abandoned-contact-form-7' ); ?>"
 						/>
 						<?php wp_nonce_field( plugin_basename( __FILE__ ), '_smtp_nonce_name' ); ?>
 					</td>
@@ -379,7 +379,7 @@
 		</div>
 		<?php } ?>
 
-		<h2><?php _e( 'Test Mail', 'cf7-abandoned-form' ); ?></h2>
+		<h2><?php _e( 'Test Mail', 'abandoned-contact-form-7' ); ?></h2>
 		<form id="cf7af_smtp_test_frm" method="post" action="">
 			<table class="form-table tooltip-table">
 				<tbody>
@@ -387,7 +387,7 @@
 					<tr valign="top">
 						<th scope="row" valign="top">
 							<label for="cf7af-test-to-email">
-								<?php _e( 'To Email', 'cf7-abandoned-form' ); ?>
+								<?php _e( 'To Email', 'abandoned-contact-form-7' ); ?>
 							</label>
 							<span class="cf7af-tooltip hide-if-no-js " id="cf7af-test-to-email-pointer"></span>
 						</th>
@@ -406,7 +406,7 @@
 					<tr valign="top">
 						<th scope="row" valign="top">
 							<label for="cf7af-test-subject">
-								<?php _e( 'Subject', 'cf7-abandoned-form' ); ?>
+								<?php _e( 'Subject', 'abandoned-contact-form-7' ); ?>
 							</label>
 							<span class="cf7af-tooltip hide-if-no-js " id="cf7af-test-subject-pointer"></span>
 						</th>
@@ -424,7 +424,7 @@
 					<tr valign="top">
 						<th scope="row" valign="top">
 							<label for="cf7af-test-message">
-								<?php _e( 'Message', 'cf7-abandoned-form' ); ?>
+								<?php _e( 'Message', 'abandoned-contact-form-7' ); ?>
 							</label>
 							<span class="cf7af-tooltip hide-if-no-js " id="cf7af-test-message-pointer"></span>
 						</th>
@@ -447,7 +447,7 @@
 								name="cf7af_smtp_test_submit"
 								type="submit"
 								class="button-primary"
-								value="<?php _e( 'Send Test Email', 'cf7-abandoned-form' ); ?>"
+								value="<?php _e( 'Send Test Email', 'abandoned-contact-form-7' ); ?>"
 							/>
 							<?php wp_nonce_field( plugin_basename( __FILE__ ), '_smtptest_nonce_name' ); ?>
 						</td>
@@ -464,27 +464,27 @@
 	// Localize the script with new data
 	$translation_array = array(
 		'cf7af_from_email' => __( '<h3>From Email Address</h3>' .
-			'<p>This email address will be used in the &apos;FROM&apos; field.</p>', 'cf7-abandoned-form' ),
+			'<p>This email address will be used in the &apos;FROM&apos; field.</p>', 'abandoned-contact-form-7' ),
 		'cf7af_from_name' => __( '<h3>From Name</h3>' .
-			'<p>This text will be used in the &apos;FROM&apos; field.</p>', 'cf7-abandoned-form' ),
+			'<p>This text will be used in the &apos;FROM&apos; field.</p>', 'abandoned-contact-form-7' ),
 		'cf7af_smtp_host' => __( '<h3>SMTP Host</h3>' .
-			'<p>Enter your SMTP host id.</p>', 'cf7-abandoned-form' ),
+			'<p>Enter your SMTP host id.</p>', 'abandoned-contact-form-7' ),
 		'cf7af_smtp_ency_type' => __( '<h3>Type of Encryption</h3>' .
-			'<p>For most servers SSL/TLS is the recommended option.</p>', 'cf7-abandoned-form' ),
+			'<p>For most servers SSL/TLS is the recommended option.</p>', 'abandoned-contact-form-7' ),
 		'cf7af_smtp_port' => __( '<h3>Port</h3>' .
-			'<p>The port to your mail server.</p>', 'cf7-abandoned-form' ),
+			'<p>The port to your mail server.</p>', 'abandoned-contact-form-7' ),
 		'cf7af_smtp_auth' => __( '<h3>SMTP Authentication</h3>' .
-			'<p>This options should always be checked &apos;Yes&apos;.</p>', 'cf7-abandoned-form' ),
+			'<p>This options should always be checked &apos;Yes&apos;.</p>', 'abandoned-contact-form-7' ),
 		'cf7af_smtp_username' => __( '<h3>SMTP Username</h3>' .
-			'<p>The username to login to your mail server.</p>', 'cf7-abandoned-form' ),
+			'<p>The username to login to your mail server.</p>', 'abandoned-contact-form-7' ),
 		'cf7af_smtp_password' => __( '<h3>SMTP Password</h3>' .
-			'<p>The password to login to your mail server.</p>', 'cf7-abandoned-form' ),
+			'<p>The password to login to your mail server.</p>', 'abandoned-contact-form-7' ),
 		'cf7af_test_to_email' => __( '<h3>To Email</h3>' .
-			'<p>Enter the recipient&apos;s email address.</p>', 'cf7-abandoned-form' ),
+			'<p>Enter the recipient&apos;s email address.</p>', 'abandoned-contact-form-7' ),
 		'cf7af_test_subject' => __( '<h3>Subject</h3>' .
-			'<p>Enter a subject for your message.</p>', 'cf7-abandoned-form' ),
+			'<p>Enter a subject for your message.</p>', 'abandoned-contact-form-7' ),
 		'cf7af_test_message' => __( '<h3>Message</h3>' .
-			'<p>Write your email message.</p>', 'cf7-abandoned-form' ),
+			'<p>Write your email message.</p>', 'abandoned-contact-form-7' ),
 	);
 
 	wp_localize_script( CF7AF_PREFIX . '_admin_js', 'translate_string_cf7af', $translation_array );

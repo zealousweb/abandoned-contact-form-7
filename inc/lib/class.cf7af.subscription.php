@@ -223,7 +223,7 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 					if ( is_wp_error( $response ) ) {
 						$message = $response->get_error_message();
 					} else {
-						$message = __( 'An error occurred, please try again.' , 'cf7-abandoned-form' );
+						$message = __( 'An error occurred, please try again.' , 'abandoned-contact-form-7' );
 					}
 
 					$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$subscription_page );
@@ -281,7 +281,7 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 						default:
 							?>
 							<div class="updated">
-								<p><?php _e( 'Subscription Activation Successfully!', 'cf7-abandoned-form' ); ?></p>
+								<p><?php _e( 'Subscription Activation Successfully!', 'abandoned-contact-form-7' ); ?></p>
 							</div>
 							<?php
 							break;
@@ -378,7 +378,7 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 						<tbody>
 						<tr valign="top">
 							<th scope="row" valign="top">
-								<?php _e( 'Email Address' , 'cf7-abandoned-form' ); ?>
+								<?php _e( 'Email Address' , 'abandoned-contact-form-7' ); ?>
 							</th>
 							<td>
 								<input
@@ -389,13 +389,13 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 									value="<?php esc_attr_e( $subscription_email ); ?>" <?php if ( !empty( $status ) ) { echo 'disabled'; } ?> required
 								/>
 								<label class="description" for="cf7af_subscription_email">
-									<?php _e( 'Enter your email which used for purchase subscription', 'cf7-abandoned-form' ); ?>
+									<?php _e( 'Enter your email which used for purchase subscription', 'abandoned-contact-form-7' ); ?>
 								</label>
 							</td>
 						</tr>
 						<tr valign="top">
 							<th scope="row" valign="top">
-								<?php _e( 'Subscription Key' , 'cf7-abandoned-form' ); ?>
+								<?php _e( 'Subscription Key' , 'abandoned-contact-form-7' ); ?>
 							</th>
 							<td>
 								<input
@@ -406,7 +406,7 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 									value="<?php esc_attr_e( $subscription ); ?>" <?php if ( !empty( $status )  ) { echo 'disabled'; }?> required
 								/>
 								<label class="description" for="cf7af_subscription_key">
-									<?php _e( 'Enter your Subscription key', 'cf7-abandoned-form' ); ?>
+									<?php _e( 'Enter your Subscription key', 'abandoned-contact-form-7' ); ?>
 								</label>
 							</td>
 						</tr>
@@ -424,13 +424,13 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 							</th>
 							<td>
 								<?php if ( !empty( $status ) ) { ?>
-									<span style="color: #29c129; font-weight:bold; line-height: 27px;padding-right: 20px;"><?php _e( 'Your Subscription is active.', 'cf7-abandoned-form' ); ?> </span>
+									<span style="color: #29c129; font-weight:bold; line-height: 27px;padding-right: 20px;"><?php _e( 'Your Subscription is active.', 'abandoned-contact-form-7' ); ?> </span>
 									<?php wp_nonce_field( self::$subscription_nonce, self::$subscription_nonce ); ?>
 									<input
 										type="submit"
 										class="button-secondary"
 										name="<?php echo self::$zw_deactivation_action; ?>"
-										value="<?php _e( 'Deactivate Subscription', 'cf7-abandoned-form' ); ?>
+										value="<?php _e( 'Deactivate Subscription', 'abandoned-contact-form-7' ); ?>
 											"/>
 								<?php } else {
 									wp_nonce_field( self::$subscription_nonce, self::$subscription_nonce ); ?>
@@ -438,7 +438,7 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 										type="submit"
 										class="button-secondary"
 										name="<?php echo self::$activation_action; ?>"
-										value="<?php _e( 'Activate Subscription', 'cf7-abandoned-form' ); ?>"
+										value="<?php _e( 'Activate Subscription', 'abandoned-contact-form-7' ); ?>"
 										style="background: #29c129; border-color: #29c129!important; text-decoration: none; color: white; font-size: 17px; padding: 8px 0; width: 170px; line-height: 0;"
 									/>
 								<?php } ?>

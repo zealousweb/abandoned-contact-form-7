@@ -10,7 +10,7 @@
 	if ( isset( $_POST['save_notify'] ) ) {
 		// check nounce
 		if ( ! check_admin_referer( plugin_basename( __FILE__ ), '_notify_nonce_name' ) ) {
-			$custom_error .= ' ' . __( 'Nonce check failed.', 'cf7-abandoned-form' ); 
+			$custom_error .= ' ' . __( 'Nonce check failed.', 'abandoned-contact-form-7' ); 
 		}
 
 		$cf7af_mail_notify_option['cf7af_notification_time'] = isset( $_POST['cf7af_notification_time'] ) ? sanitize_text_field($_POST['cf7af_notification_time']) : 'cf7af_daily';
@@ -23,19 +23,19 @@
 		/* Update settings in the database */
 		if ( empty( $custom_error ) ) {
 			update_option( 'cf7af_mail_notify_option', $cf7af_mail_notify_option );
-			$message .= __( 'Settings saved.', 'cf7-abandoned-form' );
+			$message .= __( 'Settings saved.', 'abandoned-contact-form-7' );
 		} else {
-			$custom_error .= ' '. __( 'Settings are not saved.', 'cf7-abandoned-form' ); 
+			$custom_error .= ' '. __( 'Settings are not saved.', 'abandoned-contact-form-7' ); 
 		}
 	}
 	?>
 
 	<div class="wrap">
-		<h2><?php _e( 'Mail Notification Settings', 'cf7-abandoned-form' ); ?></h2>
+		<h2><?php _e( 'Mail Notification Settings', 'abandoned-contact-form-7' ); ?></h2>
 		<p>
-			<?php _e( 'Use {email} to insert the email into the mail body.', 'cf7-abandoned-form' ); ?><br>
-			<?php _e( 'Use {contact_form} to insert the form name into the mail body.', 'cf7-abandoned-form' ); ?><br>
-			<?php _e( 'Use {link} to insert the page contact link into the mail body.', 'cf7-abandoned-form' ); ?>
+			<?php _e( 'Use {email} to insert the email into the mail body.', 'abandoned-contact-form-7' ); ?><br>
+			<?php _e( 'Use {contact_form} to insert the form name into the mail body.', 'abandoned-contact-form-7' ); ?><br>
+			<?php _e( 'Use {link} to insert the page contact link into the mail body.', 'abandoned-contact-form-7' ); ?>
 		</p>
 
 		<?php if( !empty( $message ) ) { ?>
@@ -58,7 +58,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="cf7af-subject">
-							<?php _e( 'Subject', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'Subject', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="cf7af-subject-pointer"></span>
 					</th>
@@ -77,7 +77,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="cf7af-email-body">
-							<?php _e( 'Email Body', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'Email Body', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="cf7af-email-body-pointer"></span>
 					</th>
@@ -98,7 +98,7 @@
 							type="submit"
 							class="button-primary"
 							name="save_notify"
-							value="<?php _e( 'Save', 'cf7-abandoned-form' ); ?>"
+							value="<?php _e( 'Save', 'abandoned-contact-form-7' ); ?>"
 						/>
 						<?php wp_nonce_field( plugin_basename( __FILE__ ), '_notify_nonce_name' ); ?>
 					</td>
@@ -112,9 +112,9 @@
 	// Localize the script with new data
 	$translation_array = array(
 		'cf7af_subject' => __( '<h3>Subject</h3>' .
-			'<p>Please enter the subject for send mail.</p>', 'cf7-abandoned-form' ),
+			'<p>Please enter the subject for send mail.</p>', 'abandoned-contact-form-7' ),
 		'cf7af_email_body' => __( '<h3>Email Body </h3>' .
-			'<p>It\'s a body content of mail which reflect on sent mail.</p>', 'cf7-abandoned-form' ),
+			'<p>It\'s a body content of mail which reflect on sent mail.</p>', 'abandoned-contact-form-7' ),
 	);
 
 	wp_localize_script( CF7AF_PREFIX . '_admin_js', 'translate_string_cf7af', $translation_array );

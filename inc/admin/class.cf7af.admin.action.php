@@ -110,11 +110,11 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				/** CSV Export **/
 				$filename = 'cf7af-' . $form_id . '-' . time() . '.csv';
 
-				$text_cf7af_form_data = __( 'Form Data', 'cf7-abandoned-form' );
-				$text_cf7af_email = __( 'User Email', 'cf7-abandoned-form' );
-				$text_cf7af_ip_address = __( 'User IP', 'cf7-abandoned-form' );
-				$text_number_sentmail = __( 'Number of Send Mail', 'cf7-abandoned-form' );
-				$text_date = __( 'Submitted Date', 'cf7-abandoned-form' );
+				$text_cf7af_form_data = __( 'Form Data', 'abandoned-contact-form-7' );
+				$text_cf7af_email = __( 'User Email', 'abandoned-contact-form-7' );
+				$text_cf7af_ip_address = __( 'User IP', 'abandoned-contact-form-7' );
+				$text_number_sentmail = __( 'Number of Send Mail', 'abandoned-contact-form-7' );
+				$text_date = __( 'Submitted Date', 'abandoned-contact-form-7' );
 
 				$header_row = array(
 					'cf7af_form_data'		=> $text_cf7af_form_data,
@@ -209,7 +209,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 		 * - Add mes boxes for the CPT "cf7af_data"
 		 */
 		function action__add_meta_boxes() {
-			add_meta_box( 'cf7af-data', __( 'Abandoned Form Data', 'cf7-abandoned-form' ), array( $this, 'cf7af_show_from_data' ), CF7AF_POST_TYPE, 'normal', 'high' );
+			add_meta_box( 'cf7af-data', __( 'Abandoned Form Data', 'abandoned-contact-form-7' ), array( $this, 'cf7af_show_from_data' ), CF7AF_POST_TYPE, 'normal', 'high' );
 		}
 
 		/**
@@ -301,10 +301,10 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 							filter_var( $cf7af_email, FILTER_VALIDATE_EMAIL) &&
 							$abandoned_post_status != 'trash'
 						) {
-							echo '<a href="' . esc_url( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-send-mail&abandoned_id='.$post_id.'"' ) ) . '" class="button button-primary"> '. esc_html__( 'Action', 'cf7-abandoned-form' ).' </a>';
+							echo '<a href="' . esc_url( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-send-mail&abandoned_id='.$post_id.'"' ) ) . '" class="button button-primary"> '. esc_html__( 'Action', 'abandoned-contact-form-7' ).' </a>';
 
 						} else {
-							echo '<a href="javascript::void(0);" class="disabled button-primary"> '. esc_html__( 'Invalid Email', 'cf7-abandoned-form' ).' </a>';
+							echo '<a href="javascript::void(0);" class="disabled button-primary"> '. esc_html__( 'Invalid Email', 'abandoned-contact-form-7' ).' </a>';
 						}
 					break;
 
@@ -391,14 +391,14 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 
 			echo '<div class="alignleft actions">';
 				echo '<select name="form-id" id="form-id">';
-					echo '<option value="all">' . esc_html__( 'Select Forms', 'cf7-abandoned-form' ) . '</option>';
+					echo '<option value="all">' . esc_html__( 'Select Forms', 'abandoned-contact-form-7' ) . '</option>';
 					foreach ( $posts as $post ) {
 						echo '<option value="' . esc_attr( $post->ID ) . '" ' . selected( $selected, $post->ID, false ) . '>' . esc_html( $post->post_title )  . '</option>';
 
 					}
 				echo '</select>';
 
-				echo '<button type="submit" name="export_csv_cf7af" class="button action"> '.esc_html__('Export CSV', 'cf7-abandoned-form' ).'</button>';
+				echo '<button type="submit" name="export_csv_cf7af" class="button action"> '.esc_html__('Export CSV', 'abandoned-contact-form-7' ).'</button>';
 			echo '</div>';
 		}
 
@@ -435,8 +435,8 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 
 			add_submenu_page(
 				'edit.php?post_type='.CF7AF_POST_TYPE,
-				__( 'Mail Notification Settings', 'cf7-abandoned-form' ),
-				__( 'Mail Notification Settings', 'cf7-abandoned-form' ),
+				__( 'Mail Notification Settings', 'abandoned-contact-form-7' ),
+				__( 'Mail Notification Settings', 'abandoned-contact-form-7' ),
 				'manage_options',
 				'cf7af-setting',
 				array( $this, 'cf7af_setting_callback' )
@@ -444,8 +444,8 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 
 			add_submenu_page(
 				'',
-				__( 'Send Mail', 'cf7-abandoned-form' ),
-				__( 'Send Mail', 'cf7-abandoned-form' ),
+				__( 'Send Mail', 'abandoned-contact-form-7' ),
+				__( 'Send Mail', 'abandoned-contact-form-7' ),
 				'manage_options',
 				'cf7af-send-mail',
 				array( $this, 'cf7af_send_mail_callback' )
@@ -462,7 +462,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 		function action__cf7af_admin_notices_export() {
 			echo '<div id="setting-error-settings_updated" class="notice notice-error settings-error is-dismissible"> ' .
 				'<p>' .
-					esc_html__( 'Please select form to export.', 'cf7-abandoned-form' ) .
+					esc_html__( 'Please select form to export.', 'abandoned-contact-form-7' ) .
 				'</p>' .
 			'</div>';
 		}
@@ -477,7 +477,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 		function action__cf7af_admin_notices_blank() {
 			echo '<div id="setting-error-settings_updated" class="notice notice-error settings-error is-dismissible"> ' .
 				'<p>' .
-					esc_html__( 'No Abandoned data Found', 'cf7-abandoned-form' ) .
+					esc_html__( 'No Abandoned data Found', 'abandoned-contact-form-7' ) .
 				'</p>' .
 			'</div>';
 		}
@@ -528,27 +528,27 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 
 			echo '<tr class="form-field">' .
 				'<th scope="row">' .
-					'<label for="hcf_author">' . esc_html__( 'CF7 Form Name', 'cf7-abandoned-form' ) . '</label>' .
+					'<label for="hcf_author">' . esc_html__( 'CF7 Form Name', 'abandoned-contact-form-7' ) . '</label>' .
 				'</th>' .
 			    '<td>' . esc_html( get_the_title( $cf7af_form_id ) ) . '</td>';
 			'</tr>';
 
 			echo '<tr class="form-field">' .
 				'<th scope="row">' .
-					'<label for="hcf_author">' . esc_html__( 'User Email', 'cf7-abandoned-form' ) . '</label>' .
+					'<label for="hcf_author">' . esc_html__( 'User Email', 'abandoned-contact-form-7' ) . '</label>' .
 				'</th>' .
 				'<td>' . esc_html( $cf7af_email ) . '</td>';
 			'</tr>';
 
 			echo '<tr class="form-field">' .
 				'<th scope="row">' .
-					'<label for="hcf_author">' . esc_html__( 'User IP', 'cf7-abandoned-form' ) . '</label>' .
+					'<label for="hcf_author">' . esc_html__( 'User IP', 'abandoned-contact-form-7' ) . '</label>' .
 				'</th>' .
 				'<td>'.esc_html($cf7af_ip_address).'</td>' .
 			'</tr>';
 			echo '<tr class="form-field">' .
 				'<th scope="row">' .
-					'<label for="hcf_author">' . esc_html__( 'Extra Form Field Detail', 'cf7-abandoned-form' ) . '</label>' .
+					'<label for="hcf_author">' . esc_html__( 'Extra Form Field Detail', 'abandoned-contact-form-7' ) . '</label>' .
 				'</th>' .
 				'<td>';
 
@@ -578,10 +578,10 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 			if( filter_var( $cf7af_email, FILTER_VALIDATE_EMAIL ) ) {
 				echo '<tr class="form-field">' .
 					'<th scope="row">' .
-						'<label for="cf7af_mail_status">'. esc_html__('Send Mail', 'cf7-abandoned-form' ) .'</label>' .
+						'<label for="cf7af_mail_status">'. esc_html__('Send Mail', 'abandoned-contact-form-7' ) .'</label>' .
 					'</th>' .
 					'<td>' .
-						'<a href="' . esc_url( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-send-mail&abandoned_id='.$post->ID.'"' ) ) . '" class="button button-primary"> '. esc_html__( 'Action', 'cf7-abandoned-form' ).' </a> '.
+						'<a href="' . esc_url( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-send-mail&abandoned_id='.$post->ID.'"' ) ) . '" class="button button-primary"> '. esc_html__( 'Action', 'abandoned-contact-form-7' ).' </a> '.
 					'</td>' .
 				'</tr>';
 			}

@@ -164,38 +164,38 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 							case 'expired' :
 
 								$message = sprintf(
-									__( 'Your license key expired.', 'cf7-abandoned-form' )
+									__( 'Your license key expired.', 'abandoned-contact-form-7' )
 								);
 								break;
 
 							case 'revoked' :
 
-								$message = __( 'Your license key has been disabled.', 'cf7-abandoned-form' );
+								$message = __( 'Your license key has been disabled.', 'abandoned-contact-form-7' );
 								break;
 
 							case 'missing' :
-								$message = __( 'Invalid license.', 'cf7-abandoned-form' );
+								$message = __( 'Invalid license.', 'abandoned-contact-form-7' );
 								break;
 
 							case 'invalid' :
 							case 'site_inactive' :
 
-								$message = __( 'Your license is not active for this URL.', 'cf7-abandoned-form' );
+								$message = __( 'Your license is not active for this URL.', 'abandoned-contact-form-7' );
 								break;
 
 							case 'item_name_mismatch' :
 
-								$message = sprintf( __( 'This appears to be an invalid license key for %s.' ), self::$item_name , 'cf7-abandoned-form' );
+								$message = sprintf( __( 'This appears to be an invalid license key for %s.' ), self::$item_name , 'abandoned-contact-form-7' );
 								break;
 
 							case 'no_activations_left':
 
-								$message = __( 'Your license key has reached its activation limit.' , 'cf7-abandoned-form' );
+								$message = __( 'Your license key has reached its activation limit.' , 'abandoned-contact-form-7' );
 								break;
 
 							default :
 
-								$message = __( 'An error occurred, please try again.' , 'cf7-abandoned-form' );
+								$message = __( 'An error occurred, please try again.' , 'abandoned-contact-form-7' );
 								break;
 						}
 					}
@@ -258,7 +258,7 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 					if ( is_wp_error( $response ) ) {
 						$message = $response->get_error_message();
 					} else {
-						$message = __( 'An error occurred, please try again.' , 'cf7-abandoned-form' );
+						$message = __( 'An error occurred, please try again.' , 'abandoned-contact-form-7' );
 					}
 
 					$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$license_page );
@@ -315,7 +315,7 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 						default:
 							?>
 							<div class="updated">
-								<p><?php _e( 'License Activation Successfully!', 'cf7-abandoned-form' ); ?></p>
+								<p><?php _e( 'License Activation Successfully!', 'abandoned-contact-form-7' ); ?></p>
 							</div>
 							<?php
 							break;
@@ -410,7 +410,7 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 						<tbody>
 						<tr valign="top">
 							<th scope="row" valign="top">
-								<?php _e( 'Email Address' , 'cf7-abandoned-form' ); ?>
+								<?php _e( 'Email Address' , 'abandoned-contact-form-7' ); ?>
 							</th>
 							<td>
 								<input
@@ -421,13 +421,13 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 									value="<?php esc_attr_e( $license_email ); ?>" <?php if ( !empty( $status ) ) { echo 'disabled'; } ?> required
 								/>
 								<label class="description" for="cf7af_license_email">
-									<?php _e( 'Enter your email which used for purchase license', 'cf7-abandoned-form' ); ?>
+									<?php _e( 'Enter your email which used for purchase license', 'abandoned-contact-form-7' ); ?>
 								</label>
 							</td>
 						</tr>
 						<tr valign="top">
 							<th scope="row" valign="top">
-								<?php _e( 'License Key' , 'cf7-abandoned-form' ); ?>
+								<?php _e( 'License Key' , 'abandoned-contact-form-7' ); ?>
 							</th>
 							<td>
 								<input
@@ -438,7 +438,7 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 									value="<?php esc_attr_e( $license ); ?>" <?php if ( !empty( $status )  ) { echo 'disabled'; }?> required
 								/>
 								<label class="description" for="cf7af_license_key">
-									<?php _e( 'Enter your license key', 'cf7-abandoned-form' ); ?>
+									<?php _e( 'Enter your license key', 'abandoned-contact-form-7' ); ?>
 								</label>
 							</td>
 						</tr>
@@ -448,13 +448,13 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 							</th>
 							<td>
 								<?php if ( !empty( $status ) ) { ?>
-									<span style="color: #29c129; font-weight:bold; line-height: 27px;padding-right: 20px;"><?php _e( 'Your License is active.', 'cf7-abandoned-form' ); ?> </span>
+									<span style="color: #29c129; font-weight:bold; line-height: 27px;padding-right: 20px;"><?php _e( 'Your License is active.', 'abandoned-contact-form-7' ); ?> </span>
 									<?php wp_nonce_field( self::$licence_nonce, self::$licence_nonce ); ?>
 									<input
 										type="submit"
 										class="button-secondary"
 										name="<?php echo self::$zw_deactivation_action; ?>"
-										value="<?php _e( 'Deactivate License', 'cf7-abandoned-form' ); ?>
+										value="<?php _e( 'Deactivate License', 'abandoned-contact-form-7' ); ?>
 											"/>
 								<?php } else {
 									wp_nonce_field( self::$licence_nonce, self::$licence_nonce ); ?>
@@ -462,7 +462,7 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 										type="submit"
 										class="button-secondary"
 										name="<?php echo self::$activation_action; ?>"
-										value="<?php _e( 'Activate License', 'cf7-abandoned-form' ); ?>"
+										value="<?php _e( 'Activate License', 'abandoned-contact-form-7' ); ?>"
 										style="background: #29c129; border-color: #29c129!important; text-decoration: none; color: white; font-size: 17px; padding: 8px 0; width: 170px; line-height: 0;"
 									/>
 								<?php } ?>

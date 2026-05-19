@@ -34,7 +34,7 @@
 	if ( isset( $_POST['send_mail'] ) ) {
 		// check nounce
 		if ( ! check_admin_referer( plugin_basename( __FILE__ ), '_send_mail_nonce_name' ) ) {
-			$custom_error .= ' ' . __( 'Nonce check failed.', 'cf7-abandoned-form' ); 
+			$custom_error .= ' ' . __( 'Nonce check failed.', 'abandoned-contact-form-7' ); 
 		} else {
 
 			$to = isset($_POST['abandoned_email_address']) ? sanitize_email($_POST['abandoned_email_address']) : '';
@@ -70,7 +70,7 @@
 				$number_fail_count =  get_post_meta( $abandoned_id, 'number_fail_count', true );
 				$number_fail_count = $number_fail_count + 1;
 				update_post_meta( $abandoned_id, 'number_fail_count', $number_fail_count );
-				$custom_error .= ' ' . __( 'Error on Send Mail.', 'cf7-abandoned-form' ); 
+				$custom_error .= ' ' . __( 'Error on Send Mail.', 'abandoned-contact-form-7' ); 
 			}
 			
 		}
@@ -81,15 +81,15 @@
 			$number_sentmail = $number_sentmail + 1;
 			update_post_meta( $abandoned_id, 'number_sentmail', $number_sentmail );
 
-			$message .= __( 'Send Mail Suceessfully to Abandoned User.', 'cf7-abandoned-form' );
+			$message .= __( 'Send Mail Suceessfully to Abandoned User.', 'abandoned-contact-form-7' );
 		} else {
-			$custom_error .= ' ' . __( 'Mail has not send.', 'cf7-abandoned-form' ); 
+			$custom_error .= ' ' . __( 'Mail has not send.', 'abandoned-contact-form-7' ); 
 		}
 	}
 
 	?>
 	<div class="wrap">
-		<h2><?php _e( 'Send Mail to Abandoned User Entry', 'cf7-abandoned-form' );  ?>
+		<h2><?php _e( 'Send Mail to Abandoned User Entry', 'abandoned-contact-form-7' );  ?>
 		<?php echo ' <a href="' . esc_url( get_edit_post_link( $abandoned_id ) ) . '" target="_blank" style="text-decoration:none;">#' .esc_html($abandoned_id) . '</a>';  ?>
 		</h2>
 
@@ -104,9 +104,9 @@
 			else
 			{
 				?>
-				<?php _e( 'Use {email} to insert the email into the mail body.', 'cf7-abandoned-form' ); ?><br>
-				<?php _e( 'Use {contact_form} to insert the form name into the mail body.', 'cf7-abandoned-form' ); ?><br>
-				<?php _e( 'Use {link} to insert the page contact link into the mail body.', 'cf7-abandoned-form' ); ?>
+				<?php _e( 'Use {email} to insert the email into the mail body.', 'abandoned-contact-form-7' ); ?><br>
+				<?php _e( 'Use {contact_form} to insert the form name into the mail body.', 'abandoned-contact-form-7' ); ?><br>
+				<?php _e( 'Use {link} to insert the page contact link into the mail body.', 'abandoned-contact-form-7' ); ?>
 				<?php
 			}
 			?>
@@ -132,7 +132,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="abandoned-email-address">
-							<?php _e( 'User Email Address (To)', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'User Email Address (To)', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="abandoned-email-address-pointer"></span>
 					</th>
@@ -151,7 +151,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="abandoned-from-name">
-							<?php _e( 'From Name', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'From Name', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="abandoned-from-name-pointer"></span>
 					</th>
@@ -169,7 +169,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="abandoned-from-email-address">
-							<?php _e( 'From Email Address', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'From Email Address', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="abandoned-from-email-address-pointer"></span>
 					</th>
@@ -187,7 +187,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="abandoned-subject">
-							<?php _e( 'Subject', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'Subject', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="abandoned-subject-pointer"></span>
 					</th>
@@ -208,7 +208,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="abandoned-email-body">
-							<?php _e( 'Email Body', 'cf7-abandoned-form' ); ?>
+							<?php _e( 'Email Body', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="abandoned-email-body-pointer"></span>
 					</th>
@@ -241,7 +241,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top"></th>
 					<td>
-						<input type="submit" name="send_mail" class="button button-primary" value="<?php _e( 'Send', 'cf7-abandoned-form' ); ?>" />
+						<input type="submit" name="send_mail" class="button button-primary" value="<?php _e( 'Send', 'abandoned-contact-form-7' ); ?>" />
 						<?php wp_nonce_field( plugin_basename( __FILE__ ), '_send_mail_nonce_name' ); ?>
 					</td>
 				</tr>
@@ -256,15 +256,15 @@
 	// Localize the script with new data
 	$translation_array = array(
 		'abandoned_email_address' => __( '<h3>User Email Address (To)</h3>' .
-			'<p>This is an Abandoned user&apos;s email ID which will receive the email.</p>', 'cf7-abandoned-form' ),
+			'<p>This is an Abandoned user&apos;s email ID which will receive the email.</p>', 'abandoned-contact-form-7' ),
 		'abandoned_from_name' => __( '<h3>From Name</h3>' .
-			'<p>This is a default  &apos;Name&apos; which is get from website general settings but if you use SMTP settings then From Name used from SMTP settings page.</p>', 'cf7-abandoned-form' ),
+			'<p>This is a default  &apos;Name&apos; which is get from website general settings but if you use SMTP settings then From Name used from SMTP settings page.</p>', 'abandoned-contact-form-7' ),
 		'abandoned_from_email_address' => __( '<h3>From Email Address</h3>' .
-			'<p>This is a default &apos;Email Address&apos; which is get from website general settings but if you use SMTP settings then From Email used from SMTP settings page.</p>', 'cf7-abandoned-form' ),
+			'<p>This is a default &apos;Email Address&apos; which is get from website general settings but if you use SMTP settings then From Email used from SMTP settings page.</p>', 'abandoned-contact-form-7' ),
 		'abandoned_subject' => __( '<h3>Subject</h3>' .
-			'<p>This is the subject which is used in email.</p>', 'cf7-abandoned-form' ),
+			'<p>This is the subject which is used in email.</p>', 'abandoned-contact-form-7' ),
 		'abandoned_email_body' => __( '<h3>Email Body</h3>' .
-			'<p>This is an email body content which are reflect on email body.</p>', 'cf7-abandoned-form' ),
+			'<p>This is an email body content which are reflect on email body.</p>', 'abandoned-contact-form-7' ),
 	);
 
 	wp_localize_script( CF7AF_PREFIX . '_admin_js', 'translate_string_cf7af', $translation_array );

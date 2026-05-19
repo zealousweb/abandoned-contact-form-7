@@ -20,7 +20,7 @@
 					'<tr class="form-field">' .
 						'<th scope="row">' .
 						'<label for="' . esc_attr( CF7AF_META_PREFIX . 'enable_abandoned' ) . '">' .
-								esc_html__( 'Enable Abandoned', 'cf7-abandoned-form' ) .
+								esc_html__( 'Enable Abandoned', 'abandoned-contact-form-7' ) .
 							'</label>' .
 							'<span class="cf7af-tooltip hide-if-no-js " id="cf7af-enable-abandoned-pointer"></span>' .
 						'</th>' .
@@ -31,14 +31,14 @@
 					'<tr class="form-field select-abandoned-email-row">' .
 						'<th scope="row">' .
 						'<label for="' . esc_attr( CF7AF_META_PREFIX ) . 'abandoned_email">' .
-						esc_html__( 'Select Email Field', 'cf7-abandoned-form' ) .
+						esc_html__( 'Select Email Field', 'abandoned-contact-form-7' ) .
 						'</label>'.						
 							'<span class="cf7af-tooltip hide-if-no-js " id="cf7af-abandoned-email-pointer"></span>' .
 						'</th>' .
 						'<td>';
 
 						echo '<select name="' . esc_attr( CF7AF_META_PREFIX . 'abandoned_email' ) . '" id="' . esc_attr( CF7AF_META_PREFIX . 'abandoned_email' ) . '" required>';
-								'<option>'.__( 'Select Email Field', 'cf7-abandoned-form' ).'</option>';
+								'<option>'.__( 'Select Email Field', 'abandoned-contact-form-7' ).'</option>';
 									$contact_form = WPCF7_ContactForm::get_instance($custom_id);
 									$form_fields = $contact_form->scan_form_tags();
 									if( $form_fields ) {
@@ -55,7 +55,7 @@
 					'<tr class="form-field select-abandoned-specific-field-row">' .
 						'<th scope="row">' .
 						'<label for="' . esc_attr( CF7AF_META_PREFIX . 'specific_field' ) . '">' .
-						esc_html__( 'Select Multiple Field', 'cf7-abandoned-form' ) .
+						esc_html__( 'Select Multiple Field', 'abandoned-contact-form-7' ) .
 						'</label>'.
 							'<span class="cf7af-tooltip hide-if-no-js " id="cf7af-abandoned-specific-field-pointer"></span>' .
 						'</th>' .
@@ -96,12 +96,12 @@
 	// Localize the script with new data
 	$translation_array = array(
 		'cf7af_enable_abandoned' => __( '<h3>Enable/Disable Abandoned</h3>' .
-					'<p>You can enable/disable Abandoned form functionality.</p>', 'cf7-abandoned-form' ),
+					'<p>You can enable/disable Abandoned form functionality.</p>', 'abandoned-contact-form-7' ),
 		'cf7af_abandoned_email' => __( '<h3>Select Email Field</h3>' .
-					'<p>Select the email field for tracking Abandoned user</p>', 'cf7-abandoned-form' ),
+					'<p>Select the email field for tracking Abandoned user</p>', 'abandoned-contact-form-7' ),
 
 		'cf7af_abandoned_specific_field' => __( '<h3>Select Multiple Field</h3>' .
-				'<p>Select the multiple field for tracking Abandoned user</p>', 'cf7-abandoned-form' ),
+				'<p>Select the multiple field for tracking Abandoned user</p>', 'abandoned-contact-form-7' ),
 	);
 
 	wp_localize_script( CF7AF_PREFIX . '_admin_js', 'translate_string_cf7af', $translation_array );

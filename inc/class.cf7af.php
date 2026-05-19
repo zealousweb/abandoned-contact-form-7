@@ -94,9 +94,9 @@ if ( !class_exists( 'CF7AF' ) ) {
 			}
 			if ( is_plugin_active( 'abandoned-forms-contact-form-7/abandoned-forms-contact-form-7.php' ) )
 			{
-				//$support_link = '<a href="#" target="_blank">' .__( 'Support', 'cf7-abandoned-form' ). '</a>';
+				//$support_link = '<a href="#" target="_blank">' .__( 'Support', 'abandoned-contact-form-7' ). '</a>';
 
-				$document_link = '<a href="#" target="_blank">' .__( 'Document', 'cf7-abandoned-form' ). '</a>';
+				$document_link = '<a href="#" target="_blank">' .__( 'Document', 'abandoned-contact-form-7' ). '</a>';
 				
 				//array_unshift( $links, $support_link );
 				array_unshift( $links, $document_link );
@@ -313,18 +313,18 @@ if ( !class_exists( 'CF7AF' ) ) {
 			}
 
 			# Traditional WordPress plugin locale filter
-			$locale = apply_filters( 'plugin_locale',  $get_locale, 'cf7-abandoned-form' );
-			$mofile = sprintf( '%1$s-%2$s.mo', 'cf7-abandoned-form' , $locale );
+			$locale = apply_filters( 'plugin_locale',  $get_locale, 'abandoned-contact-form-7' );
+			$mofile = sprintf( '%1$s-%2$s.mo', 'abandoned-contact-form-7' , $locale );
 
 			# Setup paths to current locale file
 			$mofile_global = WP_LANG_DIR . '/plugins/' . basename( CF7AF_DIR ) . '/' . $mofile;
 
 			if ( file_exists( $mofile_global ) ) {
 				# Look in global /wp-content/languages/plugin-name folder
-				load_textdomain( 'cf7-abandoned-form', $mofile_global );
+				load_textdomain( 'abandoned-contact-form-7', $mofile_global );
 			} else {
 				# Load the default language files
-				load_plugin_textdomain( 'cf7-abandoned-form', false, $CF7AF_lang_dir );
+				load_plugin_textdomain( 'abandoned-contact-form-7', false, $CF7AF_lang_dir );
 			}
 		}
 
@@ -366,18 +366,18 @@ if ( !class_exists( 'CF7AF' ) ) {
 			 */
 
 			$labels = array(
-				'name' => __( 'Abandoned Users', 'cf7-abandoned-form' ),
-				'singular_name' => __( 'Abandoned User Detail', 'cf7-abandoned-form' ),
-				'all_items' => __( 'All Abandoned Users', 'cf7-abandoned-form' ),
-				'edit_item' => __( 'Edit Abandoned User', 'cf7-abandoned-form' ),
-				'search_items' => __( 'Search Abandoned User', 'cf7-abandoned-form' ),
-				'view_item' => __( 'View Abandoned User', 'cf7-abandoned-form' ),
-				'not_found' => __( 'No Abandoned User found', 'cf7-abandoned-form' ),
-				'not_found_in_trash' => __( 'No Abandoned User found in Trash', 'cf7-abandoned-form' ),
+				'name' => __( 'Abandoned Users', 'abandoned-contact-form-7' ),
+				'singular_name' => __( 'Abandoned User Detail', 'abandoned-contact-form-7' ),
+				'all_items' => __( 'All Abandoned Users', 'abandoned-contact-form-7' ),
+				'edit_item' => __( 'Edit Abandoned User', 'abandoned-contact-form-7' ),
+				'search_items' => __( 'Search Abandoned User', 'abandoned-contact-form-7' ),
+				'view_item' => __( 'View Abandoned User', 'abandoned-contact-form-7' ),
+				'not_found' => __( 'No Abandoned User found', 'abandoned-contact-form-7' ),
+				'not_found_in_trash' => __( 'No Abandoned User found in Trash', 'abandoned-contact-form-7' ),
 			);
 
 			$args = array(
-				'label' => __( 'Abandoned Users', 'cf7-abandoned-form' ),
+				'label' => __( 'Abandoned Users', 'abandoned-contact-form-7' ),
 				'labels' => $labels,
 				'description' => '',
 				'public' => false,
@@ -421,15 +421,15 @@ if ( !class_exists( 'CF7AF' ) ) {
 
 			if( empty( $this->cf7af_mail_notify_opt ) ) {
 
-				$cf7af_mail_notify_option['cf7af_subject'] = __( 'You are so close!', 'cf7-abandoned-form' );
+				$cf7af_mail_notify_option['cf7af_subject'] = __( 'You are so close!', 'abandoned-contact-form-7' );
 
-				$str = __( 'Hello', 'cf7-abandoned-form' ). ' {email} <br>';
-				$str .= __( 'Contact into:', 'cf7-abandoned-form' )  . ' {contact_form}<br><br>';
-				$str .= __( 'We noticed you left something behind.', 'cf7-abandoned-form' ) . '<br>';
-				$str .= __( 'No need to worry, you can still visit the page from where you left accidentally.', 'cf7-abandoned-form' ) . '<br><br>';
-				$str .= __( 'Use the following link to make submissions.', 'cf7-abandoned-form' ) . '<br> ';
+				$str = __( 'Hello', 'abandoned-contact-form-7' ). ' {email} <br>';
+				$str .= __( 'Contact into:', 'abandoned-contact-form-7' )  . ' {contact_form}<br><br>';
+				$str .= __( 'We noticed you left something behind.', 'abandoned-contact-form-7' ) . '<br>';
+				$str .= __( 'No need to worry, you can still visit the page from where you left accidentally.', 'abandoned-contact-form-7' ) . '<br><br>';
+				$str .= __( 'Use the following link to make submissions.', 'abandoned-contact-form-7' ) . '<br> ';
 				$str .= '{link}<br><br>';
-				$str .= __( 'Thanks!', 'cf7-abandoned-form' );
+				$str .= __( 'Thanks!', 'abandoned-contact-form-7' );
 
 				$cf7af_mail_notify_option['cf7af_email_body'] = $str;
 				update_option( 'cf7af_mail_notify_option', $cf7af_mail_notify_option );
@@ -445,7 +445,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 		function action__notice_cf7af_deactive() {
 		?>
 			<div class="error">
-				<p><?php _e( '<b>Abandoned Contact Form 7 :</b> Contact Form 7 is not active! Please install <a target="_blank" href="https://wordpress.org/plugins/contact-form-7/">Contact Form 7</a>.', 'cf7-abandoned-form' ); ?></p>
+				<p><?php _e( '<b>Abandoned Contact Form 7 :</b> Contact Form 7 is not active! Please install <a target="_blank" href="https://wordpress.org/plugins/contact-form-7/">Contact Form 7</a>.', 'abandoned-contact-form-7' ); ?></p>
 			</div>
 		<?php
 		}

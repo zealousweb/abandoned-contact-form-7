@@ -8,7 +8,7 @@
  * Author URI: https://www.zealousweb.com
  * Developer: The Zealousweb Team
  * Developer E-Mail: opensource@zealousweb.com
- * Text Domain: cf7-abandoned-form
+ * Text Domain: abandoned-contact-form-7
  * Domain Path: /languages
  *
  * Copyright: © 2009-2020 Plugin author name.
