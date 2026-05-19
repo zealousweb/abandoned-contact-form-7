@@ -178,8 +178,8 @@ if ( !class_exists( 'CF7AF' ) ) {
 					}
 
 					//whether ip is from share internet
-					if (!empty($_SERVER['HTTP_CLIENT_IP']))  {
-						$ip_address = $_SERVER['HTTP_CLIENT_IP'];
+					if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+						$ip_address = sanitize_text_field( wp_unslash( $_SERVER['HTTP_CLIENT_IP'] ) );
 					}
 					//whether ip is from proxy
 					elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))  { //phpcs:ignore
@@ -313,7 +313,8 @@ if ( !class_exists( 'CF7AF' ) ) {
 			}
 
 			# Traditional WordPress plugin locale filter
-			$locale = apply_filters( 'plugin_locale',  $get_locale, 'abandoned-contact-form-7' );
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WordPress core filter.
+			$locale = apply_filters( 'plugin_locale', $get_locale, 'abandoned-contact-form-7' );
 			$mofile = sprintf( '%1$s-%2$s.mo', 'abandoned-contact-form-7' , $locale );
 
 			# Setup paths to current locale file
@@ -343,7 +344,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 			{
 				add_action( 'admin_notices', array( $this, 'action__notice_cf7af_deactive' ) );
 				deactivate_plugins( CF7AF_PLUGIN_BASENAME );
-				if ( isset( $_GET['activate'] ) ) {
+				if ( isset( $_GET['activate'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Core plugin activation redirect cleanup.
 					unset( $_GET['activate'] );
 				}
 			}
@@ -445,7 +446,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 		function action__notice_cf7af_deactive() {
 		?>
 			<div class="error">
-				<p><?php _e( '<b>Abandoned Contact Form 7 :</b> Contact Form 7 is not active! Please install <a target="_blank" href="https://wordpress.org/plugins/contact-form-7/">Contact Form 7</a>.', 'abandoned-contact-form-7' ); ?></p>
+				<p><?php echo wp_kses_post( __( '<b>Abandoned Contact Form 7 :</b> Contact Form 7 is not active! Please install <a target="_blank" href="https://wordpress.org/plugins/contact-form-7/">Contact Form 7</a>.', 'abandoned-contact-form-7' ) ); ?></p>
 			</div>
 		<?php
 		}

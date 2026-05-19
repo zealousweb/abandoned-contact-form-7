@@ -58,7 +58,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 
 			wp_register_style( CF7AF_PREFIX . '_admin_css', CF7AF_URL . 'assets/css/admin.min.css', array(), CF7AF_VERSION );
 
-			wp_register_script( CF7AF_PREFIX . '_admin_js', CF7AF_URL . 'assets/js/admin.min.js', array( 'jquery-core' ), CF7AF_VERSION );
+			wp_register_script( CF7AF_PREFIX . '_admin_js', CF7AF_URL . 'assets/js/admin.min.js', array( 'jquery-core' ), CF7AF_VERSION, true );
 		}
 
 		/**
@@ -68,13 +68,34 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 		 *
 		 */
 		function action__init_99() {
-			if (isset( $_REQUEST['export_csv_cf7af'] )
-				&& isset( $_REQUEST['form-id'] )
-				&& !empty( $_REQUEST['form-id'] )
-			) {
-				$form_id = sanitize_text_field($_REQUEST['form-id']);
+			if ( ! isset( $_REQUEST['export_csv_cf7af'] ) ) {
+				return;
+			}
 
-				if ( 'all' == $form_id ) {
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				return;
+			}
+
+			if (
+				! isset( $_REQUEST['cf7af_export_nonce'] )
+				|| ! wp_verify_nonce(
+					sanitize_text_field( wp_unslash( $_REQUEST['cf7af_export_nonce'] ) ),
+					'cf7af_export_csv'
+				)
+			) {
+				return;
+			}
+
+			if (
+				! isset( $_REQUEST['form-id'] )
+				|| '' === $_REQUEST['form-id']
+			) {
+				return;
+			}
+
+			$form_id = sanitize_text_field( wp_unslash( $_REQUEST['form-id'] ) );
+
+			if ( 'all' == $form_id ) {
 					add_action( 'admin_notices', array( $this, 'action__cf7af_admin_notices_export' ) );
 					return;
 				}
@@ -96,7 +117,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 					'post_type' => CF7AF_POST_TYPE,
 					'posts_per_page' => 10,
 					'order' => 'ASC',
-					'meta_query' => $meta_query_args,
+					'meta_query' => $meta_query_args, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required for per-form export.
 					'post_status' => array('publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash'),
 
 				);
@@ -160,7 +181,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 
 								} elseif( 'date' == $key ) {
 
-									$row[$key] = __( get_the_date( 'd, M Y H:i:s', $entry->ID ) );
+									$row[$key] = get_the_date( 'd, M Y H:i:s', $entry->ID );
 
 								} else {
 
@@ -172,14 +193,15 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				}
 				unset($header_row['cf7af_form_data']);
 
-				$header_title = array();
-				$header_title[] = __(
-									(
-									$form_id
-									? get_the_title( $form_id )
-									: get_post_meta( $form_id, 'cf7af_form_id' , true )
-								)
-							). ': You are using free version of plugin so only 10 entires exported.';
+				$header_title   = array();
+				$form_title     = $form_id
+					? get_the_title( $form_id )
+					: get_post_meta( $form_id, 'cf7af_form_id', true );
+				$header_title[] = sprintf(
+					/* translators: %s: contact form title */
+					__( '%s: You are using free version of plugin so only 10 entires exported.', 'abandoned-contact-form-7' ),
+					$form_title
+				);
 
 				ob_start();
 
@@ -196,11 +218,11 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				foreach ( $data_rows as $data_row ) {
 					fputcsv( $fh, $data_row );
 				}
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- php://output stream for CSV download.
 				fclose( $fh );
 
-				ob_end_flush();
-				die();
-			}
+			ob_end_flush();
+			die();
 		}
 
 		/**
@@ -228,18 +250,36 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				CF7AF_META_PREFIX . 'abandoned_email',
 			);
 
-			if (!empty($form_fields)) {
-				foreach ($form_fields as $key) {
-						$keyval = sanitize_text_field($_REQUEST[$key]);
-						update_post_meta($post_id, $key, $keyval);
-					
+			// Contact Form 7 verifies nonce before firing wpcf7_save_contact_form.
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended
+			if ( ! empty( $form_fields ) ) {
+				foreach ( $form_fields as $key ) {
+					if ( CF7AF_META_PREFIX . 'enable_abandoned' === $key ) {
+						// Unchecked checkboxes are omitted from the request; clear meta when off.
+						$keyval = isset( $_REQUEST[ $key ] ) ? '1' : '';
+						update_post_meta( $post_id, $key, $keyval );
+						continue;
+					}
+					if ( ! isset( $_REQUEST[ $key ] ) ) {
+						continue;
+					}
+					$keyval = sanitize_text_field( wp_unslash( $_REQUEST[ $key ] ) );
+					update_post_meta( $post_id, $key, $keyval );
 				}
 			}
 
 			/*Start Multiple Field Added */
 
-			$old_cf7af_abandoned_specific_field = get_post_meta($post_id, CF7AF_META_PREFIX . 'abandoned_specific_field');
-			$new_cf7af_abandoned_specific_field = isset ($_REQUEST[ CF7AF_META_PREFIX .'abandoned_specific_field'] )  ? $_REQUEST[ CF7AF_META_PREFIX .'abandoned_specific_field'] : array();
+			$abandoned_specific_field_key = CF7AF_META_PREFIX . 'abandoned_specific_field';
+			$old_cf7af_abandoned_specific_field = get_post_meta( $post_id, $abandoned_specific_field_key );
+			$new_cf7af_abandoned_specific_field = array();
+			if ( isset( $_REQUEST[ $abandoned_specific_field_key ] ) && is_array( $_REQUEST[ $abandoned_specific_field_key ] ) ) {
+				$new_cf7af_abandoned_specific_field = array_map(
+					'sanitize_text_field',
+					wp_unslash( $_REQUEST[ $abandoned_specific_field_key ] )
+				);
+			}
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 			if ( empty ($new_cf7af_abandoned_specific_field) ) {
 			   delete_post_meta($post_id, CF7AF_META_PREFIX . 'abandoned_specific_field');
@@ -374,6 +414,10 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				return;
 			}
 
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				return;
+			}
+
 			$posts = get_posts(
 				array(
 					'post_type'        => 'wpcf7_contact_form',
@@ -387,9 +431,15 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				return;
 			}
 
-			$selected = ( isset( $_GET['form-id'] ) ? sanitize_text_field($_GET['form-id']) : '' );
+			$selected = '';
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Admin list table filter.
+			if ( isset( $_GET['form-id'] ) ) {
+				$selected = sanitize_text_field( wp_unslash( $_GET['form-id'] ) );
+			}
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 			echo '<div class="alignleft actions">';
+				wp_nonce_field( 'cf7af_export_csv', 'cf7af_export_nonce' );
 				echo '<select name="form-id" id="form-id">';
 					echo '<option value="all">' . esc_html__( 'Select Forms', 'abandoned-contact-form-7' ) . '</option>';
 					foreach ( $posts as $post ) {
@@ -417,10 +467,23 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				return;
 			}
 
-			if ( is_admin() && isset( $_GET['form-id'] ) && 'all' != isset($_GET['form-id']) ) {
-				$query->query_vars['meta_value']   = sanitize_text_field($_GET['form-id']);
-				$query->query_vars['meta_compare'] = '=';
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				return;
 			}
+
+			if ( ! isset( $_GET['form-id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Admin list table filter.
+				return;
+			}
+
+			$form_id = sanitize_text_field( wp_unslash( $_GET['form-id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Admin list table filter.
+
+			if ( 'all' === $form_id ) {
+				return;
+			}
+
+			$query->query_vars['meta_key']     = 'cf7af_form_id'; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for per-form list filter.
+			$query->query_vars['meta_value']   = $form_id; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Required for per-form list filter.
+			$query->query_vars['meta_compare'] = '=';
 		}
 
 		/**

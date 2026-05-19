@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 if ( !class_exists( 'CF7AF_Licence' ) ) {
 
 	class CF7AF_Licence {
@@ -87,8 +91,10 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 
 					update_option( self::$activation_redirect, 'no' );
 
+					// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- WordPress plugin activation redirect.
 					if ( ! isset( $_GET['activate-multi'] ) ) {
-						wp_redirect( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$license_page ) );
+						wp_safe_redirect( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$license_page ) );
+						exit();
 					}
 				}
 			}
@@ -120,11 +126,27 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 				$license = trim( get_option( self::cf7af_licence_key ) );
 				$license_email = trim( get_option( self::cf7af_licence_email ) );
 
-				// Save license key
-				$license = sanitize_text_field($_POST['cf7af_license_key']);
-				$license_email = sanitize_email($_POST['cf7af_license_email']);
+				$license       = isset( $_POST['cf7af_license_key'] )
+					? sanitize_text_field( wp_unslash( $_POST['cf7af_license_key'] ) )
+					: '';
+				$license_email = isset( $_POST['cf7af_license_email'] )
+					? sanitize_email( wp_unslash( $_POST['cf7af_license_email'] ) )
+					: '';
+
+				$message = '';
+
+				if ( empty( $license ) || empty( $license_email ) ) {
+					$message = __( 'License key and email are required.', 'abandoned-contact-form-7' );
+				}
 
 				$license_data = array();
+
+				if ( ! empty( $message ) ) {
+					$base_url = admin_url( 'edit.php?post_type=' . CF7AF_POST_TYPE . '&page=' . self::$license_page );
+					$redirect = add_query_arg( array( 'zw_activation' => 'false', 'message' => urlencode( $message ) ), $base_url );
+					wp_safe_redirect( $redirect );
+					exit();
+				}
 
 				// data to send in our API request
 				$api_params = array(
@@ -142,15 +164,13 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 					'body'	  => $api_params
 				) );
 
-				$message = '';
-
 				// make sure the response came back okay
 				if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
 
 					if ( is_wp_error( $response ) ) {
 						$message = $response->get_error_message();
 					} else {
-						$message = __( 'An error occurred, please try again.' );
+						$message = __( 'An error occurred, please try again.', 'abandoned-contact-form-7' );
 					}
 
 				} else {
@@ -185,7 +205,11 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 
 							case 'item_name_mismatch' :
 
-								$message = sprintf( __( 'This appears to be an invalid license key for %s.' ), self::$item_name , 'abandoned-contact-form-7' );
+								$message = sprintf(
+									/* translators: %s: product name */
+									__( 'This appears to be an invalid license key for %s.', 'abandoned-contact-form-7' ),
+									self::$item_name
+								);
 								break;
 
 							case 'no_activations_left':
@@ -206,7 +230,7 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 					$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$license_page );
 					$redirect = add_query_arg( array('zw_activation' => 'false', 'message' => urlencode( $message ) ), $base_url );
 
-					wp_redirect( $redirect );
+					wp_safe_redirect( $redirect );
 					exit();
 				}
 
@@ -216,7 +240,7 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 
 				$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$license_page );
 				$redirect = add_query_arg( array('zw_activation' => 'true', 'message' => urlencode( 'success' ) ), $base_url );
-				wp_redirect( $redirect );
+				wp_safe_redirect( $redirect );
 				exit();
 			}
 		}
@@ -264,7 +288,7 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 					$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$license_page );
 					$redirect = add_query_arg( array( 'zw_activation' => 'false', 'message' => urlencode( $message ) ), $base_url );
 
-					wp_redirect( $redirect );
+					wp_safe_redirect( $redirect );
 					exit();
 				}
 
@@ -283,30 +307,40 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 
 				$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$license_page );
 				$redirect = add_query_arg( array('zw_activation' => 'false', 'message' => urlencode( 'Successfully Deactivated!' ) ), $base_url );
-				wp_redirect( $redirect );
+				wp_safe_redirect( $redirect );
 				exit();
 			}
 		}
 
 		function zw_licence_admin_notices() {
+			if ( ! current_user_can( 'manage_options' ) ) {
+				return;
+			}
+
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Redirect notice after verified activation/deactivation.
 			if (
-				isset( $_GET[ 'page' ] )
-				&& self::$license_page == $_GET['page']
+				! isset( $_GET['page'] )
+				|| self::$license_page !== sanitize_text_field( wp_unslash( $_GET['page'] ) )
 			) {
+				return;
+			}
 
-				if (
-					isset( $_GET['zw_activation'] )
-					&& isset( $_GET['zw_activation'] )
-					&& ! empty( $_GET['message'] )
-				) {
+			if (
+				! isset( $_GET['zw_activation'] )
+				|| empty( $_GET['message'] )
+			) {
+				return;
+			}
 
-					switch( $_GET['zw_activation'] ) {
+			$activation_status = sanitize_text_field( wp_unslash( $_GET['zw_activation'] ) );
+
+			switch ( $activation_status ) {
 
 						case 'false':
-							$message = urldecode( sanitize_text_field($_GET['message']) );
+							$message = urldecode( sanitize_text_field( wp_unslash( $_GET['message'] ) ) );
 							?>
 							<div class="error">
-								<p><?php echo $message; ?></p>
+								<p><?php echo esc_html( $message ); ?></p>
 							</div>
 							<?php
 							break;
@@ -315,14 +349,13 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 						default:
 							?>
 							<div class="updated">
-								<p><?php _e( 'License Activation Successfully!', 'abandoned-contact-form-7' ); ?></p>
+								<p><?php esc_html_e( 'License Activation Successfully!', 'abandoned-contact-form-7' ); ?></p>
 							</div>
 							<?php
 							break;
 
-					}
-				}
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 		}
 
 		function zw_licence_extension_deactivation() {
@@ -357,13 +390,13 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 				if ( is_wp_error( $response ) ) {
 					$message = $response->get_error_message();
 				} else {
-					$message = __( 'An error occurred, please try again.' );
+					$message = __( 'An error occurred, please try again.', 'abandoned-contact-form-7' );
 				}
 
 				$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$license_page );
 				$redirect = add_query_arg( array( 'zw_activation' => 'false', 'message' => urlencode( $message ) ), $base_url );
 
-				wp_redirect( $redirect );
+				wp_safe_redirect( $redirect );
 				exit();
 			}
 
@@ -402,7 +435,7 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 			?>
 
 			<div class="wrap">
-				<h2 class=""><?php echo self::$activation_menuname; ?></h2>
+				<h2 class=""><?php echo esc_html( self::$activation_menuname ); ?></h2>
 				<form method="post" action="options.php">
 					<?php settings_fields( 'cf7af_license' ); ?>
 
@@ -410,7 +443,7 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 						<tbody>
 						<tr valign="top">
 							<th scope="row" valign="top">
-								<?php _e( 'Email Address' , 'abandoned-contact-form-7' ); ?>
+								<?php esc_html_e( 'Email Address' , 'abandoned-contact-form-7' ); ?>
 							</th>
 							<td>
 								<input
@@ -418,16 +451,16 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 									name="cf7af_license_email"
 									type="email"
 									class="regular-text"
-									value="<?php esc_attr_e( $license_email ); ?>" <?php if ( !empty( $status ) ) { echo 'disabled'; } ?> required
+									value="<?php echo esc_attr( $license_email ); ?>" <?php if ( !empty( $status ) ) { echo 'disabled'; } ?> required
 								/>
 								<label class="description" for="cf7af_license_email">
-									<?php _e( 'Enter your email which used for purchase license', 'abandoned-contact-form-7' ); ?>
+									<?php esc_html_e( 'Enter your email which used for purchase license', 'abandoned-contact-form-7' ); ?>
 								</label>
 							</td>
 						</tr>
 						<tr valign="top">
 							<th scope="row" valign="top">
-								<?php _e( 'License Key' , 'abandoned-contact-form-7' ); ?>
+								<?php esc_html_e( 'License Key' , 'abandoned-contact-form-7' ); ?>
 							</th>
 							<td>
 								<input
@@ -435,34 +468,34 @@ if ( !class_exists( 'CF7AF_Licence' ) ) {
 									name="cf7af_license_key"
 									type="text"
 									class="regular-text"
-									value="<?php esc_attr_e( $license ); ?>" <?php if ( !empty( $status )  ) { echo 'disabled'; }?> required
+									value="<?php echo esc_attr( $license ); ?>" <?php if ( !empty( $status )  ) { echo 'disabled'; }?> required
 								/>
 								<label class="description" for="cf7af_license_key">
-									<?php _e( 'Enter your license key', 'abandoned-contact-form-7' ); ?>
+									<?php esc_html_e( 'Enter your license key', 'abandoned-contact-form-7' ); ?>
 								</label>
 							</td>
 						</tr>
 						<tr valign="top">
 							<th scope="row" valign="top">
-								<?php _e( 'Activate License' ); ?>
+								<?php esc_html_e( 'Activate License', 'abandoned-contact-form-7' ); ?>
 							</th>
 							<td>
 								<?php if ( !empty( $status ) ) { ?>
-									<span style="color: #29c129; font-weight:bold; line-height: 27px;padding-right: 20px;"><?php _e( 'Your License is active.', 'abandoned-contact-form-7' ); ?> </span>
+									<span style="color: #29c129; font-weight:bold; line-height: 27px;padding-right: 20px;"><?php esc_html_e( 'Your License is active.', 'abandoned-contact-form-7' ); ?> </span>
 									<?php wp_nonce_field( self::$licence_nonce, self::$licence_nonce ); ?>
 									<input
 										type="submit"
 										class="button-secondary"
-										name="<?php echo self::$zw_deactivation_action; ?>"
-										value="<?php _e( 'Deactivate License', 'abandoned-contact-form-7' ); ?>
+										name="<?php echo esc_attr( self::$zw_deactivation_action ); ?>"
+										value="<?php esc_attr_e( 'Deactivate License', 'abandoned-contact-form-7' ); ?>"
 											"/>
 								<?php } else {
 									wp_nonce_field( self::$licence_nonce, self::$licence_nonce ); ?>
 									<input
 										type="submit"
 										class="button-secondary"
-										name="<?php echo self::$activation_action; ?>"
-										value="<?php _e( 'Activate License', 'abandoned-contact-form-7' ); ?>"
+										name="<?php echo esc_attr( self::$activation_action ); ?>"
+										value="<?php esc_attr_e( 'Activate License', 'abandoned-contact-form-7' ); ?>"
 										style="background: #29c129; border-color: #29c129!important; text-decoration: none; color: white; font-size: 17px; padding: 8px 0; width: 170px; line-height: 0;"
 									/>
 								<?php } ?>

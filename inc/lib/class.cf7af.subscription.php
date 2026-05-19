@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 if ( !class_exists( 'CF7AF_Subscription' ) ) {
 
 	class CF7AF_Subscription {
@@ -89,8 +93,10 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 
 					update_option( self::$activation_redirect, 'no' );
 
+					// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- WordPress plugin activation redirect.
 					if ( ! isset( $_GET['activate-multi'] ) ) {
-						wp_redirect( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$subscription_page ) );
+						wp_safe_redirect( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$subscription_page ) );
+						exit();
 					}
 				}
 			}
@@ -123,44 +129,54 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 				$subscription_email = trim( get_option( self::cf7af_subscription_email ) );
 				$subscription_due_date = trim(get_option(self::cf7af_Subscription_due_date));
 
-				// Save subscription key
-				$subscription = $_POST['cf7af_subscription_key'];
-				$subscription_email = $_POST['cf7af_subscription_email'];
+				$subscription       = isset( $_POST['cf7af_subscription_key'] )
+					? sanitize_text_field( wp_unslash( $_POST['cf7af_subscription_key'] ) )
+					: '';
+				$subscription_email = isset( $_POST['cf7af_subscription_email'] )
+					? sanitize_email( wp_unslash( $_POST['cf7af_subscription_email'] ) )
+					: '';
 
+				$message           = '';
 				$subscription_data = array();
 
-				// data to send in our API request
-				$api_params = array(
-					'api_key'	=> $subscription,
-					'sku'		=> self::$item_id
-				);
-
-				// Call the custom API.
-				$response = wp_remote_post( self::$valid_url, array(
-					'timeout'	=> 15,
-					'sslverify'	=> false,
-					'headers' 	=> array('X-Requested-With' => 'XMLHttpRequest'),
-					'body'		=> $api_params
-				) );
-
-				$message = '';
-
-				// make sure the response came back okay
-				if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-					if ( is_wp_error( $response ) ) {
-						$message = $response->get_error_message();
-					} else {
-						$message = __( 'Invalid Subscription Key.', 'accept-sagepay-payments-using-contact-form-7' );
-					}
+				if ( empty( $subscription ) || empty( $subscription_email ) ) {
+					$message = __( 'Subscription key and email are required.', 'abandoned-contact-form-7' );
 				} else {
-					//response decode
-					$subscription_data = unserialize( $response['body'] );
-					if($subscription_data->success == 1 && $subscription_data->error == 'valid'){
-						$subscription_status = 1;
+
+					// data to send in our API request
+					$api_params = array(
+						'api_key' => $subscription,
+						'sku'     => self::$item_id,
+					);
+
+					// Call the custom API.
+					$response = wp_remote_post(
+						self::$valid_url,
+						array(
+							'timeout'   => 15,
+							'sslverify' => false,
+							'headers'   => array( 'X-Requested-With' => 'XMLHttpRequest' ),
+							'body'      => $api_params,
+						)
+					);
+
+					// make sure the response came back okay
+					if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+						if ( is_wp_error( $response ) ) {
+							$message = $response->get_error_message();
+						} else {
+							$message = __( 'Invalid Subscription Key.', 'abandoned-contact-form-7' );
+						}
 					} else {
-						//Subscription Key expired msg
-						$message = sprintf(__( 'Your Subscription key expired.', 'accept-sagepay-payments-using-contact-form-7' ));
-						$subscription_status = '';
+						//response decode
+						$subscription_data = unserialize( $response['body'] );
+						if ( $subscription_data->success == 1 && $subscription_data->error == 'valid' ) {
+							$subscription_status = 1;
+						} else {
+							//Subscription Key expired msg
+							$message             = __( 'Your Subscription key expired.', 'abandoned-contact-form-7' );
+							$subscription_status = '';
+						}
 					}
 				}
 
@@ -169,18 +185,21 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 					$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$subscription_page );
 					$redirect = add_query_arg( array('zw_activation' => 'false', 'message' => urlencode( $message ) ), $base_url );
 
-					wp_redirect( $redirect );
+					wp_safe_redirect( $redirect );
 					exit();
 				}
 
 				update_option( self::cf7af_subscription_key, $subscription );
 				update_option( self::cf7af_subscription_email, $subscription_email );
-				update_option( self::cf7af_Subscription_due_date, date('F j, Y', strtotime($subscription_data->exp_date)));
+				$exp_timestamp = strtotime( $subscription_data->exp_date );
+				if ( false !== $exp_timestamp ) {
+					update_option( self::cf7af_Subscription_due_date, wp_date( 'F j, Y', $exp_timestamp ) );
+				}
 				update_option( self::$subscription_status, $subscription_status );
 
 				$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$subscription_page );
 				$redirect = add_query_arg( array('zw_activation' => 'true', 'message' => urlencode( 'success' ) ), $base_url );
-				wp_redirect( $redirect );
+				wp_safe_redirect( $redirect );
 				exit();
 			}
 		}
@@ -229,7 +248,7 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 					$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$subscription_page );
 					$redirect = add_query_arg( array( 'zw_activation' => 'false', 'message' => urlencode( $message ) ), $base_url );
 
-					wp_redirect( $redirect );
+					wp_safe_redirect( $redirect );
 					exit();
 				} */
 
@@ -249,46 +268,55 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 
 				$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$subscription_page );
 				$redirect = add_query_arg( array('zw_activation' => 'false', 'message' => urlencode( 'Successfully Deactivated!' ) ), $base_url );
-				wp_redirect( $redirect );
+				wp_safe_redirect( $redirect );
 				exit();
 			}
 		}
 
 		function zw_subscription_admin_notices() {
-			if (
-				isset( $_GET[ 'page' ] )
-				&& self::$subscription_page == $_GET['page']
-			) {
-
-				if (
-					isset( $_GET['zw_activation'] )
-					&& isset( $_GET['zw_activation'] )
-					&& ! empty( $_GET['message'] )
-				) {
-
-					switch( $_GET['zw_activation'] ) {
-
-						case 'false':
-							$message = urldecode( sanitize_text_field($_GET['message']) );
-							?>
-							<div class="error">
-								<p><?php echo $message; ?></p>
-							</div>
-							<?php
-							break;
-
-						case 'true':
-						default:
-							?>
-							<div class="updated">
-								<p><?php _e( 'Subscription Activation Successfully!', 'abandoned-contact-form-7' ); ?></p>
-							</div>
-							<?php
-							break;
-
-					}
-				}
+			if ( ! current_user_can( 'manage_options' ) ) {
+				return;
 			}
+
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Redirect notice after verified activation/deactivation.
+			if (
+				! isset( $_GET['page'] )
+				|| self::$subscription_page !== sanitize_text_field( wp_unslash( $_GET['page'] ) )
+			) {
+				return;
+			}
+
+			if (
+				! isset( $_GET['zw_activation'] )
+				|| empty( $_GET['message'] )
+			) {
+				return;
+			}
+
+			$activation_status = sanitize_text_field( wp_unslash( $_GET['zw_activation'] ) );
+
+			switch ( $activation_status ) {
+
+				case 'false':
+					$message = urldecode( sanitize_text_field( wp_unslash( $_GET['message'] ) ) );
+					?>
+					<div class="error">
+						<p><?php echo esc_html( $message ); ?></p>
+					</div>
+					<?php
+					break;
+
+				case 'true':
+				default:
+					?>
+					<div class="updated">
+						<p><?php esc_html_e( 'Subscription Activation Successfully!', 'abandoned-contact-form-7' ); ?></p>
+					</div>
+					<?php
+					break;
+
+			}
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 		}
 
 		function zw_subscription_extension_deactivation() {
@@ -329,7 +357,7 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 				$base_url = admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=' . self::$subscription_page );
 				$redirect = add_query_arg( array( 'zw_activation' => 'false', 'message' => urlencode( $message ) ), $base_url );
 
-				wp_redirect( $redirect );
+				wp_safe_redirect( $redirect );
 				exit();
 			} */
 
@@ -370,7 +398,7 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 			?>
 
 			<div class="wrap">
-				<h2 class=""><?php echo self::$activation_menuname; ?></h2>
+				<h2 class=""><?php echo esc_html( self::$activation_menuname ); ?></h2>
 				<form method="post" action="options.php">
 					<?php settings_fields( 'cf7af_subscription' ); ?>
 
@@ -378,7 +406,7 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 						<tbody>
 						<tr valign="top">
 							<th scope="row" valign="top">
-								<?php _e( 'Email Address' , 'abandoned-contact-form-7' ); ?>
+								<?php esc_html_e( 'Email Address' , 'abandoned-contact-form-7' ); ?>
 							</th>
 							<td>
 								<input
@@ -386,16 +414,16 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 									name="cf7af_subscription_email"
 									type="email"
 									class="regular-text"
-									value="<?php esc_attr_e( $subscription_email ); ?>" <?php if ( !empty( $status ) ) { echo 'disabled'; } ?> required
+									value="<?php echo esc_attr( $subscription_email ); ?>" <?php if ( !empty( $status ) ) { echo 'disabled'; } ?> required
 								/>
 								<label class="description" for="cf7af_subscription_email">
-									<?php _e( 'Enter your email which used for purchase subscription', 'abandoned-contact-form-7' ); ?>
+									<?php esc_html_e( 'Enter your email which used for purchase subscription', 'abandoned-contact-form-7' ); ?>
 								</label>
 							</td>
 						</tr>
 						<tr valign="top">
 							<th scope="row" valign="top">
-								<?php _e( 'Subscription Key' , 'abandoned-contact-form-7' ); ?>
+								<?php esc_html_e( 'Subscription Key' , 'abandoned-contact-form-7' ); ?>
 							</th>
 							<td>
 								<input
@@ -403,42 +431,42 @@ if ( !class_exists( 'CF7AF_Subscription' ) ) {
 									name="cf7af_subscription_key"
 									type="text"
 									class="regular-text"
-									value="<?php esc_attr_e( $subscription ); ?>" <?php if ( !empty( $status )  ) { echo 'disabled'; }?> required
+									value="<?php echo esc_attr( $subscription ); ?>" <?php if ( !empty( $status )  ) { echo 'disabled'; }?> required
 								/>
 								<label class="description" for="cf7af_subscription_key">
-									<?php _e( 'Enter your Subscription key', 'abandoned-contact-form-7' ); ?>
+									<?php esc_html_e( 'Enter your Subscription key', 'abandoned-contact-form-7' ); ?>
 								</label>
 							</td>
 						</tr>
 						<tr valign="top">
 							<th scope="row" valign="top">
-								<?php _e('Subscription Due Date'); ?>
+								<?php esc_html_e( 'Subscription Due Date', 'abandoned-contact-form-7' ); ?>
 							</th>
 							<td>
-								<div><strong><?php esc_attr_e($subscription_due_date); ?></strong></div>
+								<div><strong><?php echo esc_html( $subscription_due_date ); ?></strong></div>
 							</td>
 						</tr>
 						<tr valign="top">
 							<th scope="row" valign="top">
-								<?php _e( 'Activate Subscription' ); ?>
+								<?php esc_html_e( 'Activate Subscription', 'abandoned-contact-form-7' ); ?>
 							</th>
 							<td>
 								<?php if ( !empty( $status ) ) { ?>
-									<span style="color: #29c129; font-weight:bold; line-height: 27px;padding-right: 20px;"><?php _e( 'Your Subscription is active.', 'abandoned-contact-form-7' ); ?> </span>
+									<span style="color: #29c129; font-weight:bold; line-height: 27px;padding-right: 20px;"><?php esc_html_e( 'Your Subscription is active.', 'abandoned-contact-form-7' ); ?> </span>
 									<?php wp_nonce_field( self::$subscription_nonce, self::$subscription_nonce ); ?>
 									<input
 										type="submit"
 										class="button-secondary"
-										name="<?php echo self::$zw_deactivation_action; ?>"
-										value="<?php _e( 'Deactivate Subscription', 'abandoned-contact-form-7' ); ?>
+										name="<?php echo esc_attr( self::$zw_deactivation_action ); ?>"
+										value="<?php esc_attr_e( 'Deactivate Subscription', 'abandoned-contact-form-7' ); ?>"
 											"/>
 								<?php } else {
 									wp_nonce_field( self::$subscription_nonce, self::$subscription_nonce ); ?>
 									<input
 										type="submit"
 										class="button-secondary"
-										name="<?php echo self::$activation_action; ?>"
-										value="<?php _e( 'Activate Subscription', 'abandoned-contact-form-7' ); ?>"
+										name="<?php echo esc_attr( self::$activation_action ); ?>"
+										value="<?php esc_attr_e( 'Activate Subscription', 'abandoned-contact-form-7' ); ?>"
 										style="background: #29c129; border-color: #29c129!important; text-decoration: none; color: white; font-size: 17px; padding: 8px 0; width: 170px; line-height: 0;"
 									/>
 								<?php } ?>

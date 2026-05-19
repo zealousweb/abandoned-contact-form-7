@@ -74,16 +74,21 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 		 */
 		public function filter__wpcf7af_editor_panels( $panels ) {
 
-			$post_id = ( isset( $_REQUEST[ 'post' ] ) ? sanitize_text_field( $_REQUEST[ 'post' ] ) : '' );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- CF7 admin editor context.
+			$post_id = ( isset( $_REQUEST['post'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['post'] ) ) : '' );
 
 			if ( empty( $post_id ) ) {
 				$wpcf7 = WPCF7_ContactForm::get_current();
 				$post_id = $wpcf7->id();
 			}
 
-			if ( isset( $_GET['post'] ) && !empty( $post_id ) ) {
-				$cf7 = WPCF7_ContactForm::get_instance( $_GET['post'] ); 
-				$tags = $cf7->collect_mail_tags();
+			$tags = array();
+			$cf7_post_id = ! empty( $post_id ) ? absint( $post_id ) : 0;
+			if ( $cf7_post_id ) {
+				$cf7 = WPCF7_ContactForm::get_instance( $cf7_post_id );
+				if ( $cf7 ) {
+					$tags = $cf7->collect_mail_tags();
+				}
 			}
 			
 			if( !empty( $tags ) ){
