@@ -79,7 +79,9 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 
 			if ( empty( $post_id ) ) {
 				$wpcf7 = WPCF7_ContactForm::get_current();
-				$post_id = $wpcf7->id();
+				if ( $wpcf7 ) {
+					$post_id = $wpcf7->id();
+				}
 			}
 
 			$tags = array();

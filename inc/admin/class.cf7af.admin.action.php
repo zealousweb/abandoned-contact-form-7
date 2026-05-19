@@ -241,8 +241,13 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 
 			$wpcf7 = WPCF7_ContactForm::get_current();
 
-			if ( !empty( $wpcf7 ) ) {
-				$post_id = $wpcf7->id();
+			if ( empty( $wpcf7 ) ) {
+				return;
+			}
+
+			$post_id = $wpcf7->id();
+			if ( empty( $post_id ) ) {
+				return;
 			}
 
 			$form_fields = array(
