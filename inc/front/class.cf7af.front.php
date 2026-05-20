@@ -19,8 +19,7 @@ if ( !class_exists( 'CF7AF_Front' ) ) {
 	 */
 	class CF7AF_Front {
 
-		var $action = null,
-		    $filter = null;
+		var $action = null;
 
 		function __construct() {
 

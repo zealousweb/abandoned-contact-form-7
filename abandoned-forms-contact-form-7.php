@@ -3,7 +3,7 @@
  * Plugin Name: Abandoned Contact Form 7
  * Plugin URL: https://wordpress.org/plugins/abandoned-contact-form-7/
  * Description: Abandoned Contact Form 7 provides an ability to track the data from Contact Form 7 even if the user does not submit the form.
- * Version: 2.3
+ * Version: 2.4
  * Author: ZealousWeb
  * Author URI: https://www.zealousweb.com
  * Developer: The Zealousweb Team
@@ -23,11 +23,11 @@ if ( !defined( 'ABSPATH' ) ) exit;
  * Basic plugin definitions
  *
  * @package Abandoned Contact Form 7
- * @since 2.3
+ * @since 2.4
  */
 
 if ( !defined( 'CF7AF_VERSION' ) ) {
-	define( 'CF7AF_VERSION', '2.3' ); // Version of plugin
+	define( 'CF7AF_VERSION', '2.4' ); // Version of plugin
 }
 
 if ( !defined( 'CF7AF_FILE' ) ) {
@@ -63,6 +63,8 @@ if( !defined( 'CF7AF_POST_TYPE' ) ) {
  */
 if ( !function_exists( 'CF7AF' ) ) {
 
+	require_once CF7AF_DIR . '/inc/lib/class.cf7af.helpers.php';
+
 	if ( is_admin() ) {
 		require_once( CF7AF_DIR . '/inc/admin/class.' . CF7AF_PREFIX . '.admin.php' );
 		require_once( CF7AF_DIR . '/inc/admin/class.' . CF7AF_PREFIX . '.admin.action.php' );
@@ -70,7 +72,6 @@ if ( !function_exists( 'CF7AF' ) ) {
 	} else {
 		require_once( CF7AF_DIR . '/inc/front/class.' . CF7AF_PREFIX . '.front.php' );
 		require_once( CF7AF_DIR . '/inc/front/class.' . CF7AF_PREFIX . '.front.action.php' );
-		require_once( CF7AF_DIR . '/inc/front/class.' . CF7AF_PREFIX . '.front.filter.php' );
 	}
 
 	//Initialize all the things.

@@ -74,18 +74,9 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 		 */
 		public function filter__wpcf7af_editor_panels( $panels ) {
 
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- CF7 admin editor context.
-			$post_id = ( isset( $_REQUEST['post'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['post'] ) ) : '' );
-
-			if ( empty( $post_id ) ) {
-				$wpcf7 = WPCF7_ContactForm::get_current();
-				if ( $wpcf7 ) {
-					$post_id = $wpcf7->id();
-				}
-			}
+			$cf7_post_id = CF7AF_Helpers::get_wpcf7_editor_post_id();
 
 			$tags = array();
-			$cf7_post_id = ! empty( $post_id ) ? absint( $post_id ) : 0;
 			if ( $cf7_post_id ) {
 				$cf7 = WPCF7_ContactForm::get_instance( $cf7_post_id );
 				if ( $cf7 ) {
@@ -205,29 +196,6 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 			$columns['date'] = __( 'Submitted Date', 'abandoned-contact-form-7' );
 			return $columns;
 		}
-
-		/**
-		 * Filter: wp_mail_content_type
-		 *
-		 * - Used to send HTML formatted emails with WordPress wp_mail()
-		 *
-		 * @method filter__wp_set_mail_content_type
-		 *
-		 * @return str
-		 */
-		function filter__wp_set_mail_content_type(){
-			return "text/html";
-		}
-
-		/*
-		######## ##     ## ##    ##  ######  ######## ####  #######  ##    ##  ######
-		##       ##     ## ###   ## ##    ##    ##     ##  ##     ## ###   ## ##    ##
-		##       ##     ## ####  ## ##          ##     ##  ##     ## ####  ## ##
-		######   ##     ## ## ## ## ##          ##     ##  ##     ## ## ## ##  ######
-		##       ##     ## ##  #### ##          ##     ##  ##     ## ##  ####       ##
-		##       ##     ## ##   ### ##    ##    ##     ##  ##     ## ##   ### ##    ##
-		##        #######  ##    ##  ######     ##    ####  #######  ##    ##  ######
-		*/
 
 		/**
 		 * Adding Abandoned Setting Fields in Abandoned Settings tab

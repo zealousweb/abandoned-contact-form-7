@@ -144,7 +144,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 					'number_sentmail'		=> $text_number_sentmail,
 					'date'					=> $text_date,
 				);
-				$other_rows = $data_rows = $cf7af_form_data_array = array();
+				$data_rows = $cf7af_form_data_array = array();
 
 				/* Get all field of contact form 7 */
 				$contact_form = WPCF7_ContactForm::get_instance( $form_id );
@@ -250,13 +250,15 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				return;
 			}
 
+			if ( ! CF7AF_Helpers::verify_wpcf7_save_nonce( $post_id ) ) {
+				return;
+			}
+
 			$form_fields = array(
 				CF7AF_META_PREFIX . 'enable_abandoned',
 				CF7AF_META_PREFIX . 'abandoned_email',
 			);
 
-			// Contact Form 7 verifies nonce before firing wpcf7_save_contact_form.
-			// phpcs:disable WordPress.Security.NonceVerification.Recommended
 			if ( ! empty( $form_fields ) ) {
 				foreach ( $form_fields as $key ) {
 					if ( CF7AF_META_PREFIX . 'enable_abandoned' === $key ) {
@@ -284,7 +286,6 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 					wp_unslash( $_REQUEST[ $abandoned_specific_field_key ] )
 				);
 			}
-			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 			if ( empty ($new_cf7af_abandoned_specific_field) ) {
 			   delete_post_meta($post_id, CF7AF_META_PREFIX . 'abandoned_specific_field');
@@ -346,7 +347,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 							filter_var( $cf7af_email, FILTER_VALIDATE_EMAIL) &&
 							$abandoned_post_status != 'trash'
 						) {
-							echo '<a href="' . esc_url( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-send-mail&abandoned_id='.$post_id.'"' ) ) . '" class="button button-primary"> '. esc_html__( 'Action', 'abandoned-contact-form-7' ).' </a>';
+							echo '<a href="' . esc_url( CF7AF_Helpers::get_send_mail_admin_url( $post_id ) ) . '" class="button button-primary"> '. esc_html__( 'Action', 'abandoned-contact-form-7' ).' </a>';
 
 						} else {
 							echo '<a href="javascript::void(0);" class="disabled button-primary"> '. esc_html__( 'Invalid Email', 'abandoned-contact-form-7' ).' </a>';
@@ -436,14 +437,10 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				return;
 			}
 
-			$selected = '';
-			// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Admin list table filter.
-			if ( isset( $_GET['form-id'] ) ) {
-				$selected = sanitize_text_field( wp_unslash( $_GET['form-id'] ) );
-			}
-			// phpcs:enable WordPress.Security.NonceVerification.Recommended
+			$selected = CF7AF_Helpers::get_list_filter_form_id();
 
 			echo '<div class="alignleft actions">';
+				wp_nonce_field( 'cf7af_filter_posts', 'cf7af_filter_nonce' );
 				wp_nonce_field( 'cf7af_export_csv', 'cf7af_export_nonce' );
 				echo '<select name="form-id" id="form-id">';
 					echo '<option value="all">' . esc_html__( 'Select Forms', 'abandoned-contact-form-7' ) . '</option>';
@@ -476,11 +473,10 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				return;
 			}
 
-			if ( ! isset( $_GET['form-id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Admin list table filter.
+			$form_id = CF7AF_Helpers::get_list_filter_form_id();
+			if ( '' === $form_id ) {
 				return;
 			}
-
-			$form_id = sanitize_text_field( wp_unslash( $_GET['form-id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Admin list table filter.
 
 			if ( 'all' === $form_id ) {
 				return;
@@ -569,7 +565,6 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 		 */
 		function cf7af_show_from_data( $post ) {
 			$post_type = $post->post_type;
-			/*$count_pages = wp_count_posts($post_type);*/
 			$args = array(
               'post_type' => $post_type,
               'order' => 'ASC',
@@ -583,13 +578,20 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
         		array_push($total_arr, $my_query->post->ID);
         	}
         	update_option('cf7af_total', $total_arr);
-			$key = array_search ($post->ID, $total_arr);
+			wp_reset_postdata();
+			$cf7af_entry_index = array_search( $post->ID, $total_arr, true );
 			$cf7af_form_id = get_post_meta( $post->ID, 'cf7af_form_id', true );
 			$cf7af_email = get_post_meta( $post->ID, 'cf7af_email', true );
-			$cf7af_specific_field = get_post_meta($post->ID, 'cf7af_abandoned_specific_field', false );
-			$cf7af_specific_field_implode_data=implode('</br>',$cf7af_specific_field);
 			$cf7af_ip_address = get_post_meta( $post->ID, 'cf7af_ip_address', true );
 			$cf7af_form_data = get_post_meta( $post->ID, 'cf7af_form_data', true );
+			if ( ! is_array( $cf7af_form_data ) ) {
+				$cf7af_form_data = array();
+			}
+			$cf7af_track_field_names = get_post_meta( $cf7af_form_id, CF7AF_META_PREFIX . 'abandoned_specific_field', false );
+			if ( ! is_array( $cf7af_track_field_names ) ) {
+				$cf7af_track_field_names = array();
+			}
+			$cf7af_email_field_name = get_post_meta( $cf7af_form_id, CF7AF_META_PREFIX . 'abandoned_email', true );
 
 			echo '<table class="cf7pap-box-data form-table">' .
 				'<style>.inside-field td, .inside-field th{ padding-top: 5px; padding-bottom: 5px;}</style>';
@@ -620,25 +622,35 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				'</th>' .
 				'<td>';
 
-				if( $cf7af_form_data ) {
-					if($key >= 10)
-					{
+				if ( ! empty( $cf7af_form_data ) ) {
+					if ( false !== $cf7af_entry_index && $cf7af_entry_index >= 10 ) {
 						echo '<table><tbody>';
-							echo'<tr class="inside-field"><th scope="row">You are using Free Abandoned Contact Form 7 - no license needed. Enjoy! 🙂</th></tr>';
-							echo'<tr class="inside-field"><th scope="row"><a href="https://store.zealousweb.com/abandoned-contact-form-7-pro" target="_blank">To unlock more features consider upgrading to PRO.</a></th></tr>';
+						echo '<tr class="inside-field"><th scope="row">' . esc_html__( 'You are using Free Abandoned Contact Form 7 - no license needed. Enjoy! 🙂', 'abandoned-contact-form-7' ) . '</th></tr>';
+						echo '<tr class="inside-field"><th scope="row"><a href="https://store.zealousweb.com/abandoned-contact-form-7-pro" target="_blank">' . esc_html__( 'To unlock more features consider upgrading to PRO.', 'abandoned-contact-form-7' ) . '</a></th></tr>';
 						echo '</tbody></table>';
-					}
-					else
-					{
+					} else {
+						$cf7af_has_rows = false;
 						echo '<table><tbody>';
-							foreach( $cf7af_form_data AS $key => $val ) {
-								if (in_array($val, $cf7af_specific_field)){
-									echo '<tr class="inside-field"><th scope="row"> ' . esc_html( $key ) . ' :</th><td> ' . esc_html( $val ) . ' </td></tr>';
-								}
+						foreach ( $cf7af_form_data as $cf7af_field_name => $cf7af_field_value ) {
+							if ( '' === $cf7af_field_value && '0' !== (string) $cf7af_field_value ) {
+								continue;
 							}
+							if ( $cf7af_email_field_name && $cf7af_field_name === $cf7af_email_field_name ) {
+								continue;
+							}
+							if ( ! empty( $cf7af_track_field_names ) && ! in_array( $cf7af_field_name, $cf7af_track_field_names, true ) ) {
+								continue;
+							}
+							$cf7af_has_rows = true;
+							echo '<tr class="inside-field"><th scope="row">' . esc_html( $cf7af_field_name ) . '</th><td>' . esc_html( $cf7af_field_value ) . '</td></tr>';
+						}
 						echo '</tbody></table>';
+						if ( ! $cf7af_has_rows ) {
+							echo '<p class="description">' . esc_html__( 'No tracked field data for this entry. Configure “Fields to Track” on the contact form’s Abandoned settings tab.', 'abandoned-contact-form-7' ) . '</p>';
+						}
 					}
-					
+				} else {
+					echo '<p class="description">' . esc_html__( 'No form field data was captured for this entry.', 'abandoned-contact-form-7' ) . '</p>';
 				}
 				echo '</td>' .
 			'</tr>';
@@ -649,7 +661,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 						'<label for="cf7af_mail_status">'. esc_html__('Send Mail', 'abandoned-contact-form-7' ) .'</label>' .
 					'</th>' .
 					'<td>' .
-						'<a href="' . esc_url( admin_url( 'edit.php?post_type='.CF7AF_POST_TYPE.'&page=cf7af-send-mail&abandoned_id='.$post->ID.'"' ) ) . '" class="button button-primary"> '. esc_html__( 'Action', 'abandoned-contact-form-7' ).' </a> '.
+						'<a href="' . esc_url( CF7AF_Helpers::get_send_mail_admin_url( $post->ID ) ) . '" class="button button-primary"> '. esc_html__( 'Action', 'abandoned-contact-form-7' ).' </a> '.
 					'</td>' .
 				'</tr>';
 			}
