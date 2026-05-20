@@ -3,15 +3,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-	if ( ! isset( $_GET['abandoned_id'] ) || '' === $_GET['abandoned_id'] ) {
-		return;
+	$cf7af_abandoned_id = CF7AF_Helpers::get_send_mail_abandoned_id();
+	if ( ! $cf7af_abandoned_id ) {
+		wp_die( esc_html__( 'Invalid request.', 'abandoned-contact-form-7' ) );
 	}
 
 	wp_enqueue_style( CF7AF_PREFIX . '_admin_css' );
 	wp_enqueue_script( 'wp-pointer' );
 	wp_enqueue_style( 'wp-pointer' );
-
-	$cf7af_abandoned_id = sanitize_text_field( wp_unslash( $_GET['abandoned_id'] ) );
 
 	$cf7af_abandoned_email_address = !empty( get_post_meta( $cf7af_abandoned_id , 'cf7af_email', true ) )
 				? get_post_meta( $cf7af_abandoned_id , 'cf7af_email', true )
@@ -53,16 +52,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$cf7af_body = str_replace("{email}", $cf7af_to, $cf7af_body);
 			$cf7af_body = str_replace("{contact_form}", $cf7af_form_title, $cf7af_body);
 			
-			if( $cf7af_page_url != '' ) {
-				if( strpos($cf7af_page_url, 'recover=') !== false ) {
-					$cf7af_body = str_replace("{link}", $cf7af_page_url , $cf7af_body);
-				} else {
-					if( strpos($cf7af_page_url, '/?') !== false ) {
-						$cf7af_body = str_replace("{link}", $cf7af_page_url.'&recover='.$cf7af_abandoned_id, $cf7af_body);
-					} else {
-						$cf7af_body = str_replace("{link}", $cf7af_page_url.'?recover='.$cf7af_abandoned_id, $cf7af_body);
-					}
-				}
+			if ( '' !== $cf7af_page_url ) {
+				$cf7af_recover_url = CF7AF_Helpers::build_recover_url( $cf7af_page_url, $cf7af_abandoned_id );
+				$cf7af_body        = str_replace( '{link}', $cf7af_recover_url, $cf7af_body );
 			}
 			else {
 				$cf7af_body = str_replace("{link}", '', $cf7af_body);

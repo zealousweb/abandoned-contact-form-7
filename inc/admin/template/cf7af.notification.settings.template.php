@@ -17,10 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$cf7af_custom_error .= ' ' . __( 'Nonce check failed.', 'abandoned-contact-form-7' ); 
 		}
 
-		$cf7af_mail_notify_option['cf7af_notification_time'] = isset( $_POST['cf7af_notification_time'] ) ? sanitize_text_field( wp_unslash( $_POST['cf7af_notification_time'] ) ) : 'cf7af_daily';
-
-		wp_schedule_event( time(), $cf7af_mail_notify_option['cf7af_notification_time'] , 'cf7af_send_notify_event' );
-
 		$cf7af_mail_notify_option['cf7af_email_body'] = isset( $_POST['cf7af_email_body'] ) ? wp_kses_post( wp_unslash( $_POST['cf7af_email_body'] ) ) : '';
 		$cf7af_mail_notify_option['cf7af_subject'] = isset( $_POST['cf7af_subject'] ) ? sanitize_text_field( wp_unslash( $_POST['cf7af_subject'] ) ) : '';
 

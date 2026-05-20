@@ -93,23 +93,17 @@
 			} ).pointer('open');
 		});
 
-		jQuery( '#cf7af-from-email-pointer' ).on( 'hover click', function() {
-			jQuery( 'body .wp-pointer-buttons .close' ).trigger( 'click' );
-			jQuery( '#cf7af-from-email-pointer' ).pointer({
-				pointerClass: 'wp-pointer cf7af-pointer',
-				content: translate_string_cf7af.cf7af_from_email,
-				position: 'left center',
-			} ).pointer('open');
-		});
+		var $cf7afFieldCheckboxes = jQuery( '#cf7af-abandoned-specific-fields .cf7af-field-picker__checkbox' );
 
-		jQuery( '#cf7af-from-name-pointer' ).on( 'hover click', function() {
-			jQuery( 'body .wp-pointer-buttons .close' ).trigger( 'click' );
-			jQuery( '#cf7af-from-name-pointer' ).pointer({
-				pointerClass: 'wp-pointer cf7af-pointer',
-				content: translate_string_cf7af.cf7af_from_name,
-				position: 'left center',
-			} ).pointer('open');
-		});
+		jQuery( '#cf7af-select-all-fields' ).on( 'click', function( e ) {
+			e.preventDefault();
+			$cf7afFieldCheckboxes.prop( 'checked', true );
+		} );
+
+		jQuery( '#cf7af-clear-all-fields' ).on( 'click', function( e ) {
+			e.preventDefault();
+			$cf7afFieldCheckboxes.prop( 'checked', false );
+		} );
 
 	});
 

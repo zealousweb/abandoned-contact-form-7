@@ -82,3 +82,104 @@
 .tooltip-table .form-table th {
 	width: auto !important;
 }
+
+/* CF7 editor: email dropdown */
+.cf7af-settings .cf7af-select {
+	min-width: 280px;
+	max-width: 100%;
+}
+
+/* CF7 editor: field picker (replaces native multi-select) */
+.cf7af-field-picker {
+	max-width: 420px;
+}
+
+.cf7af-field-picker__intro {
+	margin: 0 0 10px;
+}
+
+.cf7af-field-picker__empty {
+	margin: 0;
+	padding: 12px 14px;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	color: #50575e;
+}
+
+.cf7af-field-picker__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border: 1px solid #8c8f94;
+	border-radius: 4px;
+	background: #fff;
+	max-height: 220px;
+	overflow-y: auto;
+	box-shadow: 0 1px 2px rgba( 0, 0, 0, 0.05 );
+}
+
+.cf7af-field-picker__item {
+	margin: 0;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.cf7af-field-picker__item:last-child {
+	border-bottom: none;
+}
+
+.cf7af-field-picker__label {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 0;
+	padding: 10px 12px;
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+}
+
+.cf7af-field-picker__label:hover,
+.cf7af-field-picker__label:focus-within {
+	background: #f6f7f7;
+}
+
+.cf7af-field-picker__checkbox {
+	margin: 0;
+	flex-shrink: 0;
+}
+
+.cf7af-field-picker__tag {
+	font-family: Consolas, Monaco, monospace;
+	font-size: 13px;
+	font-weight: 600;
+	color: #1d2327;
+}
+
+.cf7af-field-picker__type {
+	margin-left: auto;
+	font-size: 11px;
+	line-height: 1.4;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	color: #646970;
+	background: #f0f0f1;
+	border-radius: 3px;
+	padding: 2px 8px;
+	flex-shrink: 0;
+}
+
+.cf7af-field-picker__label:has( .cf7af-field-picker__checkbox:checked ) {
+	background: #f0f6fc;
+}
+
+.cf7af-field-picker__label:has( .cf7af-field-picker__checkbox:checked ) .cf7af-field-picker__tag {
+	color: #2271b1;
+}
+
+.cf7af-field-picker__actions {
+	margin: 8px 0 0;
+}
+
+.cf7af-field-picker__actions .button-link {
+	font-size: 13px;
+}

@@ -105,8 +105,10 @@ No, you can't Abandon the data of the file type input field.
 * Improved security and coding standards compliance for WordPress.org.
 * Fixed abandoned users list filter by contact form.
 * Fixed saving "Enable Abandoned" when the checkbox is unchecked.
-* Fixed SMTP settings saving for from name and host.
-* Added nonce verification for CSV export in admin.
+* Fixed display of extra form field data on abandoned entry edit screen.
+* Improved Fields to Track UI in CF7 abandoned settings (checkbox picker).
+* Added proper nonce verification for admin list filter, CSV export, send mail, CF7 settings save, and recovery links.
+* Removed unused subscription, licence, SMTP, and library code not loaded in the free plugin.
 
 = 2.2 =
 * Tested with the latest version of WordPress (6.9).
