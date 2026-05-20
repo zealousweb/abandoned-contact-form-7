@@ -5,13 +5,12 @@ Tags: abandoned, contact form 7, export, email, wpvip
 Requires at least: 3.5
 Donate link: http://www.zealousweb.com/payment/
 Tested up to:  6.9
-Stable tag: 2.2
+Stable tag: 2.3
 Requires PHP: 5.6
 CF7 requires at least: 3.0
 CF7 tested up to: 6.1.4
-License: GPLv3 or later License
-Version: 2.2
-License URI: http://www.gnu.org/licenses/gpl-3.0.html
+License: GPL-3.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 Abandoned Contact Form 7 provides an ability to track the data from Contact Form 7 even if the user does not submit the form.
 
@@ -101,6 +100,13 @@ No, you can't Abandon the data of the file type input field.
 4. Select specific field to include in tracking data 
 
 == Changelog ==
+
+= 2.3 =
+* Improved security and coding standards compliance for WordPress.org.
+* Fixed abandoned users list filter by contact form.
+* Fixed saving "Enable Abandoned" when the checkbox is unchecked.
+* Fixed SMTP settings saving for from name and host.
+* Added nonce verification for CSV export in admin.
 
 = 2.2 =
 * Tested with the latest version of WordPress (6.9).

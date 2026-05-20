@@ -1,52 +1,56 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 	wp_enqueue_style( CF7AF_PREFIX . '_admin_css' );
 	wp_enqueue_script( 'wp-pointer' );
 	wp_enqueue_style( 'wp-pointer' );
 
-	$message = $custom_error = ''; 
+	$cf7af_message = $cf7af_custom_error = '';
 
 	$cf7af_mail_notify_option = get_option( 'cf7af_mail_notify_option' );
 
 	if ( isset( $_POST['save_notify'] ) ) {
 		// check nounce
 		if ( ! check_admin_referer( plugin_basename( __FILE__ ), '_notify_nonce_name' ) ) {
-			$custom_error .= ' ' . __( 'Nonce check failed.', 'cf7-abandoned-form' ); 
+			$cf7af_custom_error .= ' ' . __( 'Nonce check failed.', 'abandoned-contact-form-7' ); 
 		}
 
-		$cf7af_mail_notify_option['cf7af_notification_time'] = isset( $_POST['cf7af_notification_time'] ) ? sanitize_text_field($_POST['cf7af_notification_time']) : 'cf7af_daily';
+		$cf7af_mail_notify_option['cf7af_notification_time'] = isset( $_POST['cf7af_notification_time'] ) ? sanitize_text_field( wp_unslash( $_POST['cf7af_notification_time'] ) ) : 'cf7af_daily';
 
 		wp_schedule_event( time(), $cf7af_mail_notify_option['cf7af_notification_time'] , 'cf7af_send_notify_event' );
 
-		$cf7af_mail_notify_option['cf7af_email_body'] = isset( $_POST['cf7af_email_body'] ) ?   $_POST['cf7af_email_body'] : '';
-		$cf7af_mail_notify_option['cf7af_subject'] = isset( $_POST['cf7af_subject'] ) ?  sanitize_text_field( $_POST['cf7af_subject'] ) : '';
+		$cf7af_mail_notify_option['cf7af_email_body'] = isset( $_POST['cf7af_email_body'] ) ? wp_kses_post( wp_unslash( $_POST['cf7af_email_body'] ) ) : '';
+		$cf7af_mail_notify_option['cf7af_subject'] = isset( $_POST['cf7af_subject'] ) ? sanitize_text_field( wp_unslash( $_POST['cf7af_subject'] ) ) : '';
 
 		/* Update settings in the database */
-		if ( empty( $custom_error ) ) {
+		if ( empty( $cf7af_custom_error ) ) {
 			update_option( 'cf7af_mail_notify_option', $cf7af_mail_notify_option );
-			$message .= __( 'Settings saved.', 'cf7-abandoned-form' );
+			$cf7af_message .= __( 'Settings saved.', 'abandoned-contact-form-7' );
 		} else {
-			$custom_error .= ' '. __( 'Settings are not saved.', 'cf7-abandoned-form' ); 
+			$cf7af_custom_error .= ' '. __( 'Settings are not saved.', 'abandoned-contact-form-7' ); 
 		}
 	}
 	?>
 
 	<div class="wrap">
-		<h2><?php _e( 'Mail Notification Settings', 'cf7-abandoned-form' ); ?></h2>
+		<h2><?php esc_html_e( 'Mail Notification Settings', 'abandoned-contact-form-7' ); ?></h2>
 		<p>
-			<?php _e( 'Use {email} to insert the email into the mail body.', 'cf7-abandoned-form' ); ?><br>
-			<?php _e( 'Use {contact_form} to insert the form name into the mail body.', 'cf7-abandoned-form' ); ?><br>
-			<?php _e( 'Use {link} to insert the page contact link into the mail body.', 'cf7-abandoned-form' ); ?>
+			<?php esc_html_e( 'Use {email} to insert the email into the mail body.', 'abandoned-contact-form-7' ); ?><br>
+			<?php esc_html_e( 'Use {contact_form} to insert the form name into the mail body.', 'abandoned-contact-form-7' ); ?><br>
+			<?php esc_html_e( 'Use {link} to insert the page contact link into the mail body.', 'abandoned-contact-form-7' ); ?>
 		</p>
 
-		<?php if( !empty( $message ) ) { ?>
+		<?php if( !empty( $cf7af_message ) ) { ?>
 		<div id="setting-error-settings_updated" class="notice notice-success settings-error is-dismissible">
-		<p><strong><?php echo esc_html( $message ); ?></strong></p>
+		<p><strong><?php echo esc_html( $cf7af_message ); ?></strong></p>
 		</div>
 		<?php } ?>
 
-		<?php if( !empty( $custom_error ) ) { ?>
+		<?php if( !empty( $cf7af_custom_error ) ) { ?>
 		<div id="setting-error-settings_updated" class="notice notice-error settings-error is-dismissible">
-			<p><strong><?php echo esc_html( $custom_error ); ?></strong></p>
+			<p><strong><?php echo esc_html( $cf7af_custom_error ); ?></strong></p>
 		</div>
 		<?php } ?>
 
@@ -58,7 +62,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="cf7af-subject">
-							<?php _e( 'Subject', 'cf7-abandoned-form' ); ?>
+							<?php esc_html_e( 'Subject', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="cf7af-subject-pointer"></span>
 					</th>
@@ -77,7 +81,7 @@
 				<tr valign="top">
 					<th scope="row" valign="top">
 						<label for="cf7af-email-body">
-							<?php _e( 'Email Body', 'cf7-abandoned-form' ); ?>
+							<?php esc_html_e( 'Email Body', 'abandoned-contact-form-7' ); ?>
 						</label>
 						<span class="cf7af-tooltip hide-if-no-js " id="cf7af-email-body-pointer"></span>
 					</th>
@@ -85,7 +89,8 @@
 						<?php
 							$cf7af_mail_notify_option['cf7af_email_body'] = isset( $cf7af_mail_notify_option['cf7af_email_body'] ) ?  stripslashes( $cf7af_mail_notify_option['cf7af_email_body'] ) : '';
 
-							wp_editor( $cf7af_mail_notify_option['cf7af_email_body'], 'cf7af_email_body', $settings = array('textarea_rows'=> '10') );
+							$cf7af_editor_settings = array( 'textarea_rows' => '10' );
+							wp_editor( $cf7af_mail_notify_option['cf7af_email_body'], 'cf7af_email_body', $cf7af_editor_settings );
 						?>
 					</td>
 				</tr>
@@ -98,7 +103,7 @@
 							type="submit"
 							class="button-primary"
 							name="save_notify"
-							value="<?php _e( 'Save', 'cf7-abandoned-form' ); ?>"
+							value="<?php esc_attr_e( 'Save', 'abandoned-contact-form-7' ); ?>"
 						/>
 						<?php wp_nonce_field( plugin_basename( __FILE__ ), '_notify_nonce_name' ); ?>
 					</td>
@@ -110,14 +115,12 @@
 
 <?php
 	// Localize the script with new data
-	$translation_array = array(
-		'cf7af_subject' => __( '<h3>Subject</h3>' .
-			'<p>Please enter the subject for send mail.</p>', 'cf7-abandoned-form' ),
-		'cf7af_email_body' => __( '<h3>Email Body </h3>' .
-			'<p>It\'s a body content of mail which reflect on sent mail.</p>', 'cf7-abandoned-form' ),
+	$cf7af_translation_array = array(
+		'cf7af_subject' => __( '<h3>Subject</h3><p>Please enter the subject for send mail.</p>', 'abandoned-contact-form-7' ),
+		'cf7af_email_body' => __( '<h3>Email Body </h3><p>It\'s a body content of mail which reflect on sent mail.</p>', 'abandoned-contact-form-7' ),
 	);
 
-	wp_localize_script( CF7AF_PREFIX . '_admin_js', 'translate_string_cf7af', $translation_array );
+	wp_localize_script( CF7AF_PREFIX . '_admin_js', 'translate_string_cf7af', $cf7af_translation_array );
 	wp_enqueue_script( CF7AF_PREFIX . '_admin_js' );
 
 ?>

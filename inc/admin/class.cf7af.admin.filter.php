@@ -74,21 +74,28 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 		 */
 		public function filter__wpcf7af_editor_panels( $panels ) {
 
-			$post_id = ( isset( $_REQUEST[ 'post' ] ) ? sanitize_text_field( $_REQUEST[ 'post' ] ) : '' );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- CF7 admin editor context.
+			$post_id = ( isset( $_REQUEST['post'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['post'] ) ) : '' );
 
 			if ( empty( $post_id ) ) {
 				$wpcf7 = WPCF7_ContactForm::get_current();
-				$post_id = $wpcf7->id();
+				if ( $wpcf7 ) {
+					$post_id = $wpcf7->id();
+				}
 			}
 
-			if ( isset( $_GET['post'] ) && !empty( $post_id ) ) {
-				$cf7 = WPCF7_ContactForm::get_instance( $_GET['post'] ); 
-				$tags = $cf7->collect_mail_tags();
+			$tags = array();
+			$cf7_post_id = ! empty( $post_id ) ? absint( $post_id ) : 0;
+			if ( $cf7_post_id ) {
+				$cf7 = WPCF7_ContactForm::get_instance( $cf7_post_id );
+				if ( $cf7 ) {
+					$tags = $cf7->collect_mail_tags();
+				}
 			}
 			
 			if( !empty( $tags ) ){
 				$panels[ 'Abandoned-add-on' ] = array(
-					'title'    => __( 'Abandoned Form Settings', 'cf7-abandoned-form' ),
+					'title'    => __( 'Abandoned Form Settings', 'abandoned-contact-form-7' ),
 					'callback' => array( $this, 'wpcf7_admin_after_additional_settings' )
 				);
 			}
@@ -190,12 +197,12 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 		 */
 		function filter__manage_cf7af_data_posts_columns( $columns ) {
 			unset( $columns['date'] );
-			$columns['cf7af_email'] = __( 'Abandoned User\'s Email', 'cf7-abandoned-form' );
-			$columns['cf7af_ip_address'] = __( 'IP Address', 'cf7-abandoned-form' );
-			$columns['cf7af_send_mail'] = __( 'Send Mail', 'cf7-abandoned-form' );
-			$columns['number_sentmail'] = __( 'Number of Emails Sent', 'cf7-abandoned-form' );
-			$columns['number_fail_count'] = __( 'Fail Counter', 'cf7-abandoned-form' );
-			$columns['date'] = __( 'Submitted Date', 'cf7-abandoned-form' );
+			$columns['cf7af_email'] = __( 'Abandoned User\'s Email', 'abandoned-contact-form-7' );
+			$columns['cf7af_ip_address'] = __( 'IP Address', 'abandoned-contact-form-7' );
+			$columns['cf7af_send_mail'] = __( 'Send Mail', 'abandoned-contact-form-7' );
+			$columns['number_sentmail'] = __( 'Number of Emails Sent', 'abandoned-contact-form-7' );
+			$columns['number_fail_count'] = __( 'Fail Counter', 'abandoned-contact-form-7' );
+			$columns['date'] = __( 'Submitted Date', 'abandoned-contact-form-7' );
 			return $columns;
 		}
 

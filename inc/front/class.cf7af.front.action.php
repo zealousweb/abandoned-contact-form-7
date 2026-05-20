@@ -47,18 +47,17 @@ if ( !class_exists( 'CF7AF_Front_Action' ) ){
 
 			wp_enqueue_script( CF7AF_PREFIX . '_front_js', CF7AF_URL . 'assets/js/front.min.js', array( 'jquery' ), CF7AF_VERSION.'.1.0', true );
 
-			if( isset($_GET['recover']) ) {
-				if( $_GET['recover']!='' ) {
-					$recover = sanitize_text_field($_GET['recover']);
-				} else {
-					$recover = '';
+			$cf7af_recover = '';
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Public form recovery link.
+			if ( isset( $_GET['recover'] ) ) {
+				if ( '' !== $_GET['recover'] ) {
+					$cf7af_recover = sanitize_text_field( wp_unslash( $_GET['recover'] ) );
 				}
-			} else {
-				$recover = '';
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 			$vars = array(
 				'ajaxurl'  => admin_url( 'admin-ajax.php' ),
-				'recover'  => $recover,
+				'recover'  => $cf7af_recover,
 			);
 			wp_localize_script( CF7AF_PREFIX . '_front_js', 'wpcf7forms_abandoned', $vars );
 		}
@@ -73,10 +72,13 @@ if ( !class_exists( 'CF7AF_Front_Action' ) ){
 		 */
 		function action__fill_contact_form() {
 
-			if( !isset($_GET['recover']) )
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Public form recovery link.
+			if ( ! isset( $_GET['recover'] ) ) {
 				return;
+			}
 
-			$recover_id = $_GET['recover'];
+			$recover_id = absint( wp_unslash( $_GET['recover'] ) );
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 			$post_info = get_post( $recover_id  );
 
 			if( empty($post_info) )
@@ -84,6 +86,9 @@ if ( !class_exists( 'CF7AF_Front_Action' ) ){
 
 			$form_id = get_post_meta( $recover_id, 'cf7af_form_id', true );
 			$contact_form = WPCF7_ContactForm::get_instance( $form_id );
+			if ( ! $contact_form ) {
+				return;
+			}
 			$form_fields = $contact_form->scan_form_tags();
 
 			$cf7af_form_data =  get_post_meta( $recover_id, 'cf7af_form_data', true );
