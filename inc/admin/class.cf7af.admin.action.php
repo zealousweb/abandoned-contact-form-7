@@ -57,6 +57,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 		function action__admin_init() {
 
 			wp_register_style( CF7AF_PREFIX . '_admin_css', CF7AF_URL . 'assets/css/admin.min.css', array(), CF7AF_VERSION );
+			wp_enqueue_style( CF7AF_PREFIX  . '_admin_css' );
 
 			wp_register_script( CF7AF_PREFIX . '_admin_js', CF7AF_URL . 'assets/js/admin.min.js', array( 'jquery-core' ), CF7AF_VERSION, true );
 		}
