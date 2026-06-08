@@ -4,8 +4,8 @@ Contributors: zealopensource
 Tags: abandoned, contact form 7, export, email, wpvip
 Requires at least: 3.5
 Donate link: http://www.zealousweb.com/payment/
-Tested up to:  6.9
-Stable tag: 2.4
+Tested up to:  7.0
+Stable tag: 2.5
 Requires PHP: 5.6
 CF7 requires at least: 3.0
 CF7 tested up to: 6.1.4
@@ -100,6 +100,9 @@ No, you can't Abandon the data of the file type input field.
 4. Select specific field to include in tracking data 
 
 == Changelog ==
+
+= 2.5 =
+* Added a new "Open Support Ticket" button to provide quick and direct access to support
 
 = 2.4 =
 * Security: proper nonce verification for admin filter, export, send mail, CF7 save, and recovery links.
