@@ -451,6 +451,9 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				echo '</select>';
 
 				echo '<button type="submit" name="export_csv_cf7af" class="button action"> '.esc_html__('Export CSV', 'abandoned-contact-form-7' ).'</button>';
+			    echo '<a class="cf7af-primary-btn" href="https://support.zealousweb.com/portal/en/home" target="_blank" rel="noopener noreferrer">'
+				. esc_html__( 'Open Support Ticket', 'cf7-abandoned-form' ) .
+				'</a>';
 			echo '</div>';
 		}
 
