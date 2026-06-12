@@ -27,7 +27,7 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 			add_filter( 'manage_edit-cf7af_data_sortable_columns', array( $this, 'filter__manage_cf7af_data_sortable_columns' ), 10, 3 );
 			add_filter( 'manage_cf7af_data_posts_columns',       array( $this, 'filter__manage_cf7af_data_posts_columns' ), 10, 3 );
 			add_filter( 'wpforms_display_media_button',        	 array( $this, 'filter__wpf_dev_remove_media_button' ) );
-			add_filter( 'pre_get_posts',         				 array( $this, 'filter__pre_get_posts' ) );
+			add_filter( 'posts_search',         				 array( $this, 'filter__posts_search_abandoned_email' ), 10, 2 );
 		}
 
 		/*
@@ -133,46 +133,29 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 		}
 
 		/**
-		 * Filter: pre_get_posts
+		 * Filter: posts_search
 		 *
-		 * - Used to search post meta
+		 * Search abandoned user email via post_excerpt (synced from cf7af_email meta).
 		 *
-		 * @method filter__pre_get_posts
-		 *
-		 * @param  array $query
+		 * @param string   $search Search SQL.
+		 * @param WP_Query $query  Current query.
+		 * @return string
 		 */
-		function filter__pre_get_posts( $query ){ //phpcs:ignore
+		function filter__posts_search_abandoned_email( $search, $query ) {
+			if ( ! is_admin() || CF7AF_POST_TYPE !== $query->get( 'post_type' ) ) {
+				return $search;
+			}
 
-			// Extend search for document post type
-			$post_type = CF7AF_POST_TYPE;
+			$search_term = $query->get( 's' );
+			if ( ! is_string( $search_term ) || '' === $search_term ) {
+				return $search;
+			}
 
-			// Custom fields to search for
-			$custom_fields = array( "cf7af_email" );
+			global $wpdb;
 
-			if( ! is_admin() )
-				return;
+			$like = '%' . $wpdb->esc_like( $search_term ) . '%';
 
-			if ( $query->query['post_type'] != $post_type )
-				return;
-
-			$search_term = $query->query_vars['s'];
-
-			// Set to empty, otherwise it won't find anything
-			$query->query_vars['s'] = '';
-
-			if ( $search_term != '' ) {
-				$meta_query = array( 'relation' => 'OR' );
-
-				foreach( $custom_fields as $custom_field ) {
-					array_push( $meta_query, array(
-						'key' => $custom_field,
-						'value' => $search_term,
-						'compare' => 'LIKE'
-					));
-				}
-
-				$query->set( 'meta_query', $meta_query );
-			};
+			return $wpdb->prepare( " AND ({$wpdb->posts}.post_excerpt LIKE %s) ", $like );
 		}
 
 		/**

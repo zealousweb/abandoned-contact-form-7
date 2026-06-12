@@ -2,11 +2,11 @@
 
 Contributors: zealopensource
 Tags: abandoned, contact form 7, export, email, wpvip
-Requires at least: 3.5
+Requires at least: 6.2
 Donate link: http://www.zealousweb.com/payment/
 Tested up to:  7.0
-Stable tag: 2.5
-Requires PHP: 5.6
+Stable tag: 2.6
+Requires PHP: 7.0
 CF7 requires at least: 3.0
 CF7 tested up to: 6.1.4
 License: GPL-3.0-or-later
@@ -100,6 +100,15 @@ No, you can't Abandon the data of the file type input field.
 4. Select specific field to include in tracking data 
 
 == Changelog ==
+
+= 2.6 =
+* Security: AJAX nonce verification for abandoned form tracking and cleanup on successful submission.
+* Security: improved sanitization of front-end AJAX input, including nested form field data and server IP variables.
+* Performance: optimized admin list filter, export, and email search using post_parent and post_excerpt instead of slow meta queries.
+* Compliance: WordPress Coding Standards and Plugin Check fixes across admin, front-end, and core files.
+* Updated minimum requirements to WordPress 6.2 and PHP 7.0.
+* Removed manual translation loading; relies on WordPress.org automatic translations.
+* CSV export refactored to use the WordPress filesystem API.
 
 = 2.5 =
 * Added a new "Open Support Ticket" button to provide quick and direct access to support

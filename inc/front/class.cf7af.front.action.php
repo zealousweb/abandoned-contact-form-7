@@ -48,8 +48,10 @@ if ( !class_exists( 'CF7AF_Front_Action' ) ){
 			wp_enqueue_script( CF7AF_PREFIX . '_front_js', CF7AF_URL . 'assets/js/front.min.js', array( 'jquery' ), CF7AF_VERSION.'.1.0', true );
 
 			$vars = array(
-				'ajaxurl'  => admin_url( 'admin-ajax.php' ),
-				'recover'  => CF7AF_Helpers::get_recover_id_for_script(),
+				'ajaxurl'      => admin_url( 'admin-ajax.php' ),
+				'recover'      => CF7AF_Helpers::get_recover_id_for_script(),
+				'nonce'        => wp_create_nonce( 'cf7af_abandoned_track' ),
+				'remove_nonce' => wp_create_nonce( 'cf7af_remove_abandoned' ),
 			);
 			wp_localize_script( CF7AF_PREFIX . '_front_js', 'wpcf7forms_abandoned', $vars );
 		}
@@ -74,7 +76,7 @@ if ( !class_exists( 'CF7AF_Front_Action' ) ){
 			if( empty($post_info) )
 				return;
 
-			$form_id = get_post_meta( $recover_id, 'cf7af_form_id', true );
+			$form_id = CF7AF_Helpers::get_abandoned_entry_form_id( $recover_id );
 			$contact_form = WPCF7_ContactForm::get_instance( $form_id );
 			if ( ! $contact_form ) {
 				return;

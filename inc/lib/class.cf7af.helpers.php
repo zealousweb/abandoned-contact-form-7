@@ -224,5 +224,139 @@ if ( ! class_exists( 'CF7AF_Helpers' ) ) {
 			return $recover_id ? (string) $recover_id : '';
 		}
 
+		/**
+		 * Contact Form 7 form ID linked to an abandoned entry.
+		 *
+		 * Uses post_parent (indexed) with post meta fallback for legacy rows.
+		 *
+		 * @param int $abandoned_id Abandoned entry post ID.
+		 * @return int
+		 */
+		public static function get_abandoned_entry_form_id( $abandoned_id ) {
+			$abandoned_id = absint( $abandoned_id );
+			if ( ! $abandoned_id ) {
+				return 0;
+			}
+
+			$form_id = (int) get_post_field( 'post_parent', $abandoned_id );
+			if ( $form_id > 0 ) {
+				return $form_id;
+			}
+
+			return (int) get_post_meta( $abandoned_id, 'cf7af_form_id', true );
+		}
+
+		/**
+		 * Keep post_parent and post_excerpt in sync for query performance.
+		 *
+		 * @param int    $abandoned_id Abandoned entry post ID.
+		 * @param int    $form_id      CF7 contact form post ID.
+		 * @param string $email        Abandoned user email.
+		 */
+		public static function sync_abandoned_entry_post_fields( $abandoned_id, $form_id, $email = '' ) {
+			$abandoned_id = absint( $abandoned_id );
+			$form_id      = absint( $form_id );
+
+			if ( ! $abandoned_id ) {
+				return;
+			}
+
+			$update = array( 'ID' => $abandoned_id );
+
+			if ( $form_id > 0 ) {
+				$update['post_parent'] = $form_id;
+			}
+
+			if ( is_string( $email ) && '' !== $email ) {
+				$update['post_excerpt'] = sanitize_text_field( $email );
+			}
+
+			if ( count( $update ) > 1 ) {
+				wp_update_post( $update );
+			}
+		}
+
+		/**
+		 * One-time migration: copy cf7af_form_id and cf7af_email into post columns.
+		 */
+		public static function maybe_sync_abandoned_post_data() {
+			if ( (int) get_option( 'cf7af_post_data_synced', 0 ) >= 1 ) {
+				return;
+			}
+
+			$post_ids = get_posts(
+				array(
+					'post_type'      => CF7AF_POST_TYPE,
+					'post_status'    => 'any',
+					'posts_per_page' => -1,
+					'fields'         => 'ids',
+				)
+			);
+
+			foreach ( $post_ids as $post_id ) {
+				$form_id = (int) get_post_meta( $post_id, 'cf7af_form_id', true );
+				$email   = get_post_meta( $post_id, 'cf7af_email', true );
+				self::sync_abandoned_entry_post_fields(
+					$post_id,
+					$form_id,
+					is_string( $email ) ? $email : ''
+				);
+			}
+
+			update_option( 'cf7af_post_data_synced', 1, false );
+		}
+
+		/**
+		 * Sanitize abandoned form field data from the front-end AJAX payload.
+		 *
+		 * @param array $forms Serialized form fields (name/value pairs).
+		 * @return array
+		 */
+		public static function sanitize_abandoned_forms( $forms ) {
+			if ( ! is_array( $forms ) ) {
+				return array();
+			}
+
+			$sanitized = array();
+
+			foreach ( $forms as $form_field ) {
+				if ( ! is_array( $form_field ) ) {
+					continue;
+				}
+
+				$name = isset( $form_field['name'] ) ? sanitize_text_field( $form_field['name'] ) : '';
+				if ( '' === $name ) {
+					continue;
+				}
+
+				$sanitized[] = array(
+					'name'  => $name,
+					'value' => isset( $form_field['value'] ) ? sanitize_text_field( $form_field['value'] ) : '',
+				);
+			}
+
+			return $sanitized;
+		}
+
+		/**
+		 * Resolve and sanitize the client IP address from server variables.
+		 *
+		 * @return string
+		 */
+		public static function get_client_ip_address() {
+			$ip = '';
+
+			if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+				$ip = sanitize_text_field( wp_unslash( $_SERVER['HTTP_CLIENT_IP'] ) );
+			} elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) && '' !== $_SERVER['HTTP_X_FORWARDED_FOR'] ) {
+				$forwarded_ips = explode( ',', sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) );
+				$ip            = trim( $forwarded_ips[0] );
+			} elseif ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+				$ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+			}
+
+			return filter_var( $ip, FILTER_VALIDATE_IP ) ? $ip : '';
+		}
+
 	}
 }

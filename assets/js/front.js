@@ -78,6 +78,7 @@
 				'action': 'wpcf7forms_abandoned',
 				'page_url': window.location.href,
 				'recover': wpcf7forms_abandoned.recover,
+				'cf7af_abandoned_nonce': wpcf7forms_abandoned.nonce,
 				forms: json
 			}
 
@@ -194,8 +195,9 @@
 		var recoverId = urlParams.get('recover');
 		var data = {
 			'action': 'remove_abandoned',
-			'cf7_id':  event.detail.contactFormId  ,
+			'cf7_id': event.detail.contactFormId,
 			'recover_id': recoverId,
+			'cf7af_remove_nonce': wpcf7forms_abandoned.remove_nonce,
 		}
 
 		$.ajax({

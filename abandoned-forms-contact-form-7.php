@@ -3,7 +3,9 @@
  * Plugin Name: Abandoned Contact Form 7
  * Plugin URL: https://wordpress.org/plugins/abandoned-contact-form-7/
  * Description: Abandoned Contact Form 7 provides an ability to track the data from Contact Form 7 even if the user does not submit the form.
- * Version: 2.5
+ * Version: 2.6
+ * Requires at least: 6.2
+ * Requires PHP: 7.0
  * Author: ZealousWeb
  * Author URI: https://www.zealousweb.com
  * Developer: The Zealousweb Team
@@ -23,11 +25,11 @@ if ( !defined( 'ABSPATH' ) ) exit;
  * Basic plugin definitions
  *
  * @package Abandoned Contact Form 7
- * @since 2.5
+ * @since 2.6
  */
 
 if ( !defined( 'CF7AF_VERSION' ) ) {
-	define( 'CF7AF_VERSION', '2.5' ); // Version of plugin
+	define( 'CF7AF_VERSION', '2.6' ); // Version of plugin
 }
 
 if ( !defined( 'CF7AF_FILE' ) ) {
