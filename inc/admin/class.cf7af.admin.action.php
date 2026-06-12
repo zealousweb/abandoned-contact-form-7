@@ -32,7 +32,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 			add_action( 'manage_cf7af_data_posts_custom_column', array( $this, 'action__manage_cf7af_data_posts_custom_column' ), 10, 2 );
 			// Save settings of contact form 7 admin
 			add_action( 'wpcf7_save_contact_form', 		array( $this, 'action__wpcf7af_save_contact_form' ), 20, 2 );
-			add_action( 'pre_get_posts',       		    array( $this, 'action__pre_get_posts' ) );
+			add_filter( 'posts_clauses',                array( $this, 'filter__abandoned_orderby_clauses' ), 10, 2 );
 			add_action( 'admin_menu',    				array( $this, 'action__add_submenu' ) , 99 );
 			add_action( 'restrict_manage_posts',		array( $this, 'action__cf7af_restrict_manage_posts' ) );
 			add_action( 'parse_query',					array( $this, 'action__cf7af_parse_query' ) );
@@ -101,26 +101,13 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 					return;
 				}
 
-				$meta_query_args = array();
-				if( $form_id && $form_id!='all' ) {
-					$meta_query_args = array(
-						'relation' => 'OR', // Optional, defaults to "AND"
-						array(
-							'key'     => 'cf7af_form_id',
-							'value'   => $form_id,
-							'compare' => '='
-						)
-					);
-				}
-
 				/* Get Abandoned Forms Data for Particular Form */
 				$args = array(
-					'post_type' => CF7AF_POST_TYPE,
+					'post_type'      => CF7AF_POST_TYPE,
 					'posts_per_page' => 10,
-					'order' => 'ASC',
-					'meta_query' => $meta_query_args, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required for per-form export.
-					'post_status' => array('publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash'),
-
+					'order'          => 'ASC',
+					'post_parent'    => absint( $form_id ),
+					'post_status'    => array( 'publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash' ),
 				);
 				$exported_data = get_posts( $args );
 
@@ -204,26 +191,46 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 					$form_title
 				);
 
-				ob_start();
+				$csv_content = chr( 0xEF ) . chr( 0xBB ) . chr( 0xBF );
+				$csv_content .= $this->format_csv_row( $header_title );
+				$csv_content .= $this->format_csv_row( array_values( $header_row ) );
+				foreach ( $data_rows as $data_row ) {
+					$csv_content .= $this->format_csv_row( array_values( $data_row ) );
+				}
 
-				$fh = @fopen( 'php://output', 'w' );
-				fprintf( $fh, chr(0xEF) . chr(0xBB) . chr(0xBF) );
+				if ( ! function_exists( 'WP_Filesystem' ) ) {
+					require_once ABSPATH . 'wp-admin/includes/file.php';
+				}
+
+				if ( ! WP_Filesystem() ) {
+					wp_die( esc_html__( 'Could not initialize filesystem.', 'abandoned-contact-form-7' ) );
+				}
+
+				global $wp_filesystem;
+
+				$temp_file = wp_tempnam( $filename );
+				if ( ! $temp_file || ! $wp_filesystem->put_contents( $temp_file, $csv_content ) ) {
+					wp_die( esc_html__( 'Could not write export file.', 'abandoned-contact-form-7' ) );
+				}
+
+				ob_start();
 				header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
 				header( 'Content-Description: File Transfer' );
 				header( 'Content-type: text/csv' );
-				header( "Content-Disposition: attachment; filename={$filename}" );
+				header( 'Content-Disposition: attachment; filename=' . sanitize_file_name( $filename ) );
 				header( 'Expires: 0' );
 				header( 'Pragma: public' );
-				fputcsv( $fh, $header_title );
-				fputcsv( $fh, $header_row );
-				foreach ( $data_rows as $data_row ) {
-					fputcsv( $fh, $data_row );
-				}
-				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- php://output stream for CSV download.
-				fclose( $fh );
+				ob_end_clean();
 
-			ob_end_flush();
-			die();
+				$export_body = $wp_filesystem->get_contents( $temp_file );
+				$wp_filesystem->delete( $temp_file, false, 'f' );
+
+				if ( false === $export_body ) {
+					wp_die( esc_html__( 'Could not read export file.', 'abandoned-contact-form-7' ) );
+				}
+
+				$this->output_csv_download( $export_body );
+				die();
 		}
 
 		/**
@@ -251,7 +258,13 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				return;
 			}
 
-			if ( ! CF7AF_Helpers::verify_wpcf7_save_nonce( $post_id ) ) {
+			if (
+				! isset( $_POST['_wpnonce'] )
+				|| ! wp_verify_nonce(
+					sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ),
+					'wpcf7-save-contact-form_' . $post_id
+				)
+			) {
 				return;
 			}
 
@@ -264,14 +277,14 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				foreach ( $form_fields as $key ) {
 					if ( CF7AF_META_PREFIX . 'enable_abandoned' === $key ) {
 						// Unchecked checkboxes are omitted from the request; clear meta when off.
-						$keyval = isset( $_REQUEST[ $key ] ) ? '1' : '';
+						$keyval = isset( $_POST[ $key ] ) ? '1' : '';
 						update_post_meta( $post_id, $key, $keyval );
 						continue;
 					}
-					if ( ! isset( $_REQUEST[ $key ] ) ) {
+					if ( ! isset( $_POST[ $key ] ) ) {
 						continue;
 					}
-					$keyval = sanitize_text_field( wp_unslash( $_REQUEST[ $key ] ) );
+					$keyval = sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
 					update_post_meta( $post_id, $key, $keyval );
 				}
 			}
@@ -281,10 +294,10 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 			$abandoned_specific_field_key = CF7AF_META_PREFIX . 'abandoned_specific_field';
 			$old_cf7af_abandoned_specific_field = get_post_meta( $post_id, $abandoned_specific_field_key );
 			$new_cf7af_abandoned_specific_field = array();
-			if ( isset( $_REQUEST[ $abandoned_specific_field_key ] ) && is_array( $_REQUEST[ $abandoned_specific_field_key ] ) ) {
+			if ( isset( $_POST[ $abandoned_specific_field_key ] ) && is_array( $_POST[ $abandoned_specific_field_key ] ) ) {
 				$new_cf7af_abandoned_specific_field = array_map(
 					'sanitize_text_field',
-					wp_unslash( $_REQUEST[ $abandoned_specific_field_key ] )
+					wp_unslash( $_POST[ $abandoned_specific_field_key ] )
 				);
 			}
 
@@ -374,36 +387,45 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 		}
 
 		/**
-		 * Action: pre_get_posts
+		 * Filter: posts_clauses
 		 *
-		 * - Used to perform order by into CPT List.
+		 * Order abandoned list columns without meta_key query vars.
 		 *
-		 * @method action__pre_get_posts
-		 *
-		 * @param  object $query WP_Query
+		 * @param array    $clauses Query clauses.
+		 * @param WP_Query $query   Current query.
+		 * @return array
 		 */
-		function action__pre_get_posts( $query ) {
-
+		function filter__abandoned_orderby_clauses( $clauses, $query ) {
 			if (
 				! is_admin()
-				|| !in_array ( $query->get( 'post_type' ), array( CF7AF_POST_TYPE ) )
-			)
-				return;
+				|| CF7AF_POST_TYPE !== $query->get( 'post_type' )
+			) {
+				return $clauses;
+			}
 
 			$orderby = $query->get( 'orderby' );
+			$numeric = array( 'number_sentmail', 'number_fail_count' );
 
-			if ( 'number_sentmail' == $orderby ) {
-				$query->set( 'meta_key', 'number_sentmail' );
-				$query->set( 'orderby', 'meta_value_num' );
+			if ( ! in_array( $orderby, array_merge( $numeric, array( 'cf7af_email' ) ), true ) ) {
+				return $clauses;
 			}
-			if ( 'cf7af_email' == $orderby ) {
-				$query->set( 'meta_key', 'cf7af_email' );
-				$query->set( 'orderby', 'meta_value' );
+
+			global $wpdb;
+
+			$order = 'DESC' === strtoupper( $query->get( 'order' ) ) ? 'DESC' : 'ASC';
+
+			$clauses['join'] .= $wpdb->prepare(
+				" LEFT JOIN {$wpdb->postmeta} AS cf7af_orderby_meta ON ({$wpdb->posts}.ID = cf7af_orderby_meta.post_id AND cf7af_orderby_meta.meta_key = %s) ",
+				$orderby
+			);
+
+			if ( in_array( $orderby, $numeric, true ) ) {
+				$clauses['orderby'] = "CAST(cf7af_orderby_meta.meta_value AS UNSIGNED) {$order}";
+			} else {
+				$clauses['orderby'] = "cf7af_orderby_meta.meta_value {$order}";
 			}
-			if ( 'number_fail_count' == $orderby ) {
-				$query->set( 'meta_key', 'number_fail_count' );
-				$query->set( 'orderby', 'meta_value' );
-			}
+
+			return $clauses;
 		}
 
 		/**
@@ -453,7 +475,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 
 				echo '<button type="submit" name="export_csv_cf7af" class="button action"> '.esc_html__('Export CSV', 'abandoned-contact-form-7' ).'</button>';
 			    echo '<a class="cf7af-primary-btn" href="https://support.zealousweb.com/portal/en/home" target="_blank" rel="noopener noreferrer">'
-				. esc_html__( 'Open Support Ticket', 'cf7-abandoned-form' ) .
+				. esc_html__( 'Open Support Ticket', 'abandoned-contact-form-7' ) .
 				'</a>';
 			echo '</div>';
 		}
@@ -486,9 +508,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 				return;
 			}
 
-			$query->query_vars['meta_key']     = 'cf7af_form_id'; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for per-form list filter.
-			$query->query_vars['meta_value']   = $form_id; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Required for per-form list filter.
-			$query->query_vars['meta_compare'] = '=';
+			$query->set( 'post_parent', absint( $form_id ) );
 		}
 
 		/**
@@ -584,7 +604,7 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
         	update_option('cf7af_total', $total_arr);
 			wp_reset_postdata();
 			$cf7af_entry_index = array_search( $post->ID, $total_arr, true );
-			$cf7af_form_id = get_post_meta( $post->ID, 'cf7af_form_id', true );
+			$cf7af_form_id = CF7AF_Helpers::get_abandoned_entry_form_id( $post->ID );
 			$cf7af_email = get_post_meta( $post->ID, 'cf7af_email', true );
 			$cf7af_ip_address = get_post_meta( $post->ID, 'cf7af_ip_address', true );
 			$cf7af_form_data = get_post_meta( $post->ID, 'cf7af_form_data', true );
@@ -689,6 +709,43 @@ if ( !class_exists( 'CF7AF_Admin_Action' ) ) {
 
 			require_once( CF7AF_DIR . '/inc/admin/template/' . CF7AF_PREFIX . '.send.mail.template.php' );
 
+		}
+
+		/**
+		 * Output a CSV file download body.
+		 *
+		 * HTML escaping would corrupt the attachment; only invalid UTF-8 is stripped.
+		 *
+		 * @param string $export_body CSV file contents.
+		 */
+		private function output_csv_download( $export_body ) {
+			if ( ! is_string( $export_body ) || '' === $export_body ) {
+				return;
+			}
+
+			$export_body = wp_check_invalid_utf8( $export_body, true );
+
+			echo wp_kses( $export_body, array() );
+		}
+
+		/**
+		 * Format a row for CSV export.
+		 *
+		 * @param array $fields Row values.
+		 * @return string
+		 */
+		private function format_csv_row( $fields ) {
+			$escaped = array();
+
+			foreach ( $fields as $field ) {
+				$field = (string) $field;
+				if ( preg_match( '/[",\r\n]/', $field ) ) {
+					$field = '"' . str_replace( '"', '""', $field ) . '"';
+				}
+				$escaped[] = $field;
+			}
+
+			return implode( ',', $escaped ) . "\r\n";
 		}
 		
 	}

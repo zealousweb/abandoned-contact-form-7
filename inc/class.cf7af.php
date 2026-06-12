@@ -57,19 +57,22 @@ if ( !class_exists( 'CF7AF' ) ) {
 		 */
 		function action__remove_abandoned() {
 
-			session_start(); //phpcs:ignore
-			$cf7_id = isset( $_POST['cf7_id'] ) ? sanitize_text_field($_POST['cf7_id']) : ''; //phpcs:ignore
-			$recover_id = isset( $_POST['recover_id'] ) ? sanitize_text_field($_POST['recover_id']) : ''; //phpcs:ignore
+			check_ajax_referer( 'cf7af_remove_abandoned', 'cf7af_remove_nonce' );
 
-			if(!empty($recover_id)){
+			session_start();
+
+			$cf7_id     = isset( $_POST['cf7_id'] ) ? absint( wp_unslash( $_POST['cf7_id'] ) ) : 0;
+			$recover_id = isset( $_POST['recover_id'] ) ? absint( wp_unslash( $_POST['recover_id'] ) ) : 0;
+
+			if ( ! empty( $recover_id ) ) {
 				wp_delete_post( $recover_id, true );
 			}
 
-			if( $cf7_id  && isset( $_SESSION['wp_cf7form_id_'.$cf7_id.''] ) )  {
-				$post_id = sanitize_text_field($_SESSION['wp_cf7form_id_'.$cf7_id.'']); //phpcs:ignore
+			if ( $cf7_id && isset( $_SESSION[ 'wp_cf7form_id_' . $cf7_id ] ) ) {
+				$post_id = absint( $_SESSION[ 'wp_cf7form_id_' . $cf7_id ] );
 				wp_delete_post( $post_id, true );
 
-				unset(  $_SESSION['wp_cf7form_id_'.$cf7_id.''] ); //phpcs:ignore
+				unset( $_SESSION[ 'wp_cf7form_id_' . $cf7_id ] );
 			}
 		}
 
@@ -83,13 +86,25 @@ if ( !class_exists( 'CF7AF' ) ) {
 		 */
 		function action__wpcf7forms_abandoned() {
 
-			session_start(); //phpcs:ignore
+			check_ajax_referer( 'cf7af_abandoned_track', 'cf7af_abandoned_nonce' );
 
-			$cf7af_forms =  isset( $_POST['forms'] ) ? $_POST['forms'] : ''; //phpcs:ignore
-			$cf7af_page_url =  isset( $_POST['page_url'] ) ? sanitize_text_field($_POST['page_url']) : ''; //phpcs:ignore
-			$recover_id =  isset( $_POST['recover'] ) ? sanitize_text_field($_POST['recover']) : ''; //phpcs:ignore
+			session_start();
+
+			$cf7af_forms = array();
+			if ( isset( $_POST['forms'] ) && is_array( $_POST['forms'] ) ) {
+				$cf7af_forms = CF7AF_Helpers::sanitize_abandoned_forms(
+					map_deep( wp_unslash( $_POST['forms'] ), 'sanitize_text_field' )
+				);
+			}
+			$cf7af_page_url = isset( $_POST['page_url'] )
+				? esc_url_raw( wp_unslash( $_POST['page_url'] ) )
+				: '';
+			$recover_id = isset( $_POST['recover'] )
+				? absint( wp_unslash( $_POST['recover'] ) )
+				: 0;
 			$cf7af_enable_abandoned = $cf7af_abandoned_email  = '';
 			$cf7af_abandoned_specific_field=array();
+			$ip_address = CF7AF_Helpers::get_client_ip_address();
 
 			if( $cf7af_forms ) {
 				$cf7af_form_data = array();
@@ -144,49 +159,40 @@ if ( !class_exists( 'CF7AF' ) ) {
 					if( $cf7af_form ['name'] == $cf7af_abandoned_email ) {
 						$abandoned_cf7_data_email = trim( $cf7af_form ['value'] );
 					}
-
-					//whether ip is from share internet
-					if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-						$ip_address = sanitize_text_field( wp_unslash( $_SERVER['HTTP_CLIENT_IP'] ) );
-					}
-					//whether ip is from proxy
-					elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))  { //phpcs:ignore
-						$ip_address = $_SERVER['HTTP_X_FORWARDED_FOR']; //phpcs:ignore
-					}
-					//whether ip is from remote address
-					else {
-						$ip_address = $_SERVER['REMOTE_ADDR']; //phpcs:ignore
-					}
 				}
 
 				if ( ! isset( $_SESSION['wp_cf7af_key'] ) ) {
-					$_SESSION['wp_cf7af_key'] = time(); //phpcs:ignore
+					$_SESSION['wp_cf7af_key'] = time();
 				}
 
 				if( ( $cf7af_enable_abandoned ) &&
 					$cf7af_form_id
 				) {
 
-				$abandoned_post_id = isset( $_SESSION['wp_cf7form_id_'.$cf7af_form_id.''] ) ? sanitize_text_field($_SESSION['wp_cf7form_id_'.$cf7af_form_id.'']) : ''; //phpcs:ignore
-
+				$abandoned_post_id = isset( $_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] )
+					? absint( $_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] )
+					: 0;
 				if( $recover_id ) {
-					$_SESSION['wp_cf7form_id_'.$cf7af_form_id.''] = $recover_id; //phpcs:ignore
+					$_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] = $recover_id;
+					CF7AF_Helpers::sync_abandoned_entry_post_fields( $recover_id, $cf7af_form_id );
 				}
 
 				if( $abandoned_post_id ) {
 					$abandoned_post = get_post_status( $abandoned_post_id );
-					if( $abandoned_post != 'publish' ) unset( $_SESSION['wp_cf7form_id_'.$cf7af_form_id.''] ); //phpcs:ignore
+					if( $abandoned_post != 'publish' ) {
+						unset( $_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] );
+					}
 				}
 
-					if( !isset( $_SESSION['wp_cf7form_id_'.$cf7af_form_id.'']) ) { //phpcs:ignore
-
-						$_SESSION['wp_cf7af_key'] = time(); //phpcs:ignore
-
+					if( ! isset( $_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] ) ) {
+						$_SESSION['wp_cf7af_key'] = time();
 						// Gather post data.
 						$abandoned_post = array(
-							'post_title'    => 'Abandoned Entry',
-							'post_status'   => 'publish',
-							'post_type'		=> CF7AF_POST_TYPE,
+							'post_title'     => 'Abandoned Entry',
+							'post_status'    => 'publish',
+							'post_type'      => CF7AF_POST_TYPE,
+							'post_parent'    => absint( $cf7af_form_id ),
+							'post_excerpt'   => isset( $abandoned_cf7_data_email ) ? sanitize_text_field( $abandoned_cf7_data_email ) : '',
 							'comment_status' => 'closed',
 							'ping_status'    => 'closed',
 						);
@@ -198,12 +204,12 @@ if ( !class_exists( 'CF7AF' ) ) {
 							'ID'           => $post_id,
 							'post_title'   => 'Abandoned Entry #'.$post_id,
 							'post_status'  => 'publish',
-							'post_type'	   => CF7AF_POST_TYPE
+							'post_type'    => CF7AF_POST_TYPE,
+							'post_parent'  => absint( $cf7af_form_id ),
 						);
 
 						// Set Session Dyncmic key for particular form
-						$_SESSION['wp_cf7form_id_'.$cf7af_form_id.''] = $post_id; //phpcs:ignore
-
+						$_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] = $post_id;
 						// Update the post into the database
 						wp_update_post( $update_abandoned_post );
 
@@ -216,13 +222,16 @@ if ( !class_exists( 'CF7AF' ) ) {
 						update_post_meta( $post_id, 'cf7af_page_url', $cf7af_page_url );
 
 					} else {
-						$post_id = sanitize_text_field($_SESSION['wp_cf7form_id_'.$cf7af_form_id.'']); //phpcs:ignore
-
-						if( filter_var( $abandoned_cf7_data_email, FILTER_VALIDATE_EMAIL) ) {
-
+						$post_id = absint( $_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] );
+						if ( filter_var( $abandoned_cf7_data_email, FILTER_VALIDATE_EMAIL ) ) {
 							update_post_meta( $post_id, 'cf7af_email', $abandoned_cf7_data_email );
 						}
 						update_post_meta( $post_id, 'cf7af_form_data', $cf7af_form_data );
+						CF7AF_Helpers::sync_abandoned_entry_post_fields(
+							$post_id,
+							$cf7af_form_id,
+							isset( $abandoned_cf7_data_email ) ? $abandoned_cf7_data_email : ''
+						);
 					}
 				}
 			}
@@ -240,41 +249,9 @@ if ( !class_exists( 'CF7AF' ) ) {
 		*/
 
 		function action__plugins_loaded() {
-			
+
 			add_action( 'init', array( $this, 'action__init' ) );
 			add_action( 'admin_init', array( $this, 'action__check_plugin_state' ) );
-
- 
-			# Action to load custom post type
-
-			global $wp_version;
-
-			# Set filter for plugin's languages directory
-			$CF7AF_lang_dir = dirname( CF7AF_PLUGIN_BASENAME ) . '/languages/';
-			$CF7AF_lang_dir = apply_filters( 'CF7AF_languages_directory', $CF7AF_lang_dir );
-
-			# Traditional WordPress plugin locale filter.
-			$get_locale = get_locale();
-
-			if ( $wp_version >= 4.7 ) {
-				$get_locale = get_user_locale();
-			}
-
-			# Traditional WordPress plugin locale filter
-			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WordPress core filter.
-			$locale = apply_filters( 'plugin_locale', $get_locale, 'abandoned-contact-form-7' );
-			$mofile = sprintf( '%1$s-%2$s.mo', 'abandoned-contact-form-7' , $locale );
-
-			# Setup paths to current locale file
-			$mofile_global = WP_LANG_DIR . '/plugins/' . basename( CF7AF_DIR ) . '/' . $mofile;
-
-			if ( file_exists( $mofile_global ) ) {
-				# Look in global /wp-content/languages/plugin-name folder
-				load_textdomain( 'abandoned-contact-form-7', $mofile_global );
-			} else {
-				# Load the default language files
-				load_plugin_textdomain( 'abandoned-contact-form-7', false, $CF7AF_lang_dir );
-			}
 		}
 
 		/**
@@ -308,8 +285,9 @@ if ( !class_exists( 'CF7AF' ) ) {
 		 */
 		function action__init() {
 
-			flush_rewrite_rules(); //phpcs:ignore
+			CF7AF_Helpers::maybe_sync_abandoned_post_data();
 
+			flush_rewrite_rules();
 			/**
 			 * Post Type: CF7 Abandoned Addon Pro.
 			 */

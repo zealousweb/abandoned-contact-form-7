@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				: '';
 
 	$cf7af_abandoned_from_name = get_bloginfo();
-	$cf7af_form_id = get_post_meta( $cf7af_abandoned_id , 'cf7af_form_id', true );
+	$cf7af_form_id = CF7AF_Helpers::get_abandoned_entry_form_id( $cf7af_abandoned_id );
 	$cf7af_page_url = get_post_meta( $cf7af_abandoned_id , 'cf7af_page_url', true );
 
 	$cf7af_abandoned_from_email_address = get_bloginfo( 'admin_email' );
