@@ -36,13 +36,23 @@ Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data e
 
 We have released the PRO version of this plugin with extra advantageous features added. PRO Version 1.0 Released.
 
+* Custom Webhook URL Support - Send abandoned form data to any external endpoint of your choice for seamless third-party integration.
+* Added New Analytics Dashboard.
+* Add - Admin Email Notification Settings.
+* Compatibility of WordPress VIP.
+* Select your email ID field for Form in the form settings.
+* Enable/Disable Option for multiple forms where you need in Contact Form 7.
+* View the list of entries in the Admin side for abandoned submissions.
 * In the list of Abandoned forms entry in admin side you can view IP addresses and other data which are filled-up by the user unlimited Entries.
 * Facility to export the list of entire abandoned users unlimited Entries.
 * You can schedule a time for sending emails to each abandoned user.
 * You can set the “Status” of the user to send an email so we can manage not to send the same email again to the same user.
-* You can easily manage the number of time emails sent to the user.
+* You can easily manage the number of times emails sent to the user.
 * Also, An option to customize the mail body for Abandoned email unlimited Entries.
 * For schedule mails, we have the option of SMTP settings. Here, you can set SMTP from Plugin, no need to add another plugin for SMTP configuration.
+* Our plugin also supports in Multinetwork site.
+* Here you can select the specific field to include in tracking data.
+* Provision to send an email to a single user who abandoned the form.
 
 <strong>[Get more information of Pro version here](https://store.zealousweb.com/abandoned-contact-form-7-pro)</strong>
 <strong>[Demo for Abandoned Contact Form 7](https://demo.zealousweb.com/wordpress-plugins/abandoned-contact-form-7-pro/)</strong>
@@ -94,10 +104,10 @@ No, you can't Abandon the data of the file type input field.
 
 == Screenshots ==
 
-1. This is show list of all Abandoned users.
-2. This is global option of Edit message body content for Abandoned users email.
-3. This is option of email to sent single user entry on action button.
-4. Select specific field to include in tracking data 
+1. Abandoned Users list in the WordPress admin with email, IP address, and send-mail actions.
+2. Mail Notification Settings for the global abandoned recovery email template.
+3. Send Mail screen for emailing a single abandoned user from the admin list.
+4. Abandoned Form Settings tab in Contact Form 7 — enable tracking, email field, and fields to track.
 
 == Changelog ==
 
