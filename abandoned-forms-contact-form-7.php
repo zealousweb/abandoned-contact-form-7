@@ -3,9 +3,10 @@
  * Plugin Name: Abandoned Contact Form 7
  * Plugin URL: https://wordpress.org/plugins/abandoned-contact-form-7/
  * Description: Abandoned Contact Form 7 provides an ability to track the data from Contact Form 7 even if the user does not submit the form.
- * Version: 2.6
+ * Version: 2.7
  * Requires at least: 6.2
  * Requires PHP: 7.0
+ * Requires Plugins: contact-form-7
  * Author: ZealousWeb
  * Author URI: https://www.zealousweb.com
  * Developer: The Zealousweb Team
@@ -29,7 +30,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
  */
 
 if ( !defined( 'CF7AF_VERSION' ) ) {
-	define( 'CF7AF_VERSION', '2.6' ); // Version of plugin
+	define( 'CF7AF_VERSION', '2.7' ); // Version of plugin
 }
 
 if ( !defined( 'CF7AF_FILE' ) ) {
@@ -57,7 +58,27 @@ if ( !defined( 'CF7AF_PREFIX' ) ) {
 }
 
 if( !defined( 'CF7AF_POST_TYPE' ) ) {
-	define( 'CF7AF_POST_TYPE', 'cf7af_data' ); // Plugin registered post type name
+	define( 'CF7AF_POST_TYPE', 'cf7af_data' );
+}
+
+if ( ! defined( 'CF7AF_ADMIN_STYLE_HANDLE' ) ) {
+	define( 'CF7AF_ADMIN_STYLE_HANDLE', 'cf7af-admin-style' );
+}
+
+if ( ! defined( 'CF7AF_ADMIN_SCRIPT_HANDLE' ) ) {
+	define( 'CF7AF_ADMIN_SCRIPT_HANDLE', 'cf7af-admin' );
+}
+
+if ( ! defined( 'CF7AF_FRONT_SCRIPT_HANDLE' ) ) {
+	define( 'CF7AF_FRONT_SCRIPT_HANDLE', 'cf7af-front' );
+}
+
+if ( ! defined( 'CF7AF_OPTION_MAIL_NOTIFY' ) ) {
+	define( 'CF7AF_OPTION_MAIL_NOTIFY', 'cf7af_mail_notify_option' );
+}
+
+if ( ! defined( 'CF7AF_OPTION_POST_DATA_SYNCED' ) ) {
+	define( 'CF7AF_OPTION_POST_DATA_SYNCED', 'cf7af_post_data_synced' );
 }
 
 /**

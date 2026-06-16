@@ -22,7 +22,6 @@ if ( !class_exists( 'CF7AF_Front_Action' ) ){
 		function __construct()  {
 
 			add_action( 'wp_enqueue_scripts', array( $this, 'action__wp_enqueue_scripts' ) );
-			add_action( 'wp_footer',	array( $this, 'action__fill_contact_form' ) );
 		}
 
 		/*
@@ -45,103 +44,76 @@ if ( !class_exists( 'CF7AF_Front_Action' ) ){
 		 */
 		function action__wp_enqueue_scripts() {
 
-			wp_enqueue_script( CF7AF_PREFIX . '_front_js', CF7AF_URL . 'assets/js/front.min.js', array( 'jquery' ), CF7AF_VERSION.'.1.0', true );
+			wp_enqueue_script( CF7AF_FRONT_SCRIPT_HANDLE, CF7AF_URL . 'assets/js/front.min.js', array( 'jquery' ), CF7AF_VERSION . '.1.0', true );
 
-			$vars = array(
-				'ajaxurl'      => admin_url( 'admin-ajax.php' ),
-				'recover'      => CF7AF_Helpers::get_recover_id_for_script(),
-				'nonce'        => wp_create_nonce( 'cf7af_abandoned_track' ),
-				'remove_nonce' => wp_create_nonce( 'cf7af_remove_abandoned' ),
+			$cf7af_recover_id = CF7AF_Helpers::get_recover_id_from_request();
+
+			$cf7af_vars = array(
+				'ajaxurl'             => admin_url( 'admin-ajax.php' ),
+				'cf7af_recover'       => $cf7af_recover_id ? (string) $cf7af_recover_id : '',
+				'cf7af_recover_token' => $cf7af_recover_id ? CF7AF_Helpers::get_recover_token_from_request() : '',
+				'cf7af_nonce'         => wp_create_nonce( 'cf7af_abandoned_track' ),
+				'cf7af_remove_nonce'  => wp_create_nonce( 'cf7af_remove_abandoned' ),
+				'cf7af_fill_fields'   => $cf7af_recover_id ? $this->get_recover_fill_fields( $cf7af_recover_id ) : array(),
 			);
-			wp_localize_script( CF7AF_PREFIX . '_front_js', 'wpcf7forms_abandoned', $vars );
+			wp_localize_script( CF7AF_FRONT_SCRIPT_HANDLE, 'cf7af_abandoned', $cf7af_vars );
 		}
 
 		/**
-		 * Action: wp_footer
+		 * Build field data for recovering abandoned form values on the front end.
 		 *
-		 * - To fill autopopulate data
-		 *
-		 @ method action__fill_contact_form
-		 *
+		 * @param int $recover_id Abandoned entry post ID.
+		 * @return array
 		 */
-		function action__fill_contact_form() {
-
-			$recover_id = CF7AF_Helpers::get_recover_id_from_request();
-			if ( ! $recover_id ) {
-				return;
+		private function get_recover_fill_fields( $recover_id ) {
+			$post_info = get_post( $recover_id );
+			if ( empty( $post_info ) ) {
+				return array();
 			}
-
-			$post_info = get_post( $recover_id  );
-
-			if( empty($post_info) )
-				return;
 
 			$form_id = CF7AF_Helpers::get_abandoned_entry_form_id( $recover_id );
 			$contact_form = WPCF7_ContactForm::get_instance( $form_id );
 			if ( ! $contact_form ) {
-				return;
+				return array();
 			}
-			$form_fields = $contact_form->scan_form_tags();
 
-			$cf7af_form_data =  get_post_meta( $recover_id, 'cf7af_form_data', true );
+			$form_fields     = $contact_form->scan_form_tags();
+			$cf7af_form_data = get_post_meta( $recover_id, 'cf7af_form_data', true );
+			if ( ! is_array( $cf7af_form_data ) ) {
+				return array();
+			}
+
+			$fill_fields = array();
 
 			foreach ( $form_fields as $form_field ) {
-
-				if(  $form_field->name!= '' && isset( $cf7af_form_data[$form_field->name] ) && $form_field->basetype!= 'file' ) {
-
-					if( $form_field->basetype == 'textarea' ) {
-						echo '<script type="text/javascript"> ';
-						echo 'var textarea = document.querySelector("textarea[name=\''. esc_attr($form_field->name) .'\']");';
-						echo ' textarea.value = "' . esc_attr( $cf7af_form_data[$form_field->name] ) . '"';
-						echo '</script>';
-					} elseif( $form_field->basetype == 'radio' ) {
-						echo '<script type="text/javascript">';					
-						echo 'jQuery("input[name=\'' . esc_js( $form_field->name ) . '\'][value=\'' . esc_js( $cf7af_form_data[ $form_field->name ] ) . '\']").prop("checked", true);';
-						echo '</script>';
-					} elseif( $form_field->basetype == 'select' && in_array( 'multiple', $form_field->options ) ) {
-						echo '<script type="text/javascript">';
-						$form_field_value = $cf7af_form_data[$form_field->name];
-						if( $form_field_value!= '' ) {
-							$form_field_value = explode( ",", $form_field_value);
-							foreach(  $form_field_value AS $field_value ) {
-								echo 'jQuery("select[name=\''. esc_js( $form_field->name ) .'[]\'] option[value=\''. esc_attr( trim( $field_value ) ) .'\']").attr("selected","selected");';
-							}
-						}
-						echo '</script>';
-					} elseif( $form_field->basetype == 'select' ) {
-						echo '<script type="text/javascript">';
-						echo 'jQuery("select[name=' . esc_js( $form_field->name ) . '] option[value=' . esc_js( $cf7af_form_data[$form_field->name] ) . ']").attr("selected","selected");';
-						echo '</script>';
-					} elseif( $form_field->basetype == 'checkbox' ) {
-						$form_field_value = $cf7af_form_data[$form_field->name];
-						if( $form_field_value!= '' ) {
-							$form_field_value = explode( ",", $form_field_value);
-							$loop = 0;
-							foreach( $form_field_value AS $field_value ) {
-								$form_field_value[$loop] = trim( $field_value );
-								$loop++;
-							}
-							echo '<script type="text/javascript">';						
-							echo 'var chk_arr = document.getElementsByName("' . esc_html( $form_field->name ) . '[]");';
-							echo 'var chklength = chk_arr.length;';
-							echo 'var form_field_value = '.json_encode( $form_field_value ).';';
-							echo 'for(k=0;k<chklength;k++)
-								{
-									if ( form_field_value.includes( chk_arr[k].value ) ) {
-										chk_arr[k].checked = true;
-									}
-								}';
-							echo '</script>';
-						}
-					} else {
-						if( $form_field->name && $cf7af_form_data[$form_field->name]!='') {
-							echo '<script type="text/javascript">';
-							echo 'jQuery("input[name='. esc_js( $form_field->name ) .']").val("' . esc_js( $cf7af_form_data[ $form_field->name ] ) .'");';
-							echo '</script>';
-						}
-					}
+				if (
+					'' === $form_field->name
+					|| ! isset( $cf7af_form_data[ $form_field->name ] )
+					|| 'file' === $form_field->basetype
+				) {
+					continue;
 				}
+
+				$field_value = $cf7af_form_data[ $form_field->name ];
+				$field_entry = array(
+					'type'  => $form_field->basetype,
+					'name'  => $form_field->name,
+					'value' => $field_value,
+				);
+
+				if ( 'select' === $form_field->basetype && in_array( 'multiple', $form_field->options, true ) ) {
+					$field_entry['type']  = 'select_multiple';
+					$field_entry['value'] = '' !== $field_value
+						? array_map( 'trim', explode( ',', $field_value ) )
+						: array();
+				} elseif ( 'checkbox' === $form_field->basetype && '' !== $field_value ) {
+					$field_entry['value'] = array_map( 'trim', explode( ',', $field_value ) );
+				}
+
+				$fill_fields[] = $field_entry;
 			}
+
+			return $fill_fields;
 		}
 
 		/*

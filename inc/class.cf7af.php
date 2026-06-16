@@ -35,22 +35,22 @@ if ( !class_exists( 'CF7AF' ) ) {
 
 		function __construct() {
 
-			$this->cf7af_mail_notify_opt = get_option( 'cf7af_mail_notify_option' );
+			$this->cf7af_mail_notify_opt = get_option( CF7AF_OPTION_MAIL_NOTIFY );
 
 			# Register plugin activation hook
 			register_activation_hook( CF7AF_FILE, array( $this, 'action__plugin_activation' ) );
 
 			add_action( 'plugins_loaded', array( $this, 'action__plugins_loaded' ), 1 );
-			add_action( 'wp_ajax_wpcf7forms_abandoned', array( $this, 'action__wpcf7forms_abandoned' ) );
-			add_action( 'wp_ajax_nopriv_wpcf7forms_abandoned', array( $this, 'action__wpcf7forms_abandoned' ) );
-			add_action( 'wp_ajax_remove_abandoned', array( $this, 'action__remove_abandoned' ) );
-			add_action( 'wp_ajax_nopriv_remove_abandoned', array( $this, 'action__remove_abandoned' ) );
+			add_action( 'wp_ajax_cf7af_track_abandoned', array( $this, 'action__cf7af_track_abandoned' ) );
+			add_action( 'wp_ajax_nopriv_cf7af_track_abandoned', array( $this, 'action__cf7af_track_abandoned' ) );
+			add_action( 'wp_ajax_cf7af_remove_abandoned', array( $this, 'action__remove_abandoned' ) );
+			add_action( 'wp_ajax_nopriv_cf7af_remove_abandoned', array( $this, 'action__remove_abandoned' ) );
 
 		}
 
 
 		/**
-		 * Action: wp_ajax_remove_abandoned
+		 * Action: wp_ajax_cf7af_remove_abandoned
 		 *
 		 * Remove post if submitted succesfully
 		 *
@@ -61,30 +61,34 @@ if ( !class_exists( 'CF7AF' ) ) {
 
 			session_start();
 
-			$cf7_id     = isset( $_POST['cf7_id'] ) ? absint( wp_unslash( $_POST['cf7_id'] ) ) : 0;
-			$recover_id = isset( $_POST['recover_id'] ) ? absint( wp_unslash( $_POST['recover_id'] ) ) : 0;
+			$cf7_id        = CF7AF_Helpers::get_cf7_id_from_post();
+			$recover_id    = CF7AF_Helpers::get_recover_id_from_remove_post();
+			$recover_token = isset( $_POST['cf7af_token'] ) ? sanitize_text_field( wp_unslash( $_POST['cf7af_token'] ) ) : '';
 
-			if ( ! empty( $recover_id ) ) {
+			if ( ! empty( $recover_id ) && CF7AF_Helpers::verify_recover_token( $recover_id, $recover_token ) ) {
 				wp_delete_post( $recover_id, true );
 			}
 
-			if ( $cf7_id && isset( $_SESSION[ 'wp_cf7form_id_' . $cf7_id ] ) ) {
-				$post_id = absint( $_SESSION[ 'wp_cf7form_id_' . $cf7_id ] );
-				wp_delete_post( $post_id, true );
-
-				unset( $_SESSION[ 'wp_cf7form_id_' . $cf7_id ] );
+			if ( $cf7_id ) {
+				$post_id = CF7AF_Helpers::get_session_form_id( $cf7_id );
+				if ( $post_id ) {
+					wp_delete_post( $post_id, true );
+				}
+				CF7AF_Helpers::unset_session_form_id( $cf7_id );
 			}
+
+			wp_send_json_success();
 		}
 
 		/**
-		 * Action: wp_ajax_wpcf7forms_abandoned
+		 * Action: wp_ajax_cf7af_track_abandoned
 		 *
 		 * Keep abandoned entry on every change of contact form 7.
 		 *
-		 * @method action__wpcf7forms_abandoned
+		 * @method action__cf7af_track_abandoned
 		 *
 		 */
-		function action__wpcf7forms_abandoned() {
+		function action__cf7af_track_abandoned() {
 
 			check_ajax_referer( 'cf7af_abandoned_track', 'cf7af_abandoned_nonce' );
 
@@ -99,9 +103,14 @@ if ( !class_exists( 'CF7AF' ) ) {
 			$cf7af_page_url = isset( $_POST['page_url'] )
 				? esc_url_raw( wp_unslash( $_POST['page_url'] ) )
 				: '';
-			$recover_id = isset( $_POST['recover'] )
-				? absint( wp_unslash( $_POST['recover'] ) )
-				: 0;
+			$recover_id = CF7AF_Helpers::get_recover_id_from_post();
+			$recover_token = isset( $_POST['cf7af_token'] )
+				? sanitize_text_field( wp_unslash( $_POST['cf7af_token'] ) )
+				: '';
+
+			if ( $recover_id && ! CF7AF_Helpers::verify_recover_token( $recover_id, $recover_token ) ) {
+				$recover_id = 0;
+			}
 			$cf7af_enable_abandoned = $cf7af_abandoned_email  = '';
 			$cf7af_abandoned_specific_field=array();
 			$ip_address = CF7AF_Helpers::get_client_ip_address();
@@ -161,31 +170,27 @@ if ( !class_exists( 'CF7AF' ) ) {
 					}
 				}
 
-				if ( ! isset( $_SESSION['wp_cf7af_key'] ) ) {
-					$_SESSION['wp_cf7af_key'] = time();
-				}
+				CF7AF_Helpers::ensure_session_key();
 
 				if( ( $cf7af_enable_abandoned ) &&
 					$cf7af_form_id
 				) {
 
-				$abandoned_post_id = isset( $_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] )
-					? absint( $_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] )
-					: 0;
+				$abandoned_post_id = CF7AF_Helpers::get_session_form_id( $cf7af_form_id );
 				if( $recover_id ) {
-					$_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] = $recover_id;
+					CF7AF_Helpers::set_session_form_id( $cf7af_form_id, $recover_id );
 					CF7AF_Helpers::sync_abandoned_entry_post_fields( $recover_id, $cf7af_form_id );
 				}
 
 				if( $abandoned_post_id ) {
 					$abandoned_post = get_post_status( $abandoned_post_id );
 					if( $abandoned_post != 'publish' ) {
-						unset( $_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] );
+						CF7AF_Helpers::unset_session_form_id( $cf7af_form_id );
 					}
 				}
 
-					if( ! isset( $_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] ) ) {
-						$_SESSION['wp_cf7af_key'] = time();
+					if( ! CF7AF_Helpers::get_session_form_id( $cf7af_form_id ) ) {
+						CF7AF_Helpers::refresh_session_key();
 						// Gather post data.
 						$abandoned_post = array(
 							'post_title'     => 'Abandoned Entry',
@@ -208,21 +213,19 @@ if ( !class_exists( 'CF7AF' ) ) {
 							'post_parent'  => absint( $cf7af_form_id ),
 						);
 
-						// Set Session Dyncmic key for particular form
-						$_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] = $post_id;
-						// Update the post into the database
+						CF7AF_Helpers::set_session_form_id( $cf7af_form_id, $post_id );
 						wp_update_post( $update_abandoned_post );
 
 						update_post_meta( $post_id, 'cf7af_form_id', $cf7af_form_id );
 						update_post_meta( $post_id, 'cf7af_email', $abandoned_cf7_data_email );
 						update_post_meta( $post_id, 'cf7af_ip_address', $ip_address );
 						update_post_meta( $post_id, 'cf7af_form_data', $cf7af_form_data );
-						update_post_meta( $post_id, 'number_sentmail', 0 );
-						update_post_meta( $post_id, 'number_fail_count', 0 );
+						CF7AF_Helpers::update_abandoned_entry_meta( $post_id, 'number_sentmail', 0 );
+						CF7AF_Helpers::update_abandoned_entry_meta( $post_id, 'number_fail_count', 0 );
 						update_post_meta( $post_id, 'cf7af_page_url', $cf7af_page_url );
 
 					} else {
-						$post_id = absint( $_SESSION[ 'wp_cf7form_id_' . $cf7af_form_id ] );
+						$post_id = CF7AF_Helpers::get_session_form_id( $cf7af_form_id );
 						if ( filter_var( $abandoned_cf7_data_email, FILTER_VALIDATE_EMAIL ) ) {
 							update_post_meta( $post_id, 'cf7af_email', $abandoned_cf7_data_email );
 						}
@@ -235,7 +238,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 					}
 				}
 			}
-			exit;
+			wp_send_json_success();
 		}
 
 		/**
@@ -287,9 +290,8 @@ if ( !class_exists( 'CF7AF' ) ) {
 
 			CF7AF_Helpers::maybe_sync_abandoned_post_data();
 
-			flush_rewrite_rules();
 			/**
-			 * Post Type: CF7 Abandoned Addon Pro.
+			 * Post Type: Abandoned Contact Form 7 entries.
 			 */
 
 			$labels = array(
@@ -359,7 +361,7 @@ if ( !class_exists( 'CF7AF' ) ) {
 				$str .= __( 'Thanks!', 'abandoned-contact-form-7' );
 
 				$cf7af_mail_notify_option['cf7af_email_body'] = $str;
-				update_option( 'cf7af_mail_notify_option', $cf7af_mail_notify_option );
+				update_option( CF7AF_OPTION_MAIL_NOTIFY, $cf7af_mail_notify_option );
 			}
 		}
 

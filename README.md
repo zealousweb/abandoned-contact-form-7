@@ -6,10 +6,10 @@ Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data e
 - Select your email ID field for Form in the form settings.
 - Enable/Disable Option for multiple forms where you need in Contact Form 7.
 - View the list of entries in the Admin side for Abandoned submission.
-- In the list of Abandoned forms entry in admin side you can view IP addresses and other data which are filled-up by the user upto 10 Entries.
+- In the list of Abandoned forms entry in admin side you can view IP addresses and other data which are filled-up by the user.
 - Provision to send an email to a single user that abandoned the form.
-- Facility to export the list of entire abandoned users upto 10 Entries.
-- Also, An option to customize the mail body for Abandoned email upto 10 Entries.
+- Facility to export the list of entire abandoned users to CSV.
+- Also, an option to customize the mail body for Abandoned email.
 - Select specific field to include in tracking data.
 - Compatibility of WordPress VIP.
 
@@ -70,7 +70,7 @@ Contact Form 7 must be installed and active before using this plugin.
 
 ![Abandoned Form Settings in Contact Form 7](resources/img/image-1.png)
 
-3. Go to **Abandoned Users** in the admin menu to view captured entries, filter by form, export CSV (up to 10 entries), and send a manual email from the **Action** button.
+3. Go to **Abandoned Users** in the admin menu to view captured entries, filter by form, export CSV, and send a manual email from the **Action** button.
 
 ![Abandoned Users admin list](resources/img/image-2.png)
 

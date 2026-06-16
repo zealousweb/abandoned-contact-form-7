@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	wp_enqueue_script( 'wp-pointer' );
 	wp_enqueue_style( 'wp-pointer' );
-	wp_enqueue_style( CF7AF_PREFIX . '_admin_css' );
+	wp_enqueue_style( CF7AF_ADMIN_STYLE_HANDLE );
 
 	$cf7af_enable_abandoned          = get_post_meta( $cf7af_custom_id, CF7AF_META_PREFIX . 'enable_abandoned', true );
 	$cf7af_abandoned_email           = get_post_meta( $cf7af_custom_id, CF7AF_META_PREFIX . 'abandoned_email', true );
@@ -159,5 +159,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 		'cf7af_abandoned_specific_field'  => __( '<h3>Fields to Track</h3><p>Select which fields are saved when a user leaves the form without submitting.</p>', 'abandoned-contact-form-7' ),
 	);
 
-	wp_localize_script( CF7AF_PREFIX . '_admin_js', 'translate_string_cf7af', $cf7af_translation_array );
-	wp_enqueue_script( CF7AF_PREFIX . '_admin_js' );
+	wp_localize_script( CF7AF_ADMIN_SCRIPT_HANDLE, 'cf7af_translate_strings', $cf7af_translation_array );
+	wp_enqueue_script( CF7AF_ADMIN_SCRIPT_HANDLE );

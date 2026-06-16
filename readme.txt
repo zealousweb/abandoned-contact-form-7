@@ -5,7 +5,7 @@ Tags: abandoned, contact form 7, export, email, wpvip
 Requires at least: 6.2
 Donate link: http://www.zealousweb.com/payment/
 Tested up to:  7.0
-Stable tag: 2.6
+Stable tag: 2.7
 Requires PHP: 7.0
 CF7 requires at least: 3.0
 CF7 tested up to: 6.1.4
@@ -23,10 +23,10 @@ Abandoned Contact Form 7 plugin provides to track the Contact Form 7 form data e
 * Select your email ID field for Form in the form settings.
 * Enable/Disable Option for multiple forms where you need in Contact Form 7.
 * View the list of entries in the Admin side for Abandoned submission.
-* In the list of Abandoned forms entry in admin side you can view IP addresses and other data which are filled-up by the user upto 10 Entries.
+* In the list of Abandoned forms entry in admin side you can view IP addresses and other data which are filled-up by the user.
 * Provision to send an email to a single user that abandoned the form.
-* Facility to export the list of entire abandoned users upto 10 Entries.
-* Also, An option to customize the mail body for Abandoned email upto 10 Entries.
+* Facility to export the list of entire abandoned users to CSV.
+* Also, an option to customize the mail body for Abandoned email.
 * Select specific field to include in tracking data
 * Compatibility of WordPress VIP. 
 
@@ -110,6 +110,16 @@ No, you can't Abandon the data of the file type input field.
 4. Abandoned Form Settings tab in Contact Form 7 — enable tracking, email field, and fields to track.
 
 == Changelog ==
+
+= 2.7 =
+* Removed artificial limits on CSV export, entry detail display, and send-mail customization.
+* Added Requires Plugins header for Contact Form 7.
+* Prefixed plugin-owned identifiers (AJAX actions, nonces, meta keys, script handles, query args) with `cf7af_`; legacy keys are read with fallback and migrated on save.
+* Front-end recovery form fill now uses wp_localize_script instead of inline script tags.
+* Recovery links use cryptographically strong tokens with hashed storage instead of predictable entry IDs alone.
+* Renamed AJAX actions to cf7af_track_abandoned and cf7af_remove_abandoned; localized script object is cf7af_abandoned.
+* Admin assets now load through admin_enqueue_scripts on plugin screens only.
+* Hardened notification settings and send-mail form saves with capability checks.
 
 = 2.6 =
 * Security: AJAX nonce verification for abandoned form tracking and cleanup on successful submission.

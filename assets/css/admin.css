@@ -1,3 +1,25 @@
+.cf7af-entry-link {
+	text-decoration: none;
+}
+
+/* Abandoned Users list: filter / export toolbar */
+.post-type-cf7af_data .tablenav.top .alignleft.actions #cf7af-form-id {
+	min-width: 160px;
+	max-width: 240px;
+	margin-right: 6px;
+	vertical-align: middle;
+}
+
+.post-type-cf7af_data .tablenav.top .alignleft.actions button[name="cf7af_export_csv"],
+.post-type-cf7af_data .tablenav.top .alignleft.actions .cf7af-support-link {
+	margin-right: 6px;
+	vertical-align: middle;
+}
+
+.post-type-cf7af_data .tablenav.top .alignleft.actions .cf7af-support-link {
+	text-decoration: none;
+}
+
 .cf7af-notification-setting th{
 	width: 230px !important;
 }
@@ -182,4 +204,10 @@
 
 .cf7af-field-picker__actions .button-link {
 	font-size: 13px;
+}
+
+.inside-field td,
+.inside-field th {
+	padding-top: 5px;
+	padding-bottom: 5px;
 }

@@ -3,29 +3,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-	wp_enqueue_style( CF7AF_PREFIX . '_admin_css' );
+	wp_enqueue_style( CF7AF_ADMIN_STYLE_HANDLE );
 	wp_enqueue_script( 'wp-pointer' );
 	wp_enqueue_style( 'wp-pointer' );
 
 	$cf7af_message = $cf7af_custom_error = '';
 
-	$cf7af_mail_notify_option = get_option( 'cf7af_mail_notify_option' );
+	$cf7af_mail_notify_option = get_option( CF7AF_OPTION_MAIL_NOTIFY );
 
-	if ( isset( $_POST['save_notify'] ) ) {
-		// check nounce
-		if ( ! check_admin_referer( plugin_basename( __FILE__ ), '_notify_nonce_name' ) ) {
-			$cf7af_custom_error .= ' ' . __( 'Nonce check failed.', 'abandoned-contact-form-7' ); 
+	if ( isset( $_POST['cf7af_save_notify'] ) || isset( $_POST['save_notify'] ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to access this page.', 'abandoned-contact-form-7' ) );
 		}
 
-		$cf7af_mail_notify_option['cf7af_email_body'] = isset( $_POST['cf7af_email_body'] ) ? wp_kses_post( wp_unslash( $_POST['cf7af_email_body'] ) ) : '';
-		$cf7af_mail_notify_option['cf7af_subject'] = isset( $_POST['cf7af_subject'] ) ? sanitize_text_field( wp_unslash( $_POST['cf7af_subject'] ) ) : '';
-
-		/* Update settings in the database */
-		if ( empty( $cf7af_custom_error ) ) {
-			update_option( 'cf7af_mail_notify_option', $cf7af_mail_notify_option );
-			$cf7af_message .= __( 'Settings saved.', 'abandoned-contact-form-7' );
+		if ( ! check_admin_referer( CF7AF_Helpers::NONCE_NOTIFY, CF7AF_Helpers::NONCE_NOTIFY ) ) {
+			$cf7af_custom_error .= ' ' . __( 'Nonce check failed.', 'abandoned-contact-form-7' );
 		} else {
-			$cf7af_custom_error .= ' '. __( 'Settings are not saved.', 'abandoned-contact-form-7' ); 
+			$cf7af_mail_notify_option['cf7af_email_body'] = wp_kses_post( CF7AF_Helpers::get_post_field_value( 'cf7af_email_body', 'cf7af_email_body' ) );
+			$cf7af_mail_notify_option['cf7af_subject']    = sanitize_text_field( CF7AF_Helpers::get_post_field_value( 'cf7af_subject', 'cf7af_subject' ) );
+
+			update_option( CF7AF_OPTION_MAIL_NOTIFY, $cf7af_mail_notify_option );
+			$cf7af_message .= __( 'Settings saved.', 'abandoned-contact-form-7' );
 		}
 	}
 	?>
@@ -98,10 +96,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<input
 							type="submit"
 							class="button-primary"
-							name="save_notify"
+							name="cf7af_save_notify"
 							value="<?php esc_attr_e( 'Save', 'abandoned-contact-form-7' ); ?>"
 						/>
-						<?php wp_nonce_field( plugin_basename( __FILE__ ), '_notify_nonce_name' ); ?>
+						<?php wp_nonce_field( CF7AF_Helpers::NONCE_NOTIFY, CF7AF_Helpers::NONCE_NOTIFY ); ?>
 					</td>
 				</tr>
 				</tbody>
@@ -116,7 +114,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		'cf7af_email_body' => __( '<h3>Email Body </h3><p>It\'s a body content of mail which reflect on sent mail.</p>', 'abandoned-contact-form-7' ),
 	);
 
-	wp_localize_script( CF7AF_PREFIX . '_admin_js', 'translate_string_cf7af', $cf7af_translation_array );
-	wp_enqueue_script( CF7AF_PREFIX . '_admin_js' );
+	wp_localize_script( CF7AF_ADMIN_SCRIPT_HANDLE, 'cf7af_translate_strings', $cf7af_translation_array );
+	wp_enqueue_script( CF7AF_ADMIN_SCRIPT_HANDLE );
 
 ?>
