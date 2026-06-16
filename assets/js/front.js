@@ -1,4 +1,4 @@
-/* globals wpcf7forms_abandoned */
+/* globals cf7af_abandoned */
 (function($) {
 
 	var data = {},
@@ -74,19 +74,20 @@
 			ZealCF7AFAbandoned.debug( 'Sending' );
 
 			/* Send the form(s) data via ajax */
-			var data = {
-				'action': 'wpcf7forms_abandoned',
+			var cf7af_data = {
+				'action': 'cf7af_track_abandoned',
 				'page_url': window.location.href,
-				'recover': wpcf7forms_abandoned.recover,
-				'cf7af_abandoned_nonce': wpcf7forms_abandoned.nonce,
+				'cf7af_recover': cf7af_abandoned.cf7af_recover,
+				'cf7af_token': cf7af_abandoned.cf7af_recover_token,
+				'cf7af_abandoned_nonce': cf7af_abandoned.cf7af_nonce,
 				forms: json
 			}
 
 			$.ajax({
 			  type: "POST",
 			  dataType: "json",
-			  url: wpcf7forms_abandoned.ajaxurl,
-			  data: data,
+			  url: cf7af_abandoned.ajaxurl,
+			  data: cf7af_data,
 			  success: function(response) {
 			  }
 			});
@@ -133,7 +134,7 @@
 				// Determine click event type
 				if ( el.protocol === 'mailto' ) { // Email
 					type = 'mailto';
-				} else if ( link.indexOf( wpcf7forms_abandoned.home_url ) === -1 ) { // Outbound
+				} else if ( cf7af_abandoned.home_url && link.indexOf( cf7af_abandoned.home_url ) === -1 ) { // Outbound
 					type = 'external';
 				}
 
@@ -172,6 +173,63 @@
 			}
 		},
 		/**
+		 * Populate recovered form field values from localized data.
+		 *
+		 * @since 2.7
+		 */
+		fillRecoverForm: function() {
+			if ( ! cf7af_abandoned.cf7af_fill_fields || ! cf7af_abandoned.cf7af_fill_fields.length ) {
+				return;
+			}
+
+			cf7af_abandoned.cf7af_fill_fields.forEach( function( field ) {
+				var i, chkArr, chkLength;
+
+				switch ( field.type ) {
+					case 'textarea':
+						var textarea = document.querySelector( 'textarea[name="' + field.name + '"]' );
+						if ( textarea ) {
+							textarea.value = field.value;
+						}
+						break;
+
+					case 'radio':
+						jQuery( 'input[name="' + field.name + '"][value="' + field.value + '"]' ).prop( 'checked', true );
+						break;
+
+					case 'select_multiple':
+						if ( field.value && field.value.length ) {
+							field.value.forEach( function( optionValue ) {
+								jQuery( 'select[name="' + field.name + '[]"] option[value="' + optionValue + '"]' ).attr( 'selected', 'selected' );
+							} );
+						}
+						break;
+
+					case 'select':
+						jQuery( 'select[name="' + field.name + '"] option[value="' + field.value + '"]' ).attr( 'selected', 'selected' );
+						break;
+
+					case 'checkbox':
+						if ( field.value && field.value.length ) {
+							chkArr = document.getElementsByName( field.name + '[]' );
+							chkLength = chkArr.length;
+							for ( i = 0; i < chkLength; i++ ) {
+								if ( field.value.includes( chkArr[i].value ) ) {
+									chkArr[i].checked = true;
+								}
+							}
+						}
+						break;
+
+					default:
+						if ( field.name && field.value !== '' ) {
+							jQuery( 'input[name="' + field.name + '"]' ).val( field.value );
+						}
+						break;
+				}
+			} );
+		},
+		/**
 		 * Optional debug messages.
 		 *
 		 * @since 1.x.x
@@ -184,6 +242,7 @@
 	};
 	if( $('.wpcf7-form').length ) {
 		ZealCF7AFAbandoned.init();
+		ZealCF7AFAbandoned.fillRecoverForm();
 	}
 })(jQuery);
 
@@ -191,20 +250,22 @@
 	"use strict";
 
 	document.addEventListener( 'wpcf7mailsent', function( event ) {
-		var urlParams = new URLSearchParams(window.location.search);
-		var recoverId = urlParams.get('recover');
-		var data = {
-			'action': 'remove_abandoned',
-			'cf7_id': event.detail.contactFormId,
-			'recover_id': recoverId,
-			'cf7af_remove_nonce': wpcf7forms_abandoned.remove_nonce,
+		var cf7af_url_params = new URLSearchParams(window.location.search);
+		var cf7af_recover_id = cf7af_url_params.get('cf7af_recover') || cf7af_url_params.get('recover');
+		var cf7af_recover_token = cf7af_url_params.get('cf7af_token');
+		var cf7af_remove_data = {
+			'action': 'cf7af_remove_abandoned',
+			'cf7af_cf7_id': event.detail.contactFormId,
+			'cf7af_recover_id': cf7af_recover_id,
+			'cf7af_token': cf7af_recover_token,
+			'cf7af_remove_nonce': cf7af_abandoned.cf7af_remove_nonce,
 		}
 
 		$.ajax({
 			type: "POST",
 			dataType: "json",
-			url: wpcf7forms_abandoned.ajaxurl,
-			data: data,
+			url: cf7af_abandoned.ajaxurl,
+			data: cf7af_remove_data,
 			success: function(response) {
 			}
 		});

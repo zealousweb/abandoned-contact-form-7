@@ -84,10 +84,10 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 				}
 			}
 			
-			if( !empty( $tags ) ){
-				$panels[ 'Abandoned-add-on' ] = array(
+			if ( ! empty( $tags ) ) {
+				$panels[ CF7AF_Helpers::CF7_EDITOR_PANEL ] = array(
 					'title'    => __( 'Abandoned Form Settings', 'abandoned-contact-form-7' ),
-					'callback' => array( $this, 'wpcf7_admin_after_additional_settings' )
+					'callback' => array( $this, 'wpcf7_admin_after_additional_settings' ),
 				);
 			}
 
@@ -126,9 +126,9 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 		 * @return array
 		 */
 		function filter__manage_cf7af_data_sortable_columns( $columns ) {
-			$columns['number_sentmail'] = 'number_sentmail';
-			$columns['cf7af_email'] = 'cf7af_email';
-			$columns['number_fail_count'] = 'number_fail_count';
+			$columns[ CF7AF_Helpers::COLUMN_NUMBER_SENTMAIL ]   = CF7AF_Helpers::COLUMN_NUMBER_SENTMAIL;
+			$columns['cf7af_email']                             = 'cf7af_email';
+			$columns[ CF7AF_Helpers::COLUMN_NUMBER_FAIL_COUNT ] = CF7AF_Helpers::COLUMN_NUMBER_FAIL_COUNT;
 			return $columns;
 		}
 
@@ -174,8 +174,8 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 			$columns['cf7af_email'] = __( 'Abandoned User\'s Email', 'abandoned-contact-form-7' );
 			$columns['cf7af_ip_address'] = __( 'IP Address', 'abandoned-contact-form-7' );
 			$columns['cf7af_send_mail'] = __( 'Send Mail', 'abandoned-contact-form-7' );
-			$columns['number_sentmail'] = __( 'Number of Emails Sent', 'abandoned-contact-form-7' );
-			$columns['number_fail_count'] = __( 'Fail Counter', 'abandoned-contact-form-7' );
+			$columns[ CF7AF_Helpers::COLUMN_NUMBER_SENTMAIL ]   = __( 'Number of Emails Sent', 'abandoned-contact-form-7' );
+			$columns[ CF7AF_Helpers::COLUMN_NUMBER_FAIL_COUNT ] = __( 'Fail Counter', 'abandoned-contact-form-7' );
 			$columns['date'] = __( 'Submitted Date', 'abandoned-contact-form-7' );
 			return $columns;
 		}
@@ -187,7 +187,7 @@ if ( !class_exists( 'CF7AF_Admin_Filter' ) ) {
 		 */
 		public function wpcf7_admin_after_additional_settings( $cf7 ) {
 
-			wp_enqueue_script( CF7AF_PREFIX . '_admin_js' );
+			wp_enqueue_script( CF7AF_ADMIN_SCRIPT_HANDLE );
 
 			require_once( CF7AF_DIR . '/inc/admin/template/' . CF7AF_PREFIX . '.template.php' );
 
