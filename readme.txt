@@ -120,6 +120,14 @@ No, you can't Abandon the data of the file type input field.
 * Renamed AJAX actions to cf7af_track_abandoned and cf7af_remove_abandoned; localized script object is cf7af_abandoned.
 * Admin assets now load through admin_enqueue_scripts on plugin screens only.
 * Hardened notification settings and send-mail form saves with capability checks.
+* Fixed duplicate “Abandoned Form Settings” tab in the Contact Form 7 editor.
+* Fixed Abandoned Users list toolbar layout (filter, export, and support link spacing).
+* Addressed Plugin Check / PHPCS security warnings in request helper methods.
+
+== Upgrade Notice ==
+
+= 2.7 =
+WordPress.org review update: removes trial limits, adds secure recovery links, prefixes plugin identifiers, and improves admin asset loading. Requires Contact Form 7.
 
 = 2.6 =
 * Security: AJAX nonce verification for abandoned form tracking and cleanup on successful submission.
