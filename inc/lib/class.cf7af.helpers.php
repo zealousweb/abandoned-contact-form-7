@@ -163,7 +163,7 @@ if ( ! class_exists( 'CF7AF_Helpers' ) ) {
 			}
 
 			if ( ! isset( $_SESSION[ self::SESSION_KEY ] ) && isset( $_SESSION[ self::LEGACY_SESSION_KEY ] ) ) {
-				$_SESSION[ self::SESSION_KEY ] = $_SESSION[ self::LEGACY_SESSION_KEY ];
+				$_SESSION[ self::SESSION_KEY ] = absint( $_SESSION[ self::LEGACY_SESSION_KEY ] );
 			}
 
 			if ( ! isset( $_SESSION[ self::SESSION_KEY ] ) ) {
@@ -183,71 +183,84 @@ if ( ! class_exists( 'CF7AF_Helpers' ) ) {
 		}
 
 		/**
+		 * Read a sanitized integer from $_POST (prefixed key, then legacy fallback).
+		 *
+		 * Caller must verify the request nonce before invoking this helper.
+		 *
+		 * @param string $prefixed_key Prefixed POST field name.
+		 * @param string $legacy_key   Legacy POST field name.
+		 * @return int
+		 */
+		private static function get_post_int_value( $prefixed_key, $legacy_key ) {
+			// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce is verified by the calling handler.
+			if ( isset( $_POST[ $prefixed_key ] ) ) {
+				return absint( wp_unslash( $_POST[ $prefixed_key ] ) );
+			}
+
+			if ( '' !== $legacy_key && isset( $_POST[ $legacy_key ] ) ) {
+				return absint( wp_unslash( $_POST[ $legacy_key ] ) );
+			}
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+			return 0;
+		}
+
+		/**
 		 * Recover ID from POST with prefixed and legacy support.
+		 *
+		 * Caller must verify the AJAX nonce before calling this method.
 		 *
 		 * @return int
 		 */
 		public static function get_recover_id_from_post() {
-			if ( isset( $_POST[ self::RECOVER_QUERY_ARG ] ) ) {
-				return absint( wp_unslash( $_POST[ self::RECOVER_QUERY_ARG ] ) );
-			}
-
-			if ( isset( $_POST[ self::LEGACY_RECOVER_QUERY_ARG ] ) ) {
-				return absint( wp_unslash( $_POST[ self::LEGACY_RECOVER_QUERY_ARG ] ) );
-			}
-
-			return 0;
+			return self::get_post_int_value( self::RECOVER_QUERY_ARG, self::LEGACY_RECOVER_QUERY_ARG );
 		}
 
 		/**
 		 * CF7 form ID from remove AJAX POST with prefixed and legacy support.
 		 *
+		 * Caller must verify the AJAX nonce before calling this method.
+		 *
 		 * @return int
 		 */
 		public static function get_cf7_id_from_post() {
-			if ( isset( $_POST['cf7af_cf7_id'] ) ) {
-				return absint( wp_unslash( $_POST['cf7af_cf7_id'] ) );
-			}
-
-			if ( isset( $_POST['cf7_id'] ) ) {
-				return absint( wp_unslash( $_POST['cf7_id'] ) );
-			}
-
-			return 0;
+			return self::get_post_int_value( 'cf7af_cf7_id', 'cf7_id' );
 		}
 
 		/**
 		 * Recover ID from remove AJAX POST with prefixed and legacy support.
 		 *
+		 * Caller must verify the AJAX nonce before calling this method.
+		 *
 		 * @return int
 		 */
 		public static function get_recover_id_from_remove_post() {
-			if ( isset( $_POST['cf7af_recover_id'] ) ) {
-				return absint( wp_unslash( $_POST['cf7af_recover_id'] ) );
-			}
-
-			if ( isset( $_POST['recover_id'] ) ) {
-				return absint( wp_unslash( $_POST['recover_id'] ) );
-			}
-
-			return 0;
+			return self::get_post_int_value( 'cf7af_recover_id', 'recover_id' );
 		}
 
 		/**
 		 * Read a POST value using the prefixed name with legacy fallback.
+		 *
+		 * Caller must verify the form nonce before calling this method.
+		 * The returned value is unslashed; the caller must sanitize for its use case.
 		 *
 		 * @param string $prefixed_key Prefixed POST key.
 		 * @param string $legacy_key   Legacy POST key.
 		 * @return string
 		 */
 		public static function get_post_field_value( $prefixed_key, $legacy_key ) {
+			$prefixed_key = sanitize_key( $prefixed_key );
+			$legacy_key   = sanitize_key( $legacy_key );
+
+			// phpcs:disable WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verified by caller; caller sanitizes the returned value.
 			if ( isset( $_POST[ $prefixed_key ] ) ) {
 				return wp_unslash( $_POST[ $prefixed_key ] );
 			}
 
-			if ( isset( $_POST[ $legacy_key ] ) ) {
+			if ( '' !== $legacy_key && isset( $_POST[ $legacy_key ] ) ) {
 				return wp_unslash( $_POST[ $legacy_key ] );
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			return '';
 		}
@@ -513,14 +526,14 @@ if ( ! class_exists( 'CF7AF_Helpers' ) ) {
 		/**
 		 * Plain recovery token from the query string.
 		 *
+		 * Public recovery links authenticate with cf7af_token instead of a WordPress nonce.
+		 *
 		 * @return string
 		 */
 		private static function get_recover_token_from_query() {
-			if ( ! isset( $_GET[ self::TOKEN_QUERY_ARG ] ) ) {
-				return '';
-			}
+			$token = filter_input( INPUT_GET, self::TOKEN_QUERY_ARG );
 
-			return sanitize_text_field( wp_unslash( $_GET[ self::TOKEN_QUERY_ARG ] ) );
+			return is_string( $token ) ? sanitize_text_field( $token ) : '';
 		}
 
 		/**
