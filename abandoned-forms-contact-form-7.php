@@ -26,7 +26,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
  * Basic plugin definitions
  *
  * @package Abandoned Contact Form 7
- * @since 2.6
+ * @since 2.7
  */
 
 if ( !defined( 'CF7AF_VERSION' ) ) {

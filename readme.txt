@@ -120,6 +120,94 @@ No, you can't Abandon the data of the file type input field.
 * Renamed AJAX actions to cf7af_track_abandoned and cf7af_remove_abandoned; localized script object is cf7af_abandoned.
 * Admin assets now load through admin_enqueue_scripts on plugin screens only.
 * Hardened notification settings and send-mail form saves with capability checks.
+* Fixed duplicate “Abandoned Form Settings” tab in the Contact Form 7 editor.
+* Fixed Abandoned Users list toolbar layout (filter, export, and support link spacing).
+* Addressed Plugin Check / PHPCS security warnings in request helper methods.
+
+= 2.6 =
+* Security: AJAX nonce verification for abandoned form tracking and cleanup on successful submission.
+* Security: improved sanitization of front-end AJAX input, including nested form field data and server IP variables.
+* Performance: optimized admin list filter, export, and email search using post_parent and post_excerpt instead of slow meta queries.
+* Compliance: WordPress Coding Standards and Plugin Check fixes across admin, front-end, and core files.
+* Updated minimum requirements to WordPress 6.2 and PHP 7.0.
+* Removed manual translation loading; relies on WordPress.org automatic translations.
+* CSV export refactored to use the WordPress filesystem API.
+
+= 2.5 =
+* Added a new "Open Support Ticket" button to provide quick and direct access to support
+
+= 2.4 =
+* Security: proper nonce verification for admin filter, export, send mail, CF7 save, and recovery links.
+* Fixed display of tracked form fields on the abandoned entry edit screen.
+* Improved “Fields to Track” UI in Contact Form 7 (checkbox picker with select all / clear all).
+* Fixed saving “Enable Abandoned” when the checkbox is unchecked.
+* Fixed abandoned users list filter by contact form.
+* Removed unused subscription, licence, SMTP, and library code from the free plugin.
+* WordPress.org coding standards and license (GPL-3.0-or-later) compliance updates.
+
+= 2.3 =
+* Improved security and coding standards compliance for WordPress.org.
+* Fixed abandoned users list filter by contact form.
+* Fixed saving "Enable Abandoned" when the checkbox is unchecked.
+* Fixed display of extra form field data on abandoned entry edit screen.
+* Improved Fields to Track UI in CF7 abandoned settings (checkbox picker).
+* Added proper nonce verification for admin list filter, CSV export, send mail, CF7 settings save, and recovery links.
+* Removed unused subscription, licence, SMTP, and library code not loaded in the free plugin.
+
+= 2.2 =
+* Tested with the latest version of WordPress (6.9).
+* Tested with the latest version of Contact Form 7 (6.1.4).
+
+= 2.1 =
+* Minor changes - Doc update
+
+= 2.0 =
+* Minor changes - Doc update
+
+= 1.9 =
+* Minor changes - Doc update
+
+= 1.8 =
+* Minor changes - Hidden
+
+= 1.7 =
+* Improved compatibility with WordPress VIP platform by refactoring code to adhere to VIP coding standards.
+
+= 1.6 =
+* Add - Here you can select specific field to include in tracking data.
+
+= 1.5 =
+* Fixed - Solved Javascript issue
+
+= 1.4 =
+* Test - Checking with Latest wordPress and Contact form 7, Tested and works fine.
+
+= 1.3 =
+* Fix - Fixed Image issue in mail body of notification mail.
+
+= 1.2 =
+* Fix - Fixed issue of Mobile and Ipad tracking.
+
+= 1.1 =
+* Fix - Fixed Email body Content issue.
+
+= 1.0 =
+* Initial Release
+
+== Upgrade Notice ==
+
+= 2.7 =
+* Removed artificial limits on CSV export, entry detail display, and send-mail customization.
+* Added Requires Plugins header for Contact Form 7.
+* Prefixed plugin-owned identifiers (AJAX actions, nonces, meta keys, script handles, query args) with `cf7af_`; legacy keys are read with fallback and migrated on save.
+* Front-end recovery form fill now uses wp_localize_script instead of inline script tags.
+* Recovery links use cryptographically strong tokens with hashed storage instead of predictable entry IDs alone.
+* Renamed AJAX actions to cf7af_track_abandoned and cf7af_remove_abandoned; localized script object is cf7af_abandoned.
+* Admin assets now load through admin_enqueue_scripts on plugin screens only.
+* Hardened notification settings and send-mail form saves with capability checks.
+* Fixed duplicate “Abandoned Form Settings” tab in the Contact Form 7 editor.
+* Fixed Abandoned Users list toolbar layout (filter, export, and support link spacing).
+* Addressed Plugin Check / PHPCS security warnings in request helper methods.
 
 = 2.6 =
 * Security: AJAX nonce verification for abandoned form tracking and cleanup on successful submission.
